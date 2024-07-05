@@ -1,3 +1,4 @@
+import * as keys from './keys';
 export { default as NumberKeyboard } from './NumberKeyboard';
 
 export { default as LetterKeyboard } from './LetterKeyboard';
@@ -11,3 +12,9 @@ export { default as SettingKeyboard } from './SettingKeyboard';
 export { default as WriteKeyboard } from './WriteKeyboard';
 
 export { default as DragBlock } from './DragBlock';
+
+export { default as useVirtualKeyboard } from './VirtualKeyboard';
+export { keys };
+
+// export {* as kyes } from './keys';
+

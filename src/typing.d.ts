@@ -1,6 +1,8 @@
 import { ReactNode } from 'react';
 
 declare namespace VKB {
+  type InputMode = 'zh' | 'en';
+
   /**
    *  number:数字
    *  letter:字母
@@ -26,10 +28,10 @@ declare namespace VKB {
       onChangeInputMode,
     }: {
       themeMode: string;
-      inputMode: string;
+      inputMode: InputMode;
       positionMode: string;
       onClick: (e: VKB.KeyboardAttributeType) => void;
-      onChangeInputMode: (mode: string) => void;
+      onChangeInputMode: (mode: InputMode) => void;
     }) => JSX.Element;
   };
 
@@ -84,10 +86,6 @@ declare namespace VKB {
     '--vkb-key-font-size': string;
     /** tab 高度 */
     '--vkb-keyboard-tab': string;
-    /** tab 项左右 padding */
-    '--vkb-keyboard-padding-inline': string;
-    /** 光标选择的上下 padding */
-    '--vkb-keyboard-padding-block': string;
     /** 内部 svg 大小 */
     '--vkb-keyboard-svg-size': string;
   };
@@ -107,18 +105,6 @@ declare namespace VKB {
     show: boolean;
     /** 当前输入框的值 */
     value?: string;
-    /** 需要操作的input */
-    elInput?: HTMLInputElement;
-    /** 操作时携带附加参数 */
-    options?: Record<string, any>;
-    /** 开始选择时光标起始位置 */
-    // cursorIndex: number;
-    /** 左开始位置 */
-    // cursorStartIndex: number;
-    /** 右结束位置 */
-    // cursorEndIndex: number;
-    /** 光标模式 */
-    // cursorMode: "index" | "select";
     /** 自定义键盘内容 */
     virtualKeyboardTab?: KeyboardTabItem[];
     /** 自定义主题,当使用了主题变量时，主题变量的权重更高 */
@@ -134,7 +120,7 @@ declare namespace VKB {
     /** 设置位置模式 */
     setPositionMode: (mode: string) => void;
     /** 操作时的回调,通过ctx 重写 onChange 实现 */
-    onChange?: (value: string, options?: Record<string, any>) => void;
+    onChange?: (value: string) => void;
     /** 回车 通过 ctx 重写 onEnter 实现*/
     onEnter?: () => void;
   };

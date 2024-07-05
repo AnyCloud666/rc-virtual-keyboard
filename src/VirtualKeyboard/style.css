@@ -1,0 +1,252 @@
+@import url('../var.css');
+
+.virtual-keyboard-var {
+  /** 键盘背景色 */
+  --vkb-background: #f2f5fa;
+  /** 按键字体颜色 */
+  --vkb-key-color: #000;
+  /** 按键背景色 */
+  --vkb-key-background: #ffffff;
+  /** 按键背活动景色 */
+  --vkb-key-active-background: #dce1e7;
+  /** 按键活动字体颜色 */
+  --vkb-key-active-font-color: #1677ff;
+  /** 按键边框颜色 */
+  --vkb-key-border-color: #f0f0f0;
+  /** 按键活动边框颜色 */
+  --vkb-key-active-border-color: #dce1e7;
+  /** 按键边框线宽度 */
+  --vkb-key-border-width: 1px;
+  /** 按键边框颜色 */
+  --vkb-key-shadow-color: #f0f0f0;
+  /** 按键活动 shadow */
+  --vkb-key-active-shadow-color: #dce1e7;
+  /** 按键 shadow 宽度 */
+  --vkb-key-shadow-width: 4px;
+  /** 提示颜色 */
+  --vkb-key-tips-color: #ccc;
+  /** 提示文字大小 */
+  --vkb-key-tips-font-size: 12px;
+  /** 滚动条颜色 */
+  --vkb-key-scroll-bar-color: #ccc;
+  /** 按键间隔 */
+  --vkb-key-gap: 6px;
+  /** 按键圆角 */
+  --vkb-key-borer-radius: 4px;
+  /** 按键文字大小 */
+  --vkb-key-font-size: 14px;
+  /** tab 高度 */
+  --vkb-keyboard-tab: 40px;
+  /** 内部 svg 大小 */
+  --vkb-keyboard-svg-size: 26px
+}
+
+.virtual-keyboard-var-dark {
+  /** 键盘背景色 */
+  --vkb-background: #141414;
+  /** 按键字体颜色 */
+  --vkb-key-color: #fff;
+  /** 按键背景色 */
+  --vkb-key-background: #141414;
+  /** 按键背活动景色 */
+  --vkb-key-active-background: #424242;
+  /** 按键活动字体颜色 */
+  --vkb-key-active-font-color: #1677ff;
+  /** 按键边框颜色 */
+  --vkb-key-border-color: #424242;
+  /** 按键活动边框颜色 */
+  --vkb-key-active-border-color: #424242;
+  /** 按键边框线宽度 */
+  --vkb-key-border-width: 1px;
+  /** 按键边框颜色 */
+  --vkb-key-shadow-color: #424242;
+  /** 按键活动 shadow */
+  --vkb-key-active-shadow-color: #424242;
+  /** 按键 shadow 宽度 */
+  --vkb-key-shadow-width: 4px;
+  /** 提示颜色 */
+  --vkb-key-tips-color: #ccc;
+  /** 提示文字大小 */
+  --vkb-key-tips-font-size: 12px;
+  /** 滚动条颜色 */
+  --vkb-key-scroll-bar-color: #ccc;
+  /** 按键间隔 */
+  --vkb-key-gap: 6px;
+  /** 按键圆角 */
+  --vkb-key-borer-radius: 4px;
+  /** 按键文字大小 */
+  --vkb-key-font-size: 14px;
+  /** tab 高度 */
+  --vkb-keyboard-tab: 40px;
+  /** 内部 svg 大小 */
+  --vkb-keyboard-svg-size: 26px
+}
+
+
+
+.virtual-keyboard {
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  font-size: var(--vkb-key-font-size);
+  color: var(--vkb-key-color);
+
+  background-color: var(--vkb-background);
+  border-radius: var(--vkb-key-borer-radius);
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 0.3s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.virtual-keyboard-temp {
+  position: absolute;
+  top: 0px;
+  display: flex;
+  gap: var(--vkb-key-gap);
+
+  width: calc(100% - var(--vkb-key-gap) * 2);
+  height: var(--vkb-keyboard-tab);
+  padding: var(--vkb-key-gap);
+  background-color: var(--vkb-background);
+}
+
+.virtual-keyboard-pinyin {
+  position: absolute;
+  z-index: 1;
+  top: calc(var(--vkb-keyboard-tab) / -2);
+  left: 0;
+  padding: 0 var(--vkb-key-gap);
+  height: calc(var(--vkb-keyboard-tab) / 2);
+  width: min-content;
+  background-color: var(--vkb-background);
+}
+
+.virtual-keyboard-temp-list {
+  display: flex;
+  gap: var(--vkb-key-gap);
+  width: 80%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.virtual-keyboard-temp-char {
+  display: flex;
+  align-items: center;
+  width: min-content;
+  padding: 0 10px;
+  height: 100%;
+  background-color: var(--vkb-key-background);
+  cursor: pointer;
+  border: var(--vkb-key-border-width) solid transparent;
+  box-sizing: border-box;
+}
+
+
+.virtual-keyboard-temp-right,
+.virtual-keyboard-temp-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: calc(10% - var(--vkb-key-gap));
+  height: 100%;
+
+  color: var(--vkb-key-color);
+  fill: var(--vkb-key-color);
+
+  background-color: var(--vkb-key-background);
+
+  box-sizing: border-box;
+}
+
+.virtual-keyboard-temp-right svg,
+.virtual-keyboard-temp-left svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+}
+
+.virtual-keyboard-temp-char:active,
+.virtual-keyboard-temp-right:active,
+.virtual-keyboard-temp-left:active {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+
+.virtual-keyboard-temp-right:active svg,
+.virtual-keyboard-temp-left:active svg {
+  fill: var(--vkb-key-active-font-color);
+}
+
+
+
+
+.virtual-keyboard-tab {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  gap: var(--vkb-key-gap);
+  width: calc(100% - var(--vkb-key-gap) * 2);
+  height: var(--vkb-keyboard-tab);
+  padding: var(--vkb-key-gap);
+}
+
+.keyboard-tab,
+.keyboard-tab-move,
+.keyboard-tab-down {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: var(--vkb-keyboard-tab);
+
+  color: var(--vkb-key-color);
+  fill: var(--vkb-key-color);
+
+  border-radius: var(--vkb-key-borer-radius);
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: all 0.3s;
+  overflow: hidden;
+}
+
+.keyboard-tab-move {
+  cursor: move;
+}
+
+.keyboard-tab:hover {
+  fill: var(--vkb-key-active-font-color);
+  background-color: var(--vkb-key-active-background);
+}
+
+.keyboard-tab-active {
+  fill: var(--vkb-key-active-font-color);
+  background-color: var(--vkb-key-active-background);
+}
+
+.keyboard-tab svg,
+.keyboard-tab-move svg,
+.keyboard-tab-down svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+}
+
+
+.virtual-keyboard-content {
+  height: calc(100% - var(--vkb-keyboard-tab) - var(--vkb-key-gap) * 2);
+  padding: 0 var(--vkb-key-gap) var(--vkb-key-gap);
+  box-sizing: border-box;
+}
+
+.virtual-drag-block {
+  position: fixed;
+  top: -10000px;
+  user-select: none;
+  -webkit-user-select: none
+    /* cursor: grab; */
+}

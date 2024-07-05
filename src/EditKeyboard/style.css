@@ -43,8 +43,6 @@
   align-items: center;
   justify-content: center;
 
-  padding-block: var(--vkb-keyboard-padding-block);
-
   height: 100%;
   width: 100%;
 

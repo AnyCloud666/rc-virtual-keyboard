@@ -11,7 +11,7 @@ const LetterKeyboard = ({
 }: {
   inputMode: typeof ZH | typeof EN;
   onClick?: (e: VKB.KeyboardAttributeType) => void;
-  onChangeInputMode?: (mode: string) => void;
+  onChangeInputMode?: (mode: VKB.InputMode) => void;
 }) => {
   const [keys, setKeys] = useState(letterKeys);
 

@@ -33,6 +33,11 @@ export const ZH = 'zh';
 /** 英文模式 */
 export const EN = 'en';
 
+/** 主题模式key */
+export const VKB_THEME_MODE = 'VKB_THEME_MODE';
+/** 位置模式key */
+export const VKB_POSITION_MODE = 'VKB_POSITION_MODE';
+
 /** ---------------------------功能控制类--------------------------- */
 /** 删除 */
 export const Backspace: VKB.KeyboardAttributeType = {

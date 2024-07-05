@@ -35,10 +35,6 @@
   --vkb-key-font-size: 14px;
   /** tab 高度 */
   --vkb-keyboard-tab: 40px;
-  /** tab 项左右 padding */
-  --vkb-keyboard-padding-inline: 24px;
-  /** 光标选择的上下 padding */
-  --vkb-keyboard-padding-block: 16px;
   /** 内部 svg 大小 */
   --vkb-keyboard-svg-size: 26px
 }
