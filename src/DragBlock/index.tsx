@@ -62,22 +62,6 @@ const DragBlock = ({
   const clickTimer = useRef(0);
   /** block 是否隐藏 */
   const isHidden = useRef(true);
-
-  /**
-   * 点击事件
-   *
-   */
-  const onClickFn = () => {
-    if (Date.now() - clickTimer.current < delay) {
-      if (isHidden.current && autoKeepRight && blockRef.current) {
-        blockRef.current.style.transition = 'all 0.3s';
-        showBlock.run();
-      } else {
-        !allowMove.current && onClick && onClick();
-      }
-    }
-  };
-
   /** @type {*}
    * 自动靠右
    */
@@ -99,7 +83,6 @@ const DragBlock = ({
       wait: autoKeepRightDelay,
     },
   );
-
   /** @type {*}
    * 点击展示块
    */
@@ -117,6 +100,21 @@ const DragBlock = ({
       leading: true,
     },
   );
+
+  /**
+   * 点击事件
+   *
+   */
+  const onClickFn = () => {
+    if (Date.now() - clickTimer.current < delay) {
+      if (isHidden.current && autoKeepRight && blockRef.current) {
+        blockRef.current.style.transition = 'all 0.3s';
+        showBlock.run();
+      } else {
+        !allowMove.current && onClick && onClick();
+      }
+    }
+  };
 
   /** 初始位置 */
   useEffect(() => {

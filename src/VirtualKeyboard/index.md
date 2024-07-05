@@ -19,7 +19,13 @@ export default () => {
 
   return (
     <>
-      <div>可使用左侧虚拟键盘</div>
+      {/* <div>可使用左侧虚拟键盘</div> */}
+      <input
+        placeholder="可使用左侧虚拟键盘"
+        onInput={(e) => {
+          console.log('value', e.target.value);
+        }}
+      />
       <VirtualKeyboardProvide
         value={{
           ...InitVirtualKeyBoardCtx,

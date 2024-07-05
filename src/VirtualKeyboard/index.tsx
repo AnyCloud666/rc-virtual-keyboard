@@ -33,7 +33,7 @@ export const VirtualKeyboardContext = createContext<VKB.KeyBoardCtxType>(
 );
 
 export const VirtualKeyboard = () => {
-  const { virtualKeyboardCtx } = useVirtualKeyboard();
+  const virtualKeyboardCtx = useContext(VirtualKeyboardContext);
 
   const vkbStyles = useMemo(() => {
     const styles = {
@@ -119,4 +119,5 @@ const useVirtualKeyboard = () => {
     VirtualKeyboard,
   };
 };
+
 export default useVirtualKeyboard;
