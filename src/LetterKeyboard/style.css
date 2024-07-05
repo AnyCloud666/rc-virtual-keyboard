@@ -7,14 +7,11 @@
   height: 100%;
 }
 
-
 .letter-key-item {
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 100%;
-
   background-color: var(--vkb-key-background);
   border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
   box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
@@ -23,8 +20,6 @@
   transition: all 0.3s;
   cursor: pointer;
 }
-
-
 
 .letter-key-item:active {
   background-color: var(--vkb-key-active-background);
@@ -63,12 +58,11 @@
 
 .letter-key-item:nth-child(30) {
   margin-left: calc(100% + var(--vkb-key-gap));
-  width: calc(650% + var(--vkb-key-gap) + var(--vkb-key-gap) /2);
-  /* width: calc(650% - var(--vkb-key-gap)*2); */
+  width: calc(600% + var(--vkb-key-gap) * 5);
 }
 
 .letter-key-item:nth-child(31) {
-  margin-left: calc(650% + var(--vkb-key-gap)*2 + var(--vkb-key-gap) /2);
+  margin-left: calc(600% + var(--vkb-key-gap) * 6);
   width: calc(200% + var(--vkb-key-gap));
 }
 
@@ -77,7 +71,7 @@
   font-size: 12px;
 }
 
-.letter-key-item>svg {
+.letter-key-item > svg {
   width: var(--vkb-keyboard-svg-size);
   height: var(--vkb-keyboard-svg-size);
 }
