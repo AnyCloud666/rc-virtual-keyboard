@@ -14,6 +14,7 @@ export default () => {
   const [positionMode, setPositionMode] = useState(
     localStorage?.getItem(keys.VKB_POSITION_MODE) ?? 'float',
   );
+  const [value, setValue] = useState('');
   const { VirtualKeyboard, InitVirtualKeyBoardCtx, VirtualKeyboardProvide } =
     useVirtualKeyboard();
 
@@ -23,9 +24,11 @@ export default () => {
       <input
         placeholder="可使用左侧虚拟键盘"
         onInput={(e) => {
+          setValue(e.target.value);
           console.log('value', e.target.value);
         }}
       />
+      <div>value：{value}</div>
       <VirtualKeyboardProvide
         value={{
           ...InitVirtualKeyBoardCtx,
@@ -73,26 +76,26 @@ export default () => {
 
 ## 支持的样式 token
 
-| token                         | 说明             | 类型   | 默认值  |
-| ----------------------------- | ---------------- | ------ | ------- |
-| --vkb-key-gap                 | 间隔             | string | 6px     |
-| --vkb-key-border-width        | 按键边框线宽度   | string | 1px     |
-| --vkb-keyboard-svg-size       | 内部 svg 大小    | string | 26px    |
-| --vkb-key-shadow-width        | 按键 shadow 宽度 | string | 4px     |
-| --vkb-key-borer-radius        | 按键圆角         | string | 4px     |
-| --vkb-key-background          | 按键背景色       | string | #ffffff |
-| --vkb-key-border-color        | 按键边框颜色     | string | #f0f0f0 |
-| --vkb-key-shadow-color        | 按键 shadow 颜色 | string | #f0f0f0 |
-| --vkb-key-active-font-color   | 按键活动字体颜色 | string | #1677ff |
-| --vkb-key-active-background   | 按键背活动景色   | string | #dce1e7 |
-| --vkb-key-active-shadow-color | 按键活动 shadow  | string | #dce1e7 |
-| --vkb-key-active-border-color | 按键活动边框颜色 | string | #dce1e7 |
-| --vkb-background              | 键盘背景色       | string | #f2f5fa |
-| --vkb-key-color               | 字体颜色         | string | #000    |
-| --vkb-key-tips-color          | 提示颜色         | string | #ccc    |
-| --vkb-key-tips-font-size      | 提示文字大小     | string | 12px    |
-| --vkb-key-scroll-bar-color    | 滚动条颜色       | string | #ccc    |
-| --vkb-keyboard-tab            | tab 高度         | string | 40px    |
+| token                         | 说明             | 类型   | 默认值                                          |
+| ----------------------------- | ---------------- | ------ | ----------------------------------------------- |
+| --vkb-key-gap                 | 间隔             | string | 6px                                             |
+| --vkb-key-border-width        | 按键边框线宽度   | string | 1px                                             |
+| --vkb-keyboard-svg-size       | 内部 svg 大小    | string | 26px                                            |
+| --vkb-key-shadow-width        | 按键 shadow 宽度 | string | 4px                                             |
+| --vkb-key-borer-radius        | 按键圆角         | string | 4px                                             |
+| --vkb-key-tips-font-size      | 提示文字大小     | string | 12px                                            |
+| --vkb-keyboard-tab            | tab 高度         | string | 40px                                            |
+| --vkb-key-background          | 按键背景色       | string | #ffffff                                         |
+| --vkb-key-border-color        | 按键边框颜色     | string | #f0f0f0                                         |
+| --vkb-key-shadow-color        | 按键 shadow 颜色 | string | #f0f0f0                                         |
+| --vkb-key-active-font-color   | 按键活动字体颜色 | string | #1677ff                                         |
+| --vkb-key-active-background   | 按键背活动景色   | string | #dce1e7                                         |
+| --vkb-key-active-shadow-color | 按键活动 shadow  | string | #dce1e7                                         |
+| --vkb-key-active-border-color | 按键活动边框颜色 | string | #dce1e7                                         |
+| --vkb-background              | 键盘背景色       | string | #f2f5fa                                         |
+| --vkb-key-color               | 字体颜色         | string | <input type='color' value=' #000000' /> #000000 |
+| --vkb-key-tips-color          | 提示颜色         | string | <input type='color' value='#cccccc' /> #cccccc  |
+| --vkb-key-scroll-bar-color    | 滚动条颜色       | string | <input type='color' value='#cccccc' /> #cccccc  |
 
 ## 默认的 virtualKeyboardTab
 
@@ -102,11 +105,23 @@ const tabs: VKB.KeyboardTabItem[] = [
     id: 'letter',
     label: <KeyboardSvg />,
     name: '字母键',
-    Component: ({ onClick, inputMode, onChangeInputMode }) => (
+    Component: ({
+      inputMode,
+      inputValue,
+      chinese,
+      onClick,
+      onMouseDown,
+      onChangeInputMode,
+      onSelectChinese,
+    }) => (
       <LetterKeyboard
+        inputValue={inputValue}
+        chinese={chinese}
         inputMode={inputMode}
-        onChangeInputMode={onChangeInputMode}
         onClick={onClick}
+        onMouseDown={onMouseDown}
+        onChangeInputMode={onChangeInputMode}
+        onSelectChinese={onSelectChinese}
       />
     ),
   },

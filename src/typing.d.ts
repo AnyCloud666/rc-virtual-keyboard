@@ -30,8 +30,13 @@ declare namespace VKB {
       themeMode: string;
       inputMode: InputMode;
       positionMode: string;
+      inputValue: string;
+      chinese: string[];
+      onMouseDown: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
       onClick: (e: VKB.KeyboardAttributeType) => void;
       onChangeInputMode: (mode: InputMode) => void;
+      onChangeInputMode: (mode: VKB.InputMode) => void;
+      onSelectChinese: (chinese: string) => void;
     }) => JSX.Element;
   };
 

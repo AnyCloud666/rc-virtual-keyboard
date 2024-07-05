@@ -14,7 +14,9 @@ export { default as WriteKeyboard } from './WriteKeyboard';
 export { default as DragBlock } from './DragBlock';
 
 export { default as useVirtualKeyboard } from './VirtualKeyboard';
+
+export { default as useInput } from './hooks/useInput';
+
 export { keys };
 
 // export {* as kyes } from './keys';
-

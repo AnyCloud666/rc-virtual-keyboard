@@ -210,7 +210,6 @@ const useInput = ({
       if (vkbNotEmpty && e.key === Space.code) {
         return;
       }
-
       if (
         inputMode === ZH &&
         e.key !== Space.code &&
@@ -419,17 +418,17 @@ const useInput = ({
   };
 
   /** 翻页 */
-  const onMore = (type: string) => {
-    if (tempInputAreaRef.current) {
-      const width = tempInputAreaRef.current.offsetWidth;
-      tempInputAreaRef.current.scrollTo({
-        left:
-          tempInputAreaRef.current.scrollLeft +
-          (type === 'add' ? width : -width) / 10,
-        behavior: 'smooth',
-      });
-    }
-  };
+  // const onMore = (type: string) => {
+  //   if (tempInputAreaRef.current) {
+  //     const width = tempInputAreaRef.current.offsetWidth;
+  //     tempInputAreaRef.current.scrollTo({
+  //       left:
+  //         tempInputAreaRef.current.scrollLeft +
+  //         (type === 'add' ? width : -width) / 10,
+  //       behavior: 'smooth',
+  //     });
+  //   }
+  // };
   /** 选择输入的中文 */
   const onSelectChinese = (chinese: string) => {
     if (
@@ -646,7 +645,7 @@ const useInput = ({
     chinese,
     activeKeyboard,
     onClick,
-    onMore,
+    // onMore,
     onMouseDown,
     onSelectChinese,
     onChangeInputMode,
