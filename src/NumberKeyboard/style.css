@@ -1,0 +1,34 @@
+@import url('../var.css');
+
+.number-keyboard {
+  display: grid;
+  grid-template-columns: repeat(4, calc((100% - var(--vkb-key-gap)* 3) / 4));
+  height: 100%;
+  gap: var(--vkb-key-gap);
+}
+
+.number-key-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: var(--vkb-key-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  box-sizing: border-box;
+  border-radius: var(--vkb-key-borer-radius);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.number-key-item:active {
+  color: var(--vkb-key-active-font-color);
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+
+.number-key-item>svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+}

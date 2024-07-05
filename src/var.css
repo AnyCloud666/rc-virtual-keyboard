@@ -1,0 +1,44 @@
+:root {
+  /** 键盘背景色 */
+  --vkb-background: #f2f5fa;
+  /** 按键字体颜色 */
+  --vkb-key-color: #000;
+  /** 按键背景色 */
+  --vkb-key-background: #ffffff;
+  /** 按键背活动景色 */
+  --vkb-key-active-background: #dce1e7;
+  /** 按键活动字体颜色 */
+  --vkb-key-active-font-color: #1677ff;
+  /** 按键边框颜色 */
+  --vkb-key-border-color: #f0f0f0;
+  /** 按键活动边框颜色 */
+  --vkb-key-active-border-color: #dce1e7;
+  /** 按键边框线宽度 */
+  --vkb-key-border-width: 1px;
+  /** 按键边框颜色 */
+  --vkb-key-shadow-color: #f0f0f0;
+  /** 按键活动 shadow */
+  --vkb-key-active-shadow-color: #dce1e7;
+  /** 按键 shadow 宽度 */
+  --vkb-key-shadow-width: 4px;
+  /** 提示颜色 */
+  --vkb-key-tips-color: #ccc;
+  /** 提示文字大小 */
+  --vkb-key-tips-font-size: 12px;
+  /** 滚动条颜色 */
+  --vkb-key-scroll-bar-color: #ccc;
+  /** 按键间隔 */
+  --vkb-key-gap: 6px;
+  /** 按键圆角 */
+  --vkb-key-borer-radius: 4px;
+  /** 按键文字大小 */
+  --vkb-key-font-size: 14px;
+  /** tab 高度 */
+  --vkb-keyboard-tab: 40px;
+  /** tab 项左右 padding */
+  --vkb-keyboard-padding-inline: 24px;
+  /** 光标选择的上下 padding */
+  --vkb-keyboard-padding-block: 16px;
+  /** 内部 svg 大小 */
+  --vkb-keyboard-svg-size: 26px
+}

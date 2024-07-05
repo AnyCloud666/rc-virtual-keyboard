@@ -1,0 +1,83 @@
+@import url('../var.css');
+
+.letter-keyboard {
+  display: grid;
+  grid-template-columns: repeat(10, calc((100% - var(--vkb-key-gap) * 9) / 10));
+  gap: var(--vkb-key-gap);
+  height: 100%;
+}
+
+
+.letter-key-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  background-color: var(--vkb-key-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  box-sizing: border-box;
+  border-radius: var(--vkb-key-borer-radius);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+
+
+.letter-key-item:active {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+
+.letter-key-item:nth-child(n + 11):nth-child(-n + 19) {
+  margin-left: calc(50% + var(--vkb-key-gap) / 2);
+  width: 100%;
+}
+
+.letter-key-item:nth-child(20) {
+  grid-column: 1;
+  grid-row: 3;
+  width: calc(150% + var(--vkb-key-gap) / 2);
+}
+
+.letter-key-item:nth-child(n + 21):nth-child(-n + 28) {
+  grid-column: auto;
+  grid-row: 3;
+  margin-left: calc(50% + var(--vkb-key-gap) / 2);
+}
+
+.letter-key-item:nth-child(28) {
+  width: calc(150% + var(--vkb-key-gap) / 2);
+}
+
+.letter-key-item:nth-child(n + 29) {
+  grid-row: 4;
+}
+
+.letter-key-item:nth-child(29) {
+  width: calc(200% + var(--vkb-key-gap));
+}
+
+.letter-key-item:nth-child(30) {
+  margin-left: calc(100% + var(--vkb-key-gap));
+  width: calc(650% + var(--vkb-key-gap) + var(--vkb-key-gap) /2);
+  /* width: calc(650% - var(--vkb-key-gap)*2); */
+}
+
+.letter-key-item:nth-child(31) {
+  margin-left: calc(650% + var(--vkb-key-gap)*2 + var(--vkb-key-gap) /2);
+  width: calc(200% + var(--vkb-key-gap));
+}
+
+.letter-caps-lock-small,
+.letter-shift-small {
+  font-size: 12px;
+}
+
+.letter-key-item>svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+}

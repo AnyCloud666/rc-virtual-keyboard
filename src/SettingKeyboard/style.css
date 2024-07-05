@@ -1,0 +1,87 @@
+.setting-keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vkb-key-gap);
+
+  height: 100%;
+
+  overflow: auto;
+
+}
+
+
+
+.setting-keyboard::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.setting-keyboard::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 5px;
+  transition: all 0.3s;
+}
+
+.setting-keyboard:hover::-webkit-scrollbar-thumb {
+  background: var(--vkb-key-scroll-bar-color);
+  border-radius: 5px;
+}
+
+.setting-keyboard-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vkb-key-gap);
+}
+
+.setting-keyboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vkb-key-gap);
+}
+
+.setting-keyboard-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--vkb-key-gap);
+
+  width: 100%;
+}
+
+.setting-keyboard-box-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* padding: 20px; */
+  width: 60px;
+  height: 60px;
+
+  color: var(--vkb-key-color);
+  fill: var(--vkb-key-color);
+
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  border-radius: var(--vkb-key-borer-radius);
+  background-color: var(--vkb-key-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  box-sizing: border-box;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.setting-keyboard-box-item>svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+}
+
+.setting-keyboard-box-item:active {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+
+.setting-keyboard-box-item-active {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}

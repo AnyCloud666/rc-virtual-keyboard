@@ -1,0 +1,7 @@
+.virtual-drag-block {
+  position: fixed;
+  top: -10000px;
+  user-select: none;
+  -webkit-user-select: none
+    /* cursor: grab; */
+}
