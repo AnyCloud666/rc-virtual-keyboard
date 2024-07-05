@@ -1,3 +1,17 @@
+---
+order: 0
+toc: content
+group:
+  title: 基础
+  order: 0
+nav:
+  title: 组件
+  order: 1
+  second:
+    title: 字母键
+    order: 1
+---
+
 # 字母键
 
 常用的字母键盘
@@ -26,6 +40,7 @@ export default () => {
       <div style={{ margin: '0 auto', textAlign: 'center' }}>
         <input
           placeholder="可使用虚拟键盘"
+          value={value}
           onInput={(e) => {
             {
               /* console.log('value', e.target.value); */

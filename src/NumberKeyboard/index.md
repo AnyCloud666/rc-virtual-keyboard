@@ -1,3 +1,17 @@
+---
+order: 1
+toc: content
+group:
+  title: 基础
+  order: 0
+nav:
+  title: 组件
+  order: 1
+  second:
+    title: 数字键
+    order: 1
+---
+
 # 数字键
 
 常用的数字键盘

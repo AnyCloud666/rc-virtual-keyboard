@@ -26,6 +26,7 @@ export const InitVirtualKeyBoardCtx: VKB.KeyBoardCtxType = {
   setShow: () => {},
   setThemeMode: () => {},
   setPositionMode: () => {},
+  onChange: () => {},
 };
 
 export const VirtualKeyboardContext = createContext<VKB.KeyBoardCtxType>(

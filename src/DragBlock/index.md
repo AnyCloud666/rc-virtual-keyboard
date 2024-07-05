@@ -1,3 +1,17 @@
+---
+order: 6
+toc: content
+group:
+  title: 基础
+  order: 0
+nav:
+  title: 组件
+  order: 1
+  second:
+    title: 手写键
+    order: 1
+---
+
 # 拖动块
 
 支持拖动

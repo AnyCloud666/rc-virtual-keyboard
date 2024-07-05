@@ -1,3 +1,16 @@
+---
+order: 4
+group:
+  title: 基础
+  order: 0
+nav:
+  title: 组件
+  order: 1
+  second:
+    title: 手写键
+    order: 1
+---
+
 # 手写键
 
 手写识别，暂未完成，请等待

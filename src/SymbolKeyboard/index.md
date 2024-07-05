@@ -1,3 +1,17 @@
+---
+order: 2
+toc: content
+group:
+  title: 基础
+  order: 0
+nav:
+  title: 组件
+  order: 1
+  second:
+    title: 符号键
+    order: 1
+---
+
 # 符号键
 
 常用的符号键盘

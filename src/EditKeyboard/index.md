@@ -1,9 +1,23 @@
+---
+order: 3
+toc: content
+group:
+  title: 基础
+  order: 0
+nav:
+  title: 组件
+  order: 1
+  second:
+    title: 编辑键
+    order: 1
+---
+
 # 编辑键
 
 常用的编辑键盘
 
 ```jsx
-import { EditKeyboard} from 'react-virtual-keyboard';
+import { EditKeyboard } from 'react-virtual-keyboard';
 
 export default () => {
   const onClick = (e) => {

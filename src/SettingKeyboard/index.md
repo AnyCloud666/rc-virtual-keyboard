@@ -1,3 +1,16 @@
+---
+order: 5
+toc: content
+group:
+  title: 基础
+  order: 0
+nav:
+  title: 组件
+  second:
+    title: 设置组合键盘
+    order: 1
+---
+
 # 设置组合键盘
 
 在组合键盘时使用改组件，对组件进行配置，单独使用无效
