@@ -18,7 +18,16 @@ nav:
 
 ```jsx
 import { useState } from 'react';
-import { useVirtualKeyboard, keys } from 'react-virtual-keyboard';
+import {
+  useVirtualKeyboard,
+  keys,
+  LetterKeyboardTab,
+  NumberKeyboardTab,
+  SymbolKeyboardTab,
+  EditKeyboardTab,
+  SettingKeyboardTab,
+  WriteKeyboardTab,
+} from 'react-virtual-keyboard';
 
 export default () => {
   const [show, setShow] = useState(false);
@@ -55,6 +64,14 @@ export default () => {
           positionMode,
           setPositionMode,
           theme: {},
+          virtualKeyboardTab: [
+            LetterKeyboardTab,
+            NumberKeyboardTab,
+            SymbolKeyboardTab,
+            WriteKeyboardTab,
+            EditKeyboardTab,
+            SettingKeyboardTab,
+          ],
         }}
       >
         <VirtualKeyboard />
@@ -115,65 +132,11 @@ export default () => {
 
 ```js
 const tabs: VKB.KeyboardTabItem[] = [
-  {
-    id: 'letter',
-    label: <KeyboardSvg />,
-    name: '字母键',
-    Component: ({
-      inputMode,
-      inputValue,
-      chinese,
-      onClick,
-      onMouseDown,
-      onChangeInputMode,
-      onSelectChinese,
-    }) => (
-      <LetterKeyboard
-        inputValue={inputValue}
-        chinese={chinese}
-        inputMode={inputMode}
-        onClick={onClick}
-        onMouseDown={onMouseDown}
-        onChangeInputMode={onChangeInputMode}
-        onSelectChinese={onSelectChinese}
-      />
-    ),
-  },
-  {
-    id: 'number',
-    label: <NumberSvg />,
-    name: '数字键',
-    Component: ({ onClick }) => <NumberKeyboard onClick={onClick} />,
-  },
-  {
-    id: 'symbol',
-    label: <SymbolSvg />,
-    name: '符号键',
-    Component: ({ onClick }) => <SymbolKeyboard onClick={onClick} />,
-  },
-  {
-    id: 'edit',
-    label: <EditSvg />,
-    name: '编辑键',
-    Component: ({ onClick }) => <EditKeyboard onClick={onClick} />,
-  },
-  {
-    id: 'setting',
-    label: <SettingSvg />,
-    name: '设置',
-    Component: ({ themeMode, positionMode, onClick }) => (
-      <SettingKeyBoard
-        themeMode={themeMode}
-        positionMode={positionMode}
-        onClick={onClick}
-      />
-    ),
-  },
-  {
-    id: 'write',
-    label: <WriteSvg />,
-    name: '手写板',
-    Component: ({ onClick }) => <WriteKeyboard onClick={onClick} />,
-  },
+  LetterKeyboardTab,
+  NumberKeyboardTab,
+  SymbolKeyboardTab,
+  EditKeyboardTab,
+  SettingKeyboardTab,
+  WriteKeyboardTab,
 ];
 ```

@@ -17,68 +17,81 @@ import SymbolKeyboard from '../SymbolKeyboard';
 import WriteKeyboard from '../WriteKeyboard';
 import { VKB } from '../typing';
 import './style.css';
+/** 字母键tab */
+export const LetterKeyboardTab: VKB.KeyboardTabItem = {
+  id: 'letter',
+  label: <KeyboardSvg />,
+  name: '字母键',
+  Component: ({
+    inputMode,
+    inputValue,
+    chinese,
+    onClick,
+    onMouseDown,
+    onChangeInputMode,
+    onSelectChinese,
+  }) => (
+    <LetterKeyboard
+      inputValue={inputValue}
+      chinese={chinese}
+      inputMode={inputMode}
+      onClick={onClick}
+      onMouseDown={onMouseDown}
+      onChangeInputMode={onChangeInputMode}
+      onSelectChinese={onSelectChinese}
+    />
+  ),
+};
+
+/** 数字键tab */
+export const NumberKeyboardTab: VKB.KeyboardTabItem = {
+  id: 'number',
+  label: <NumberSvg />,
+  name: '数字键',
+  Component: ({ onClick }) => <NumberKeyboard onClick={onClick} />,
+};
+/** 符号键tab */
+export const SymbolKeyboardTab: VKB.KeyboardTabItem = {
+  id: 'symbol',
+  label: <SymbolSvg />,
+  name: '符号键',
+  Component: ({ onClick }) => <SymbolKeyboard onClick={onClick} />,
+};
+/** 编辑键tab */
+export const EditKeyboardTab: VKB.KeyboardTabItem = {
+  id: 'edit',
+  label: <EditSvg />,
+  name: '编辑键',
+  Component: ({ onClick }) => <EditKeyboard onClick={onClick} />,
+};
+/** 手写板tab */
+export const WriteKeyboardTab: VKB.KeyboardTabItem = {
+  id: 'write',
+  label: <WriteSvg />,
+  name: '手写板',
+  Component: ({ onClick }) => <WriteKeyboard onClick={onClick} />,
+};
+/** 设置tab */
+export const SettingKeyboardTab: VKB.KeyboardTabItem = {
+  id: 'setting',
+  label: <SettingSvg />,
+  name: '设置',
+  Component: ({ themeMode, positionMode, onClick }) => (
+    <SettingKeyBoard
+      themeMode={themeMode}
+      positionMode={positionMode}
+      onClick={onClick}
+    />
+  ),
+};
 
 const tabs: VKB.KeyboardTabItem[] = [
-  {
-    id: 'letter',
-    label: <KeyboardSvg />,
-    name: '字母键',
-    Component: ({
-      inputMode,
-      inputValue,
-      chinese,
-      onClick,
-      onMouseDown,
-      onChangeInputMode,
-      onSelectChinese,
-    }) => (
-      <LetterKeyboard
-        inputValue={inputValue}
-        chinese={chinese}
-        inputMode={inputMode}
-        onClick={onClick}
-        onMouseDown={onMouseDown}
-        onChangeInputMode={onChangeInputMode}
-        onSelectChinese={onSelectChinese}
-      />
-    ),
-  },
-  {
-    id: 'number',
-    label: <NumberSvg />,
-    name: '数字键',
-    Component: ({ onClick }) => <NumberKeyboard onClick={onClick} />,
-  },
-  {
-    id: 'symbol',
-    label: <SymbolSvg />,
-    name: '符号键',
-    Component: ({ onClick }) => <SymbolKeyboard onClick={onClick} />,
-  },
-  {
-    id: 'edit',
-    label: <EditSvg />,
-    name: '编辑键',
-    Component: ({ onClick }) => <EditKeyboard onClick={onClick} />,
-  },
-  {
-    id: 'setting',
-    label: <SettingSvg />,
-    name: '设置',
-    Component: ({ themeMode, positionMode, onClick }) => (
-      <SettingKeyBoard
-        themeMode={themeMode}
-        positionMode={positionMode}
-        onClick={onClick}
-      />
-    ),
-  },
-  {
-    id: 'write',
-    label: <WriteSvg />,
-    name: '手写板',
-    Component: ({ onClick }) => <WriteKeyboard onClick={onClick} />,
-  },
+  LetterKeyboardTab,
+  NumberKeyboardTab,
+  SymbolKeyboardTab,
+  EditKeyboardTab,
+  SettingKeyboardTab,
+  WriteKeyboardTab,
 ];
 
 export default tabs;

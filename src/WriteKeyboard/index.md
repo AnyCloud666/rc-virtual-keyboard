@@ -1,5 +1,6 @@
 ---
 order: 4
+toc: content
 group:
   title: 基础
   order: 0
@@ -10,7 +11,6 @@ nav:
     title: 手写键
     order: 1
 ---
-
 # 手写键
 
 手写识别，暂未完成，请等待
