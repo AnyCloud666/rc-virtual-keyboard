@@ -1,6 +1,5 @@
 node_modules
 /dist
-docs
 docs-dist/*
 .dumi/tmp
 .dumi/tmp-test
