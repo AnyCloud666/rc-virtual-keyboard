@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { CSSProperties, useEffect, useRef, useState } from 'react';
 
 import { ReactComponent as LeftSvg } from '../svg/left.svg';
 import { ReactComponent as RightSvg } from '../svg/right.svg';
@@ -9,6 +9,7 @@ import './style.css';
 
 /** 字母键盘 */
 const LetterKeyboard = ({
+  style,
   inputMode,
   inputValue,
   chinese,
@@ -17,6 +18,7 @@ const LetterKeyboard = ({
   onChangeInputMode,
   onSelectChinese,
 }: {
+  style?: CSSProperties;
   chinese?: string[];
   inputValue?: string;
   inputMode: typeof ZH | typeof EN;
@@ -104,7 +106,7 @@ const LetterKeyboard = ({
   }, []);
 
   return (
-    <div className="letter-keyboard" onMouseDown={onMouseDown}>
+    <div style={style} className="letter-keyboard" onMouseDown={onMouseDown}>
       {inputMode === ZH && inputValue && (
         <div className="letter-keyboard-temp">
           <div className="letter-keyboard-temp-pinyin">{inputValue}</div>

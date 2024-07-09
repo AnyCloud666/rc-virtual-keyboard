@@ -1,12 +1,14 @@
 import { useDebounceFn, useEventListener } from 'ahooks';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { CSSProperties, useEffect, useRef, useState } from 'react';
 import { ReactComponent as DeleteSvg } from '../svg/delete.svg';
 import { ReactComponent as EnterSvg } from '../svg/enter.svg';
 import { VKB } from '../typing';
 import './style.css';
 const WriteKeyboard = ({
+  style,
   onClick,
 }: {
+  style: CSSProperties;
   onClick?: (e: VKB.KeyboardAttributeType) => void;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -107,7 +109,7 @@ const WriteKeyboard = ({
   }, []);
 
   return (
-    <div className="write-keyboard">
+    <div style={style} className="write-keyboard">
       <div className="write-content" ref={writeContentRef}>
         <canvas
           className="write-content-canvas"

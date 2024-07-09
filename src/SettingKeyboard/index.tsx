@@ -1,20 +1,22 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 
 import { VKB } from '../typing';
 import './style.css';
 
 import { positionKeys, themeKeys } from '../keys';
 const SettingKeyboard = ({
+  style,
   themeMode,
   positionMode,
   onClick,
 }: {
+  style: CSSProperties;
   themeMode: string;
   positionMode: string;
   onClick: (e: VKB.KeyboardAttributeType) => void;
 }) => {
   return (
-    <div className="setting-keyboard">
+    <div style={style} className="setting-keyboard">
       <div className="setting-keyboard-item">
         <div>主题配置：</div>
         <div className="setting-keyboard-box">

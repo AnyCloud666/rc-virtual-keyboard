@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+import React, { CSSProperties, useState } from 'react';
 import { symbolKeys } from '../keys';
 import { VKB } from '../typing';
 import './style.css';
 
 const SymbolKeyboard = ({
+  style,
   onClick,
 }: {
+  style: CSSProperties;
   onClick: (e: VKB.KeyboardAttributeType) => void;
 }) => {
   const [activeSymbol, setActiveSymbol] = useState(symbolKeys[0]);
 
   return (
-    <div className="symbol-keyboard">
+    <div style={style} className="symbol-keyboard">
       <div className="symbol-key-tab">
         {symbolKeys.map((item) => {
           return (

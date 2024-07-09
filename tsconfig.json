@@ -8,8 +8,8 @@
     "baseUrl": "./",
     "paths": {
       "@@/*": [".dumi/tmp/*"],
-      "react-vitrual-keyboard": ["src"],
-      "react-vitrual-keyboard/*": ["src/*", "*"]
+      "react-virtual-keyboard": ["src"],
+      "react-virtual-keyboard/*": ["src/*", "*"]
     }
   },
   "include": [".dumirc.ts", "src/**/*"]

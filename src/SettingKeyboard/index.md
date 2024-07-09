@@ -32,10 +32,11 @@ export default () => {
 
 ## 属性
 
-| 属性         | 说明     | 类型                                                        | 默认值 |
-| ------------ | -------- | ----------------------------------------------------------- | ------ |
-| themeMode    | 主题模式 | light \| dark \| 自定义                                     | light  |
-| positionMode | 位置模式 | fixedBottom \| fixedTop \| fixedLeft \| fixedRight \| float | float  |
+| 属性         | 说明                           | 类型                                                        | 默认值 |
+| ------------ | ------------------------------ | ----------------------------------------------------------- | ------ |
+| themeMode    | 主题模式                       | light \| dark \| 自定义                                     | light  |
+| positionMode | 位置模式                       | fixedBottom \| fixedTop \| fixedLeft \| fixedRight \| float | float  |
+| style        | 外部传入的样式，作用于整个容器 | CSSProperties                                               | -      |
 
 ## 方法
 

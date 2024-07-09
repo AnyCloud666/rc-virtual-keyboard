@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { CSSProperties, useState } from 'react';
 import { cursorKeys, editKeys } from '../keys';
 
 import { ReactComponent as BottomSvg } from '../svg/bottom.svg';
@@ -21,8 +21,10 @@ const cursorSvg: Record<string, JSX.Element> = {
 };
 
 const EditKeyboard = ({
+  style,
   onClick,
 }: {
+  style?: CSSProperties;
   onClick?: (e: VKB.KeyboardAttributeType) => void;
 }) => {
   const [keys, setKeys] = useState(cursorKeys);
@@ -45,7 +47,7 @@ const EditKeyboard = ({
   };
 
   return (
-    <div className="edit-keyboard">
+    <div style={style} className="edit-keyboard">
       <div className="edit-key-cursor">
         {keys.map((item, index) => {
           return (
