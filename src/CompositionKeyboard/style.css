@@ -128,7 +128,6 @@
   border-radius: var(--vkb-key-borer-radius);
   box-sizing: border-box;
   user-select: none;
-  user-select: none;
   transition: all 0.3s;
   -webkit-tap-highlight-color: transparent;
 }

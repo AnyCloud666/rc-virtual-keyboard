@@ -8,6 +8,9 @@ declare namespace VKB {
    *  letter:字母
    *  symbol:符号
    *  controls:操作
+   *  edit: 表情
+   *  write: 手写
+   *  setting: 设置
    */
   type KeyType =
     | 'number'
@@ -17,7 +20,8 @@ declare namespace VKB {
     | 'edit'
     | 'emjo'
     | 'write'
-    | 'setting';
+    | 'setting'
+    | 'chinese';
 
   type KeyboardTabItem = {
     id: KeyType;
@@ -125,7 +129,7 @@ declare namespace VKB {
     /** 设置位置模式 */
     setPositionMode: (mode: string) => void;
     /** 操作时的回调,通过ctx 重写 onChange 实现 */
-    onChange?: (value: string) => void;
+    onChange?: (e: VKB.KeyboardAttributeType) => void;
     /** 回车 通过 ctx 重写 onEnter 实现*/
     onEnter?: () => void;
   };

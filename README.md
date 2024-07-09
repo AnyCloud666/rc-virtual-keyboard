@@ -1,7 +1,7 @@
-# react-vitrual-keyboard
+# react-virtual-keyboard
 
-[![NPM version](https://img.shields.io/npm/v/react-vitrual-keyboard.svg?style=flat)](https://npmjs.org/package/react-vitrual-keyboard)
-[![NPM downloads](http://img.shields.io/npm/dm/react-vitrual-keyboard.svg?style=flat)](https://npmjs.org/package/react-vitrual-keyboard)
+[![NPM version](https://img.shields.io/npm/v/react-virtual-keyboard.svg?style=flat)](https://npmjs.org/package/react-virtual-keyboard)
+[![NPM downloads](http://img.shields.io/npm/dm/react-virtual-keyboard.svg?style=flat)](https://npmjs.org/package/react-virtual-keyboard)
 
 virtual keyboard
 

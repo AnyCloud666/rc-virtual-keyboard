@@ -14,34 +14,32 @@ import useInput from '../hooks/useInput';
 import { pinyin2ChineseV1 } from '../utils/pinyin';
 import tabs from './KeyboardTabs';
 /**
- * 虚拟键盘
+ * 组合键盘
  *
  * @return {*}
  */
-const Keyboard = ({
+const CompositionKeyboard = ({
   style,
-  options,
-  showDragHandle,
+  showDragHandle = true,
+  showHiddenHandle = true,
   defaultActiveKeyboard = numberType,
   virtualKeyboardTab = tabs,
   moveLabel = <MoveSvg />,
   hiddenLabel = <BottomSvg />,
   themeMode = LightTheme.code,
   positionMode = FloatPosition.code,
-
   onEnter,
-  onShow,
-  onHidden,
   onChange,
+  onChangeShow,
   onThemeModeChange,
   onPositionModeChange,
 }: {
   /** 显示拖拽 */
   showDragHandle?: boolean;
+  /** 显示隐藏 */
+  showHiddenHandle?: boolean;
   /** 样式 */
   style?: CSSProperties;
-  /** 附加参数 */
-  options?: Record<string, any>;
   /** 默认活动的键盘 */
   defaultActiveKeyboard?: string;
   /** 需要渲染的虚拟键盘 */
@@ -57,11 +55,9 @@ const Keyboard = ({
   /** enter 方法回调 */
   onEnter?: () => void;
   /** 输入回调 */
-  onChange?: (value: string, options?: Record<string, any>) => void;
-  /** 隐藏 */
-  onHidden?: () => void;
-  /** 显示 */
-  onShow?: () => void;
+  onChange?: (e: VKB.KeyboardAttributeType) => void;
+  /** 显示/隐藏虚拟键盘 */
+  onChangeShow?: (b: boolean) => void;
   /** 主题改变 */
   onThemeModeChange?: (mode: string) => void;
   /** 位置模式改变 */
@@ -83,9 +79,9 @@ const Keyboard = ({
     themeMode,
     positionMode,
     defaultActiveKeyboard,
-    onShow,
     onChange,
     onEnter,
+    onChangeShow,
     onThemeModeChange,
     onPositionModeChange,
     onPinyin2Chinese: pinyin2ChineseV1,
@@ -122,16 +118,17 @@ const Keyboard = ({
             </div>
           );
         })}
-
-        <div
-          className="keyboard-tab-down "
-          onClick={(e) => {
-            e.stopPropagation();
-            onHidden && onHidden();
-          }}
-        >
-          {hiddenLabel ? hiddenLabel : <BottomSvg />}
-        </div>
+        {showHiddenHandle && (
+          <div
+            className="keyboard-tab-down "
+            onClick={(e) => {
+              e.stopPropagation();
+              onChangeShow && onChangeShow(false);
+            }}
+          >
+            {hiddenLabel ? hiddenLabel : <BottomSvg />}
+          </div>
+        )}
       </div>
       <div className="virtual-keyboard-content">
         {virtualKeyboardTab.map((item) => {
@@ -158,4 +155,4 @@ const Keyboard = ({
     </div>
   );
 };
-export default Keyboard;
+export default CompositionKeyboard;

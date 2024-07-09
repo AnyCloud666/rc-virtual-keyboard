@@ -38,10 +38,9 @@ const useInput = ({
   themeMode = LightTheme.code,
   positionMode = FloatPosition.code,
   defaultActiveKeyboard = numberType,
-  onShow,
-  onHidden,
   onChange,
   onEnter,
+  onChangeShow,
   onThemeModeChange,
   onPositionModeChange,
   onPinyin2Chinese = pinyin2ChineseV1,
@@ -55,11 +54,9 @@ const useInput = ({
   /** enter 方法回调 */
   onEnter?: () => void;
   /** 输入回调 */
-  onChange?: (value: string) => void;
-  /** 隐藏 */
-  onHidden?: () => void;
-  /** 显示 */
-  onShow?: () => void;
+  onChange?: (e: VKB.KeyboardAttributeType) => void;
+  /** 显示/隐藏 */
+  onChangeShow?: (s: boolean) => void;
   /** 主题改变 */
   onThemeModeChange?: (mode: string) => void;
   /** 位置模式改变 */
@@ -96,8 +93,6 @@ const useInput = ({
   const inputType = useRef('');
   /** 当前活动的input */
   const activeInputRef = useRef<HTMLInputElement | null>(null);
-  /** 临时输入区引用 */
-  const tempInputAreaRef = useRef<HTMLDivElement | null>(null);
   /** 当前活动的键盘 */
   const [activeKeyboard, setActiveKeyboard] = useState<string>(
     defaultActiveKeyboard,
@@ -130,7 +125,7 @@ const useInput = ({
   }, []);
   /** 获得焦点 */
   const onFocus = useCallback(() => {
-    onShow && onShow();
+    onChangeShow && onChangeShow(true);
   }, []);
 
   /** 寻找聚焦有效的input */
@@ -148,7 +143,7 @@ const useInput = ({
       inputType.current = vkbType;
       activeInputRef.current = activeElement;
       if (!cacheInputFocus.current.has(activeElement)) {
-        onShow && onShow();
+        onChangeShow && onChangeShow(true);
         cacheInputFocus.current.add(activeElement);
         activeInputRef.current.addEventListener('blur', onBlur);
         activeInputRef.current.addEventListener('focus', onFocus);
@@ -243,8 +238,6 @@ const useInput = ({
         activeInputRef.current.value = value;
 
         emitInputEvent();
-
-        onChange && onChange(value);
       }
     }
   };
@@ -297,7 +290,6 @@ const useInput = ({
       );
 
       emitInputEvent();
-      onChange && onChange(value);
     }
   };
 
@@ -417,18 +409,6 @@ const useInput = ({
     setInputValue('');
   };
 
-  /** 翻页 */
-  // const onMore = (type: string) => {
-  //   if (tempInputAreaRef.current) {
-  //     const width = tempInputAreaRef.current.offsetWidth;
-  //     tempInputAreaRef.current.scrollTo({
-  //       left:
-  //         tempInputAreaRef.current.scrollLeft +
-  //         (type === 'add' ? width : -width) / 10,
-  //       behavior: 'smooth',
-  //     });
-  //   }
-  // };
   /** 选择输入的中文 */
   const onSelectChinese = (chinese: string) => {
     if (
@@ -459,7 +439,13 @@ const useInput = ({
       (changeEvent as any).simulated = true;
       activeInputRef.current.dispatchEvent(changeEvent);
 
-      onChange && onChange(value);
+      onChange &&
+        onChange({
+          code: '-1',
+          key: value,
+          keyCode: -1,
+          keyType: 'chinese',
+        });
 
       setInputValue('');
     } else {
@@ -586,6 +572,7 @@ const useInput = ({
 
   /** 点击事件分发 */
   const onClick = (e: VKB.KeyboardAttributeType) => {
+    onChange && onChange(e);
     if (e.keyType === controlsType) {
       onControl(e);
     } else if (e.keyType === settingType) {
@@ -611,7 +598,7 @@ const useInput = ({
     return checkStopPropagation(target.parentNode, targetId, outId);
   };
 
-  /** 整个键盘的鼠标按下事件，整个键盘的触摸事件 */
+  /** 整个键盘的鼠标按下事件，整个键盘的触摸事件，用来对虚拟键盘进行移动 */
   const onMouseDown = (
     e:
       | React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -641,11 +628,9 @@ const useInput = ({
     inputValue,
     vkbThemeMode,
     vkbPositionMode,
-    tempInputAreaRef,
     chinese,
     activeKeyboard,
     onClick,
-    // onMore,
     onMouseDown,
     onSelectChinese,
     onChangeInputMode,

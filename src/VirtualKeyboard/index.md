@@ -9,7 +9,7 @@ nav:
   order: 1
   second:
     title: 组合虚拟键盘
-    order: 0
+    order: 1
 ---
 
 # 组合虚拟键盘

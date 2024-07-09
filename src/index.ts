@@ -1,4 +1,3 @@
-import * as keys from './keys';
 import {
   EditKeyboardTab,
   LetterKeyboardTab,
@@ -6,7 +5,8 @@ import {
   SettingKeyboardTab,
   SymbolKeyboardTab,
   WriteKeyboardTab,
-} from './VirtualKeyboard/KeyboardTabs';
+} from './CompositionKeyboard/KeyboardTabs';
+import * as keys from './keys';
 export {
   EditKeyboardTab,
   keys,
@@ -30,6 +30,8 @@ export { default as SettingKeyboard } from './SettingKeyboard';
 export { default as WriteKeyboard } from './WriteKeyboard';
 
 export { default as DragBlock } from './DragBlock';
+
+export { default as CompositionKeyboard } from './CompositionKeyboard';
 
 export { default as useVirtualKeyboard } from './VirtualKeyboard';
 

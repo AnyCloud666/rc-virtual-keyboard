@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useMemo } from 'react';
-import Keyboard from './Keyboard';
+import CompositionKeyboard from '../CompositionKeyboard';
 
 import DragBlock from '../DragBlock';
 
@@ -89,18 +89,13 @@ export const VirtualKeyboard = () => {
         zIndex={virtualKeyboardCtx.show ? virtualKeyboardCtx.zIndex : -1}
         positionMode={virtualKeyboardCtx.positionMode}
       >
-        <Keyboard
+        <CompositionKeyboard
           style={vkbStyles}
           themeMode={virtualKeyboardCtx.themeMode}
           positionMode={virtualKeyboardCtx.positionMode}
           virtualKeyboardTab={virtualKeyboardCtx.virtualKeyboardTab}
           showDragHandle={virtualKeyboardCtx.showDragHandle}
-          onShow={() => {
-            virtualKeyboardCtx.setShow(true);
-          }}
-          onHidden={() => {
-            virtualKeyboardCtx.setShow(false);
-          }}
+          onChangeShow={virtualKeyboardCtx.setShow}
           onChange={virtualKeyboardCtx.onChange}
           onThemeModeChange={virtualKeyboardCtx.setThemeMode}
           onPositionModeChange={virtualKeyboardCtx.setPositionMode}
