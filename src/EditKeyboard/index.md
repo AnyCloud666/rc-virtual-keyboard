@@ -33,9 +33,13 @@ export default () => {
 
 ## 属性
 
-| 属性  | 说明                           | 类型          | 默认值 |
-| ----- | ------------------------------ | ------------- | ------ |
-| style | 外部传入的样式，作用于整个容器 | CSSProperties | -      |
+| 属性                  | 说明                           | 类型                                                                                   | 默认值 |
+| --------------------- | ------------------------------ | -------------------------------------------------------------------------------------- | ------ |
+| style                 | 外部传入的样式，作用于整个容器 | CSSProperties                                                                          | -      |
+| styles                | 外部传入的样式，作用于单个元素 | {keyCursor?: CSSProperties;cursorItem?: CSSProperties;editKeyControl?: CSSProperties;} | -      |
+| styles.keyCursor      | 编辑键容器样式                 | CSSProperties                                                                          | -      |
+| styles.cursorItem     | 单个编辑键                     | CSSProperties                                                                          | -      |
+| styles.editKeyControl | 控制键                         | CSSProperties                                                                          | -      |
 
 ## 方法
 

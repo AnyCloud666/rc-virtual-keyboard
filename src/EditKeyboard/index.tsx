@@ -22,9 +22,18 @@ const cursorSvg: Record<string, JSX.Element> = {
 
 const EditKeyboard = ({
   style,
+  styles,
   onClick,
 }: {
   style?: CSSProperties;
+  styles?: {
+    /** 编辑键容器 */
+    keyCursor?: CSSProperties;
+    /** 单个编辑键 */
+    cursorItem?: CSSProperties;
+    /** 控制键 */
+    editKeyControl?: CSSProperties;
+  };
   onClick?: (e: VKB.KeyboardAttributeType) => void;
 }) => {
   const [keys, setKeys] = useState(cursorKeys);
@@ -48,10 +57,11 @@ const EditKeyboard = ({
 
   return (
     <div style={style} className="edit-keyboard">
-      <div className="edit-key-cursor">
+      <div style={styles?.keyCursor} className="edit-key-cursor">
         {keys.map((item, index) => {
           return (
             <div
+              style={styles?.cursorItem}
               className={`cursor-item ${
                 index < 7 && isSelect ? 'cursor-item-active' : ''
               }`}
@@ -69,6 +79,7 @@ const EditKeyboard = ({
       {editKeys.map((item) => {
         return (
           <div
+            style={styles?.editKeyControl}
             className="edit-key-control"
             key={item.keyCode}
             title={item.description}
