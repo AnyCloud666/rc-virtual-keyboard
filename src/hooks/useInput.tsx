@@ -188,6 +188,9 @@ const useInput = ({
   const onInput = async (e: VKB.KeyboardAttributeType) => {
     if (activeInputRef.current && typeof e.key === 'string') {
       const vkbNotEmpty = activeInputRef.current.dataset?.vkbNotEmpty;
+      const vkbNotInput =
+        activeInputRef.current.dataset?.vkbNotInput?.split(',');
+      console.log('vkbNotInput: ', vkbNotInput);
       // 处理类型
       // if (!(await handleInputType(activeInputRef.current))) return;
 
@@ -202,7 +205,7 @@ const useInput = ({
         return;
       }
 
-      if (vkbNotEmpty && e.key === Space.code) {
+      if (vkbNotInput?.includes(e.key)) {
         return;
       }
       if (

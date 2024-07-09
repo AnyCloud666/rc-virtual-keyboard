@@ -102,7 +102,7 @@ export default () => {
 };
 ```
 
-## 这些 `type` 应该禁用虚拟键盘
+## 这些 `type` 不会触发虚拟键盘
 
 - `week`
 - `month`
@@ -187,13 +187,32 @@ export default () => {
 
 ## 禁用虚拟键盘
 
-存在需求，不想触发虚拟键盘，禁止虚拟键盘输入时，在 `input` 上加入 `data-vkb-disabled` 属性去禁用
+- 存在需求，不想触发虚拟键盘，禁止虚拟键盘输入时，在 `input` 上加入 `data-vkb-disabled` 属性去禁用
+- 传入的值将转为 `string` 类型 ，`true` => `'true'`
 
 ```jsx
 export default () => {
   return (
     <>
       <input placeholder="禁止虚拟键盘输入" data-vkb-disabled />
+    </>
+  );
+};
+```
+
+## 禁用内容输入
+
+- 存在需求，不想输入某些内容时，在 `input` 上加入 `data-vkb-not-input` 属性去禁用
+- 传入的值将转为 `string` 类型, `['a', 'b', 'c']` => `a,b,c`
+
+```jsx
+export default () => {
+  return (
+    <>
+      <input
+        placeholder="禁止输入部分内容a, b, c"
+        data-vkb-not-input={['a', 'b', 'c']}
+      />
     </>
   );
 };
