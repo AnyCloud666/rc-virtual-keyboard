@@ -37,15 +37,23 @@ export default () => {
 
 ## 属性
 
-| 属性  | 说明                           | 类型          | 默认值 |
-| ----- | ------------------------------ | ------------- | ------ |
-| style | 外部传入的样式，作用于整个容器 | CSSProperties | -      |
+| 属性                         | 说明                           | 类型                                                                                                                                                                                                           | 默认值 |
+| ---------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| style                        | 外部传入的样式，作用于整个容器 | CSSProperties                                                                                                                                                                                                  | -      |
+| styles                       | 外部传入的样式，作用于单个容器 | { writeContent?: CSSProperties; writeContentCanvas?: CSSProperties; writeContentTips?: CSSProperties; writeControl?: CSSProperties; writeControlBackspace?: CSSProperties; writeControlEnter?: CSSProperties;} | -      |
+| styles.writeContent          | 书写区域                       | CSSProperties                                                                                                                                                                                                  | -      |
+| styles.writeContentCanvas    | 书写区域内部 canvas            | CSSProperties                                                                                                                                                                                                  | -      |
+| styles.writeContentTips      | 内容提示                       | CSSProperties                                                                                                                                                                                                  | -      |
+| styles.writeControl          | 书写控制区                     | CSSProperties                                                                                                                                                                                                  | -      |
+| styles.writeControlBackspace | 删除键                         | CSSProperties                                                                                                                                                                                                  | -      |
+| styles.writeControlEnter     | 回车键                         | CSSProperties                                                                                                                                                                                                  | -      |
 
 ## 方法
 
 | 方法    | 说明     | 类型                                   | 默认值 |
 | ------- | -------- | -------------------------------------- | ------ |
 | onClick | 点击事件 | (e: VKB.KeyboardAttributeType) => void | -      |
+| onDraw  | 绘制图像 | (img: string) => void                  | -      |
 
 ## 支持的样式 token
 

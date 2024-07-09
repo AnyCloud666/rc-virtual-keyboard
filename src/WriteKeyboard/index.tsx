@@ -6,10 +6,27 @@ import { VKB } from '../typing';
 import './style.css';
 const WriteKeyboard = ({
   style,
+  styles,
   onClick,
+  onDraw,
 }: {
-  style: CSSProperties;
+  style?: CSSProperties;
+  styles?: {
+    /** 书写区域 */
+    writeContent?: CSSProperties;
+    /** 书写区域内部canvas */
+    writeContentCanvas?: CSSProperties;
+    /** 内容提示 */
+    writeContentTips?: CSSProperties;
+    /** 书写控制区 */
+    writeControl?: CSSProperties;
+    /** 删除键 */
+    writeControlBackspace?: CSSProperties;
+    /** 回车键 */
+    writeControlEnter?: CSSProperties;
+  };
   onClick?: (e: VKB.KeyboardAttributeType) => void;
+  onDraw?: (img: string) => void;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const canvasCTX = useRef<CanvasRenderingContext2D | null>(null);
@@ -30,6 +47,7 @@ const WriteKeyboard = ({
       if (canvasRef.current) {
         const tempUrl = canvasRef.current?.toDataURL();
         console.log('tempUrl: ', tempUrl);
+        onDraw && onDraw(tempUrl);
         // let writeImgEl = document.body.querySelector("#write-img") as HTMLImageElement;
         // console.log("writeImgEl: ", writeImgEl);
         // if (!writeImgEl) {
@@ -110,20 +128,35 @@ const WriteKeyboard = ({
 
   return (
     <div style={style} className="write-keyboard">
-      <div className="write-content" ref={writeContentRef}>
+      <div
+        style={styles?.writeContent}
+        className="write-content"
+        ref={writeContentRef}
+      >
         <canvas
+          style={styles?.writeContentCanvas}
           className="write-content-canvas"
           ref={canvasRef}
           {...canvasRect}
         />
-        <div className="write-content-tips">单字</div>
+        <div style={styles?.writeContentTips} className="write-content-tips">
+          单字
+        </div>
       </div>
-      <div className="write-control">
-        <div className="write-control-backspace" onClick={onDelete}>
+      <div style={styles?.writeControl} className="write-control">
+        <div
+          style={styles?.writeControlBackspace}
+          className="write-control-backspace"
+          onClick={onDelete}
+        >
           {/* Del */}
           <DeleteSvg />
         </div>
-        <div className="write-control-enter" onClick={generateImage.run}>
+        <div
+          style={styles?.writeControlEnter}
+          className="write-control-enter"
+          onClick={generateImage.run}
+        >
           {/* Enter */}
           <EnterSvg />
         </div>
