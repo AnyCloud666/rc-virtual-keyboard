@@ -5,19 +5,28 @@ import './style.css';
 
 const SymbolKeyboard = ({
   style,
+  styles,
   onClick,
 }: {
-  style: CSSProperties;
-  onClick: (e: VKB.KeyboardAttributeType) => void;
+  style?: CSSProperties;
+  styles?: {
+    symbolKeyTab?: CSSProperties;
+    symbolKeyTabItem?: CSSProperties;
+    symbolKeyContent?: CSSProperties;
+    symbolKeyItem?: CSSProperties;
+    symbolKeyItemTips?: CSSProperties;
+  };
+  onClick?: (e: VKB.KeyboardAttributeType) => void;
 }) => {
   const [activeSymbol, setActiveSymbol] = useState(symbolKeys[0]);
 
   return (
     <div style={style} className="symbol-keyboard">
-      <div className="symbol-key-tab">
+      <div style={styles?.symbolKeyTab} className="symbol-key-tab">
         {symbolKeys.map((item) => {
           return (
             <div
+              style={styles?.symbolKeyTabItem}
               className={`symbol-key-tab-item ${
                 activeSymbol.id === item.id ? 'symbol-key-tab-item-active' : ''
               }`}
@@ -29,16 +38,20 @@ const SymbolKeyboard = ({
           );
         })}
       </div>
-      <div className="symbol-key-content">
+      <div style={styles?.symbolKeyContent} className="symbol-key-content">
         {activeSymbol.value.map((item) => {
           return (
             <div
-              className="symbol-key-item"
               key={item.keyCode}
-              onClick={() => onClick(item)}
+              style={styles?.symbolKeyItem}
+              className="symbol-key-item"
+              onClick={() => onClick && onClick(item)}
             >
               {item.key}
-              <span className="symbol-key-item-tips">
+              <span
+                style={styles?.symbolKeyItemTips}
+                className="symbol-key-item-tips"
+              >
                 {(typeof activeSymbol.label === 'string' &&
                   activeSymbol.label?.slice(0, 1)) ??
                   ''}
