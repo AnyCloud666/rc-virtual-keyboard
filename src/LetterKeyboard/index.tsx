@@ -10,6 +10,7 @@ import './style.css';
 /** 字母键盘 */
 const LetterKeyboard = ({
   style,
+  styles,
   inputMode,
   inputValue,
   chinese,
@@ -19,6 +20,36 @@ const LetterKeyboard = ({
   onSelectChinese,
 }: {
   style?: CSSProperties;
+  styles?: {
+    /** 按键区域 */
+    letterKeyboardArea?: CSSProperties;
+    /** 单个按键 */
+    letterKeyItem?: CSSProperties;
+    /** 大小写切换 */
+    letterCapsLockLock?: CSSProperties;
+    /** 选中模式 */
+    letterCapsLockLockBig?: CSSProperties;
+    /** 非选中模式 */
+    letterCapsLockLockSmall?: CSSProperties;
+    /** 中英文切换 */
+    letterShift?: CSSProperties;
+    /** 选中模式 */
+    letterShiftBig?: CSSProperties;
+    /** 非选中模式 */
+    letterShiftSmall?: CSSProperties;
+    /** 输入法区域 */
+    letterKeyboardTemp?: CSSProperties;
+    /** 当前输入的拼音 */
+    letterKeyboardTempPinyin?: CSSProperties;
+    /** 向左选择 */
+    letterKeyboardTempLeft?: CSSProperties;
+    /** 向右选择 */
+    letterKeyboardTempRight?: CSSProperties;
+    /** 拼音转中文的列表 */
+    letterKeyboardTempList?: CSSProperties;
+    /** 拼音转中文的单个汉字 */
+    letterKeyboardTempChar?: CSSProperties;
+  };
   chinese?: string[];
   inputValue?: string;
   inputMode: typeof ZH | typeof EN;
@@ -108,19 +139,33 @@ const LetterKeyboard = ({
   return (
     <div style={style} className="letter-keyboard" onMouseDown={onMouseDown}>
       {inputMode === ZH && inputValue && (
-        <div className="letter-keyboard-temp">
-          <div className="letter-keyboard-temp-pinyin">{inputValue}</div>
+        <div
+          style={styles?.letterKeyboardTemp}
+          className="letter-keyboard-temp"
+        >
           <div
+            style={styles?.letterKeyboardTempPinyin}
+            className="letter-keyboard-temp-pinyin"
+          >
+            {inputValue}
+          </div>
+          <div
+            style={styles?.letterKeyboardTempLeft}
             className="letter-keyboard-temp-left"
             onClick={() => onMore('minus')}
           >
             <LeftSvg />
           </div>
-          <div className="letter-keyboard-temp-list" ref={tempInputAreaRef}>
+          <div
+            style={styles?.letterKeyboardTempList}
+            className="letter-keyboard-temp-list"
+            ref={tempInputAreaRef}
+          >
             {chinese?.map((item, index) => {
               return (
                 <div
                   key={index}
+                  style={styles?.letterKeyboardTempChar}
                   className="letter-keyboard-temp-char"
                   onClick={() => onSelectChinese && onSelectChinese(item)}
                 >
@@ -130,6 +175,7 @@ const LetterKeyboard = ({
             })}
           </div>
           <div
+            style={styles?.letterKeyboardTempRight}
             className="letter-keyboard-temp-right"
             onClick={() => onMore('add')}
           >
@@ -138,27 +184,49 @@ const LetterKeyboard = ({
         </div>
       )}
 
-      <div className="letter-keyboard-area">
+      <div style={styles?.letterKeyboardArea} className="letter-keyboard-area">
         {keys.map((item) => {
           return (
             <div
+              style={styles?.letterKeyItem}
               className="letter-key-item"
               title={item.description}
               key={item.keyCode}
               onClick={() => onClickLetter(item)}
             >
               {item.code === 'CapsLock' ? (
-                <div className="letter-caps-lock">
-                  <span className="letter-caps-lock-big"> {item.key}</span>/
-                  <span className="letter-caps-lock-small">
+                <div
+                  style={styles?.letterCapsLockLock}
+                  className="letter-caps-lock"
+                >
+                  <span
+                    style={styles?.letterCapsLockLockBig}
+                    className="letter-caps-lock-big"
+                  >
+                    {item.key}
+                  </span>
+                  /
+                  <span
+                    style={styles?.letterCapsLockLockSmall}
+                    className="letter-caps-lock-small"
+                  >
                     {item.key === '大' ? '小' : '大'}
                   </span>
                 </div>
               ) : // item.key
               item.code === 'Shift' ? (
-                <div className="letter-shift">
-                  <span className="letter-shift-big">{item.key}</span>/
-                  <span className="letter-shift-small">
+                <div style={styles?.letterShift} className="letter-shift">
+                  <span
+                    style={styles?.letterShiftBig}
+                    className="letter-shift-big"
+                  >
+                    {item.key}
+                  </span>
+                  /
+                  <span
+                    style={styles?.letterShiftSmall}
+                    className="letter-shift-small"
+                  >
                     {item.key === '英' ? '中' : '英'}
                   </span>
                 </div>
