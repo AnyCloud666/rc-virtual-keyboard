@@ -13,11 +13,11 @@ const LetterKeyboard = ({
   styles,
   inputMode,
   inputValue,
-  chinese,
+  words,
   onClick,
   onMouseDown,
   onChangeInputMode,
-  onSelectChinese,
+  onSelectWord,
 }: {
   style?: CSSProperties;
   styles?: {
@@ -50,13 +50,13 @@ const LetterKeyboard = ({
     /** 拼音转中文的单个汉字 */
     letterKeyboardTempChar?: CSSProperties;
   };
-  chinese?: string[];
+  words?: string[];
   inputValue?: string;
   inputMode: typeof ZH | typeof EN;
   onClick?: (e: VKB.KeyboardAttributeType) => void;
   onMouseDown?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   onChangeInputMode?: (mode: VKB.InputMode) => void;
-  onSelectChinese?: (chinese: string) => void;
+  onSelectWord?: (words: string) => void;
 }) => {
   /** 临时输入区引用 */
   const tempInputAreaRef = useRef<HTMLDivElement | null>(null);
@@ -161,13 +161,13 @@ const LetterKeyboard = ({
             className="letter-keyboard-temp-list"
             ref={tempInputAreaRef}
           >
-            {chinese?.map((item, index) => {
+            {words?.map((item, index) => {
               return (
                 <div
                   key={index}
                   style={styles?.letterKeyboardTempChar}
                   className="letter-keyboard-temp-char"
-                  onClick={() => onSelectChinese && onSelectChinese(item)}
+                  onClick={() => onSelectWord && onSelectWord(item)}
                 >
                   {item}
                 </div>

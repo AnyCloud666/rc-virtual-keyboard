@@ -1,15 +1,23 @@
 import { useDebounceFn, useEventListener } from 'ahooks';
 import React, { CSSProperties, useEffect, useRef, useState } from 'react';
+import { Backspace } from '../keys';
 import { ReactComponent as DeleteSvg } from '../svg/delete.svg';
 import { ReactComponent as EnterSvg } from '../svg/enter.svg';
+import { ReactComponent as LeftSvg } from '../svg/left.svg';
+import { ReactComponent as RightSvg } from '../svg/right.svg';
+
 import { VKB } from '../typing';
 import './style.css';
 const WriteKeyboard = ({
+  words,
   style,
   styles,
   onClick,
   onDraw,
+  onSelectWord,
+  onMouseDown = (e) => e.preventDefault(),
 }: {
+  words?: string[];
   style?: CSSProperties;
   styles?: {
     /** 书写区域 */
@@ -24,14 +32,29 @@ const WriteKeyboard = ({
     writeControlBackspace?: CSSProperties;
     /** 回车键 */
     writeControlEnter?: CSSProperties;
+    /** 手写识别到的临时区域 */
+    writeKeyboardTemp?: CSSProperties;
+    /** 左侧翻页 */
+    writeKeyboardTempLeft?: CSSProperties;
+    /** 识别到的字符列表 */
+    writeKeyboardTempList?: CSSProperties;
+    /** 识别到的字符 */
+    writeKeyboardTempChar?: CSSProperties;
+    /** 右侧翻页 */
+    writeKeyboardTempRight?: CSSProperties;
   };
   onClick?: (e: VKB.KeyboardAttributeType) => void;
   onDraw?: (img: string) => void;
+  onSelectWord?: (word: string) => void;
+  onMouseDown?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const canvasCTX = useRef<CanvasRenderingContext2D | null>(null);
   const writeContentRef = useRef<HTMLDivElement | null>(null);
   const allowMove = useRef(false);
+  const imgUrl = useRef('');
+  /** 临时输入区引用 */
+  const tempInputAreaRef = useRef<HTMLDivElement | null>(null);
   const [canvasRect, setCanvasRect] = useState({
     width: '200px',
     height: '200px',
@@ -40,31 +63,40 @@ const WriteKeyboard = ({
   const onDelete = () => {
     if (canvasCTX.current) {
       canvasCTX.current.clearRect(0, 0, 10000, 10000);
+      if (imgUrl.current) {
+        imgUrl.current = '';
+      } else {
+        onClick && onClick(Backspace);
+      }
     }
   };
   const generateImage = useDebounceFn(
     () => {
       if (canvasRef.current) {
         const tempUrl = canvasRef.current?.toDataURL();
-        console.log('tempUrl: ', tempUrl);
+
+        imgUrl.current = tempUrl;
         onDraw && onDraw(tempUrl);
-        // let writeImgEl = document.body.querySelector("#write-img") as HTMLImageElement;
-        // console.log("writeImgEl: ", writeImgEl);
-        // if (!writeImgEl) {
-        //   writeImgEl = document.createElement("img");
-        //   writeImgEl.id = "write-img";
-        //   writeImgEl.style.position = "fixed";
-        //   writeImgEl.style.top = "0px";
-        //   writeImgEl.style.left = "0px";
-        //   document.body.appendChild(writeImgEl);
-        // }
-        // writeImgEl.src = tempUrl;
       }
     },
     {
       wait: 1000,
     },
   );
+
+  /** 翻页 */
+  const onMore = (type: string) => {
+    if (tempInputAreaRef.current) {
+      const width = tempInputAreaRef.current.offsetWidth;
+      tempInputAreaRef.current.scrollTo({
+        left:
+          tempInputAreaRef.current.scrollLeft +
+          (type === 'add' ? width : -width) / 10,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   useEventListener(
     'mousedown',
     (e: MouseEvent) => {
@@ -127,7 +159,46 @@ const WriteKeyboard = ({
   }, []);
 
   return (
-    <div style={style} className="write-keyboard">
+    <div style={style} className="write-keyboard" onMouseDown={onMouseDown}>
+      {words && words.length > 0 && (
+        <div style={styles?.writeKeyboardTemp} className="write-keyboard-temp">
+          <div
+            style={styles?.writeKeyboardTempLeft}
+            className="write-keyboard-temp-left"
+            onClick={() => onMore('minus')}
+          >
+            <LeftSvg />
+          </div>
+          <div
+            style={styles?.writeKeyboardTempList}
+            className="write-keyboard-temp-list"
+            ref={tempInputAreaRef}
+          >
+            {words?.map((item, index) => {
+              return (
+                <div
+                  key={index}
+                  style={styles?.writeKeyboardTempChar}
+                  className="write-keyboard-temp-char"
+                  onClick={() => {
+                    onDelete();
+                    onSelectWord && onSelectWord(item);
+                  }}
+                >
+                  {item}
+                </div>
+              );
+            })}
+          </div>
+          <div
+            style={styles?.writeKeyboardTempRight}
+            className="write-keyboard-temp-right"
+            onClick={() => onMore('add')}
+          >
+            <RightSvg />
+          </div>
+        </div>
+      )}
       <div
         style={styles?.writeContent}
         className="write-content"

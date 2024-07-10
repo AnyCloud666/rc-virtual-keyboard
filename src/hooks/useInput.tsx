@@ -1,5 +1,6 @@
 import { useEventListener } from 'ahooks';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import imgToWordV1 from 'react-virtual-keyboard/utils/ocr';
 import {
   ArrowDown,
   ArrowLeft,
@@ -43,7 +44,8 @@ const useInput = ({
   onChangeShow,
   onThemeModeChange,
   onPositionModeChange,
-  onPinyin2Chinese = pinyin2ChineseV1,
+  onPinyin2Words = pinyin2ChineseV1,
+  onImg2Words = imgToWordV1,
 }: {
   /** 主题模式 */
   themeMode?: string;
@@ -62,7 +64,9 @@ const useInput = ({
   /** 位置模式改变 */
   onPositionModeChange?: (mode: string) => void;
   /** 拼音转汉字，自定义实现拼音转汉字，默认采用最简单的单字输入模式 */
-  onPinyin2Chinese?: (value: string) => { pinyin: string; chinese: string[] };
+  onPinyin2Words?: (pinyin: string) => { pinyin: string; words: string[] };
+  /** 图片转字符 */
+  onImg2Words?: (imgUrl: string) => Promise<string[]>;
 }) => {
   /** 光标选择模式 */
   const cursorMode = useRef('index');
@@ -101,8 +105,8 @@ const useInput = ({
   const [inputMode, setInputMode] = useState<VKB.InputMode>(EN);
   /** 输入的值 */
   const [inputValue, setInputValue] = useState('');
-  /** 当前拼音转成的中文 */
-  const [chinese, setChinese] = useState<string[]>([]);
+  /** 当前拼音转成的字符 */
+  const [words, setWords] = useState<string[]>([]);
   /** 删除inputValue 不立马删除targetValue中的值 */
   const jumpDelete = useRef(false);
   /** 焦点状态 */
@@ -215,12 +219,12 @@ const useInput = ({
       ) {
         const value = inputValue + e.key;
 
-        const transformMsg = (onPinyin2Chinese && onPinyin2Chinese(value)) || {
+        const transformMsg = (onPinyin2Words && onPinyin2Words(value)) || {
           pinyin: value,
-          chinese: [],
+          words: [],
         };
         setInputValue(value);
-        setChinese([value, ...transformMsg.chinese]);
+        setWords([value, ...transformMsg.words]);
         jumpDelete.current = false;
       } else {
         let value = activeInputRef.current.value;
@@ -261,12 +265,12 @@ const useInput = ({
 
       if (inputMode === ZH) {
         const value = inputValue.slice(0, inputValue.length - 1);
-        const transformMsg = (onPinyin2Chinese && onPinyin2Chinese(value)) || {
+        const transformMsg = (onPinyin2Words && onPinyin2Words(value)) || {
           pinyin: value,
-          chinese: [],
+          words: [],
         };
         setInputValue(value);
-        setChinese([value, ...transformMsg.chinese]);
+        setWords([value, ...transformMsg.words]);
 
         if (value) return;
 
@@ -280,6 +284,8 @@ const useInput = ({
       const selectionStart = activeInputRef.current.selectionStart ?? 0;
       const selectionEnd = activeInputRef.current.selectionEnd ?? 0;
       const value = activeInputRef.current.value;
+
+      console.log('value: ', value);
 
       const tempValue =
         value.slice(
@@ -413,7 +419,7 @@ const useInput = ({
   };
 
   /** 选择输入的中文 */
-  const onSelectChinese = (chinese: string) => {
+  const onSelectWord = (chinese: string) => {
     if (
       activeInputRef.current &&
       !needHandleInputType.includes(inputType.current)
@@ -447,13 +453,14 @@ const useInput = ({
           code: '-1',
           key: value,
           keyCode: -1,
-          keyType: 'chinese',
+          keyType: 'word',
         });
 
       setInputValue('');
+      setWords([]);
     } else {
       setInputValue('');
-      setChinese([]);
+      setWords([]);
       console.error('input type = email or number not allow input chinese');
     }
   };
@@ -601,7 +608,12 @@ const useInput = ({
     return checkStopPropagation(target.parentNode, targetId, outId);
   };
 
-  /** 整个键盘的鼠标按下事件，整个键盘的触摸事件，用来对虚拟键盘进行移动 */
+  /**
+   * 整个键盘的鼠标按下事件，整个键盘的触摸事件，用来对虚拟键盘进行移动
+   *
+   * @param {(React.MouseEvent<HTMLDivElement, MouseEvent>
+   *       | React.TouchEvent<HTMLDivElement>)} e
+   */
   const onMouseDown = (
     e:
       | React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -618,6 +630,16 @@ const useInput = ({
     }
   };
 
+  /**
+   * canvas 绘制的图片
+   *
+   * @param {string} imgUrl
+   */
+  const onDraw = async (imgUrl: string) => {
+    const res = await onImg2Words(imgUrl);
+    setWords(res);
+  };
+
   useEffect(() => {
     setVkbThemeMode(themeMode);
   }, [themeMode]);
@@ -631,11 +653,12 @@ const useInput = ({
     inputValue,
     vkbThemeMode,
     vkbPositionMode,
-    chinese,
+    words,
     activeKeyboard,
+    onDraw,
     onClick,
     onMouseDown,
-    onSelectChinese,
+    onSelectWord,
     onChangeInputMode,
     setActiveKeyboard,
   };

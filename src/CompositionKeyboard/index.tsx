@@ -68,12 +68,13 @@ const CompositionKeyboard = ({
     inputValue,
     vkbThemeMode,
     vkbPositionMode,
-    chinese,
+    words,
     activeKeyboard,
     setActiveKeyboard,
+    onDraw,
     onClick,
     onMouseDown,
-    onSelectChinese,
+    onSelectWord,
     onChangeInputMode,
   } = useInput({
     themeMode,
@@ -84,7 +85,7 @@ const CompositionKeyboard = ({
     onChangeShow,
     onThemeModeChange,
     onPositionModeChange,
-    onPinyin2Chinese: pinyin2ChineseV1,
+    onPinyin2Words: pinyin2ChineseV1,
   });
 
   return (
@@ -138,11 +139,12 @@ const CompositionKeyboard = ({
               inputMode={inputMode}
               themeMode={vkbThemeMode}
               positionMode={vkbPositionMode}
-              chinese={chinese}
+              words={words}
               onClick={onClick}
+              onDraw={onDraw}
               onChangeInputMode={onChangeInputMode}
               inputValue={inputValue}
-              onSelectChinese={onSelectChinese}
+              onSelectWord={onSelectWord}
               onMouseDown={(e) => {
                 e.preventDefault();
               }}

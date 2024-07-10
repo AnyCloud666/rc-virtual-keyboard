@@ -21,26 +21,24 @@ declare namespace VKB {
     | 'emjo'
     | 'write'
     | 'setting'
-    | 'chinese';
+    | 'word';
 
   type KeyboardTabItem = {
     id: KeyType;
     label: ReactNode;
     name: string;
-    Component: ({
-      onClick,
-      onChangeInputMode,
-    }: {
+    Component: (props: {
       themeMode: string;
       inputMode: InputMode;
       positionMode: string;
       inputValue: string;
-      chinese: string[];
+      words: string[];
       onMouseDown: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
       onClick: (e: VKB.KeyboardAttributeType) => void;
       onChangeInputMode: (mode: InputMode) => void;
       onChangeInputMode: (mode: VKB.InputMode) => void;
-      onSelectChinese: (chinese: string) => void;
+      onSelectWord: (words: string) => void;
+      onDraw: (imgUrl: string) => void;
     }) => JSX.Element;
   };
 

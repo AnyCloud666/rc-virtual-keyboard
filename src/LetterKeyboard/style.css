@@ -81,7 +81,7 @@
 }
 
 .letter-keyboard-temp-right:active svg,
-.letter-keyboard-left:active svg {
+.letter-keyboard-temp-left:active svg {
   fill: var(--vkb-key-active-font-color);
 }
 
@@ -156,7 +156,7 @@
   font-size: 12px;
 }
 
-.letter-key-item > svg {
+.letter-key-item>svg {
   width: var(--vkb-keyboard-svg-size);
   height: var(--vkb-keyboard-svg-size);
 }

@@ -1,4 +1,4 @@
-import dictionaries from "../lib/dictionaries";
+import dictionaries from '../lib/dictionaries';
 
 /** 获取单个汉字 */
 export function getSingleChinese(pinyin: string) {
@@ -7,23 +7,23 @@ export function getSingleChinese(pinyin: string) {
 
 /** 拼音转汉字 */
 export function pinyin2ChineseV1(pinyin: string) {
-  let chinese = getSingleChinese(pinyin);
+  let words = getSingleChinese(pinyin);
 
-  if (chinese) {
+  if (words) {
     return {
       pinyin,
-      chinese: chinese.split(""),
+      words: words.split(''),
     };
   }
 
-  let temp = "";
+  let temp = '';
 
   for (let i = 0, len = pinyin.length; i < len; i++) {
     temp += pinyin[i];
 
-    chinese = getSingleChinese(temp);
+    words = getSingleChinese(temp);
 
-    if (!chinese) continue;
+    if (!words) continue;
 
     // flag表示如果当前能匹配到结果、并且往后5个字母不能匹配结果，因为最长可能是5个字母，如 zhuang
 
@@ -41,14 +41,14 @@ export function pinyin2ChineseV1(pinyin: string) {
     if (!flag) {
       return {
         pinyin: pinyin.substr(0, i + 1) + "'" + pinyin.substr(i + 1),
-        chinese: chinese.split(""),
+        words: words.split(''),
       };
     }
   }
 
   // 理论上一般不会出现这种情况
   return {
-    pinyin: "",
-    chinese: [],
+    pinyin: '',
+    words: [],
   };
 }

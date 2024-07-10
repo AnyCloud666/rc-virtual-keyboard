@@ -10,10 +10,10 @@ const SettingKeyboard = ({
   positionMode,
   onClick,
 }: {
-  style: CSSProperties;
-  themeMode: string;
-  positionMode: string;
-  onClick: (e: VKB.KeyboardAttributeType) => void;
+  style?: CSSProperties;
+  themeMode?: string;
+  positionMode?: string;
+  onClick?: (e: VKB.KeyboardAttributeType) => void;
 }) => {
   return (
     <div style={style} className="setting-keyboard">
@@ -29,7 +29,7 @@ const SettingKeyboard = ({
                       ? 'setting-keyboard-box-item-active'
                       : ''
                   }`}
-                  onClick={() => onClick(item)}
+                  onClick={() => onClick && onClick(item)}
                   title={item.description}
                 >
                   {item.key}
@@ -53,7 +53,7 @@ const SettingKeyboard = ({
                       ? 'setting-keyboard-box-item-active'
                       : ''
                   }`}
-                  onClick={() => onClick(item)}
+                  onClick={() => onClick && onClick(item)}
                   title={item.description}
                 >
                   {item.key}

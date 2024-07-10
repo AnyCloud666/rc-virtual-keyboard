@@ -25,20 +25,20 @@ export const LetterKeyboardTab: VKB.KeyboardTabItem = {
   Component: ({
     inputMode,
     inputValue,
-    chinese,
+    words,
     onClick,
     onMouseDown,
     onChangeInputMode,
-    onSelectChinese,
+    onSelectWord,
   }) => (
     <LetterKeyboard
       inputValue={inputValue}
-      chinese={chinese}
+      words={words}
       inputMode={inputMode}
       onClick={onClick}
       onMouseDown={onMouseDown}
       onChangeInputMode={onChangeInputMode}
-      onSelectChinese={onSelectChinese}
+      onSelectWord={onSelectWord}
     />
   ),
 };
@@ -69,7 +69,14 @@ export const WriteKeyboardTab: VKB.KeyboardTabItem = {
   id: 'write',
   label: <WriteSvg />,
   name: '手写板',
-  Component: ({ onClick }) => <WriteKeyboard onClick={onClick} />,
+  Component: ({ words, onClick, onDraw, onSelectWord }) => (
+    <WriteKeyboard
+      words={words}
+      onDraw={onDraw}
+      onClick={onClick}
+      onSelectWord={onSelectWord}
+    />
+  ),
 };
 /** 设置tab */
 export const SettingKeyboardTab: VKB.KeyboardTabItem = {

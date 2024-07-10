@@ -16,17 +16,18 @@ nav:
 
 ## 参数
 
-| 参数                  | 说明                                                           | 类型                                                     | 默认值           |
-| --------------------- | -------------------------------------------------------------- | -------------------------------------------------------- | ---------------- |
-| themeMode             | 主题模式                                                       | string                                                   | -                |
-| positionMode          | 位置模式                                                       | string                                                   | -                |
-| defaultActiveKeyboard | 默认选中的键盘                                                 | string                                                   | -                |
-| onEnter               | enter 方法回调                                                 | ()=>void                                                 | -                |
-| onChange              | 输入回调                                                       | (e: VKB.KeyboardAttributeType) => void                   | -                |
-| onChangeShow          | 显示/隐藏                                                      | (s: boolean) => void                                     | -                |
-| onThemeModeChange     | 主题改变                                                       | (mode: string) => void                                   | -                |
-| onPositionModeChange  | 位置改变                                                       | (mode: string) => void                                   | -                |
-| onPinyin2Chinese      | 拼音转汉字，自定义实现拼音转汉字，默认采用最简单的单字输入模式 | (value: string) => { pinyin: string; chinese: string[] } | pinyin2ChineseV1 |
+| 参数                  | 说明                                                           | 类型                                                    | 默认值           |
+| --------------------- | -------------------------------------------------------------- | ------------------------------------------------------- | ---------------- |
+| themeMode             | 主题模式                                                       | string                                                  | -                |
+| positionMode          | 位置模式                                                       | string                                                  | -                |
+| defaultActiveKeyboard | 默认选中的键盘                                                 | string                                                  | -                |
+| onEnter               | enter 方法回调                                                 | ()=>void                                                | -                |
+| onChange              | 输入回调                                                       | (e: VKB.KeyboardAttributeType) => void                  | -                |
+| onChangeShow          | 显示/隐藏                                                      | (s: boolean) => void                                    | -                |
+| onThemeModeChange     | 主题改变                                                       | (mode: string) => void                                  | -                |
+| onPositionModeChange  | 位置改变                                                       | (mode: string) => void                                  | -                |
+| onPinyin2Words        | 拼音转汉字，自定义实现拼音转汉字，默认采用最简单的单字输入模式 | (pinyin: string) => { pinyin: string; words: string[] } | pinyin2ChineseV1 |
+| onImg2Words           | 拼音转汉字，自定义实现拼音转汉字，默认采用最简单的单字输入模式 | (imgUrl: string) => { pinyin: string; words: string[] } | imgToWordV1      |
 
 ## 结果
 

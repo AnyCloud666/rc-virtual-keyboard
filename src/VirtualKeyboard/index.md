@@ -97,13 +97,15 @@ export default () => {
 
 ## 方法
 
-| 方法            | 说明                                     | 类型                               | 默认值 |
-| --------------- | ---------------------------------------- | ---------------------------------- | ------ |
-| setShow         | 显示 ,传入的必须是 setStatus 重新 render | (show: boolean) => void            | -      |
-| setThemeMode    | 设置主题模式                             | (mode:string)=>void                | -      |
-| setPositionMode | 设置位置模式                             | (mode:string)=>void                | -      |
-| onChange        | 操作时的回调,通过 ctx 重写 onChange 实现 | onChange?: (value: string) => void | -      |
-| onEnter         | 回车 通过 ctx 重写 onEnter 实现          | onEnter?: () => void               | -      |
+| 方法            | 说明                                                   | 类型                      | 默认值 |
+| --------------- | ------------------------------------------------------ | ------------------------- | ------ |
+| setShow         | 显示 ,传入的必须是 setStatus 重新 render               | (show: boolean) => void   | -      |
+| setThemeMode    | 设置主题模式                                           | (mode:string)=>void       | -      |
+| setPositionMode | 设置位置模式                                           | (mode:string)=>void       | -      |
+| onChange        | 操作时的回调,通过 ctx 重写 onChange 实现               | (value: string) => void   | -      |
+| onEnter         | 回车 通过 ctx 重写 onEnter 实现                        | () => void                | -      |
+| onPinyin2Word   | 默认实现了最简单的转换方式，可以自定义实现             | (pinyin:string)=>string[] | -      |
+| onImg2Word      | 手写板图片转字符，如果你想使用手写板，你应该实现该方法 | (imgUrl:string)=>string[] | -      |
 
 ## 支持的样式 token
 

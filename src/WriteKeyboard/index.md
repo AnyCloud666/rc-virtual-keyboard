@@ -14,39 +14,52 @@ nav:
 
 # 手写键
 
-手写识别，暂未完成，请等待
+手写识别，采用了 `tesseract.js` 进行 `OCR` 识别
 
 或
 
-将书写的图片进行导出，采用第三方进行识别...
+将书写的图片进行导出，采用第三方进行识别...，你需要实现 `onImg2Word:(imgUrl: string) => Promise<string[]>` 方法
 
 ```jsx
-import { WriteKeyboard } from 'react-virtual-keyboard';
+import { WriteKeyboard, useInput, keys } from 'react-virtual-keyboard';
 
 export default () => {
-  const onClick = (e) => {
-    console.log('WriteKeyboard e: ', e);
-  };
+  const { words, onDraw, onClick, onSelectWord } = useInput({
+    defaultActiveKeyboard: keys.writeType,
+  });
   return (
-    <div style={{ width: 500, height: 320, margin: '0 auto' }}>
-      <WriteKeyboard onClick={onClick} />
-    </div>
+    <>
+      <input style={{ marginBottom: 50 }} />
+      <div style={{ width: 500, height: 320, margin: '0 auto' }}>
+        <WriteKeyboard
+          words={words}
+          onDraw={onDraw}
+          onSelectWord={onSelectWord}
+          onClick={onClick}
+        />
+      </div>
+    </>
   );
 };
 ```
 
 ## 属性
 
-| 属性                         | 说明                           | 类型                                                                                                                                                                                                           | 默认值 |
-| ---------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| style                        | 外部传入的样式，作用于整个容器 | CSSProperties                                                                                                                                                                                                  | -      |
-| styles                       | 外部传入的样式，作用于单个容器 | { writeContent?: CSSProperties; writeContentCanvas?: CSSProperties; writeContentTips?: CSSProperties; writeControl?: CSSProperties; writeControlBackspace?: CSSProperties; writeControlEnter?: CSSProperties;} | -      |
-| styles.writeContent          | 书写区域                       | CSSProperties                                                                                                                                                                                                  | -      |
-| styles.writeContentCanvas    | 书写区域内部 canvas            | CSSProperties                                                                                                                                                                                                  | -      |
-| styles.writeContentTips      | 内容提示                       | CSSProperties                                                                                                                                                                                                  | -      |
-| styles.writeControl          | 书写控制区                     | CSSProperties                                                                                                                                                                                                  | -      |
-| styles.writeControlBackspace | 删除键                         | CSSProperties                                                                                                                                                                                                  | -      |
-| styles.writeControlEnter     | 回车键                         | CSSProperties                                                                                                                                                                                                  | -      |
+| 属性                          | 说明                           | 类型                                                                                                                                                                                                                                                                                                                                                                                                       | 默认值 |
+| ----------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| style                         | 外部传入的样式，作用于整个容器 | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                              | -      |
+| styles                        | 外部传入的样式，作用于单个容器 | { writeContent?: CSSProperties; writeContentCanvas?: CSSProperties; writeContentTips?: CSSProperties; writeControl?: CSSProperties; writeControlBackspace?: CSSProperties; writeControlEnter?: CSSProperties; writeKeyboardTemp?: CSSProperties;writeKeyboardTempLeft?: CSSProperties;writeKeyboardTempList?: CSSProperties;writeKeyboardTempChar?: CSSProperties;writeKeyboardTempRight?: CSSProperties;} | -      |
+| styles.writeContent           | 书写区域                       | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                              | -      |
+| styles.writeContentCanvas     | 书写区域内部 canvas            | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                              | -      |
+| styles.writeContentTips       | 内容提示                       | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                              | -      |
+| styles.writeControl           | 书写控制区                     | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                              | -      |
+| styles.writeControlBackspace  | 删除键                         | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                              | -      |
+| styles.writeControlEnter      | 回车键                         | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                              | -      |
+| styles.writeKeyboardTemp      | 手写识别到的临时区域           | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                              | -      |
+| styles.writeKeyboardTempLeft  | 左侧翻页                       | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                              | -      |
+| styles.writeKeyboardTempRight | writeKeyboardTempRight         | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                              | -      |
+| styles.writeKeyboardTempList  | 识别到的字符列表               | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                              | -      |
+| styles.writeKeyboardTempChar  | 识别到的字符                   | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                              | -      |
 
 ## 方法
 
