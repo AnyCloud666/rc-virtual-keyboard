@@ -4,14 +4,14 @@ let workerEng: Tesseract.Worker;
 let workerCh: Tesseract.Worker;
 async function init() {
   workerEng = await createWorker('eng', 1, {
-    corePath: '/public/tesseract-core-simd-lstm.wasm.js',
-    workerPath: '/public/worker.min.js',
-    langPath: '/public/eng.traineddata.gz',
+    corePath: '/tesseract-core-simd-lstm.wasm.js',
+    workerPath: '/worker.min.js',
+    langPath: '/',
   });
   workerCh = await createWorker('chi_sim', 1, {
-    corePath: '/public/tesseract-core-simd-lstm.wasm.js',
-    workerPath: '/public/worker.min.js',
-    langPath: '/public/chi_sim.traineddata.gz',
+    corePath: '/tesseract-core-simd-lstm.wasm.js',
+    workerPath: '/worker.min.js',
+    langPath: '/',
   });
 }
 init();
