@@ -68,8 +68,8 @@ const useInput = ({
   /** 图片转字符 */
   onImg2Words?: (imgUrl: string) => Promise<string[]>;
 }) => {
-  /** 光标选择模式 */
-  const cursorMode = useRef('index');
+  /** 光标选择模式 index 插入模式， select 选择模式 */
+  const cursorMode = useRef<'index' | 'select'>('index');
   /** 无效 type */
   const invalidInputType = [
     'week',
@@ -321,42 +321,60 @@ const useInput = ({
       const value = activeInputRef.current.value;
       const maxLength = value.length;
 
-      // TODO: 待优化
       if (cursorMode.current === 'index') {
+        // 插入模式
         switch (e.code) {
+          // 上 || 最左 光标位置放置到最前面
           case ArrowUp.code:
           case ArrowLeftFirst.code:
             activeInputRef.current.setSelectionRange(0, 0);
             break;
-          case ArrowLeft.code:
-            index = selectionEnd - 1 > 0 ? selectionEnd - 1 : 0;
-            activeInputRef.current.setSelectionRange(index, index);
-            break;
-          case ArrowRight.code:
-            index = selectionEnd + 1 > maxLength ? maxLength : selectionEnd + 1;
-            activeInputRef.current.setSelectionRange(index, index);
-            break;
+          // 下 || 最右 光标位置放置到最后面
           case ArrowDown.code:
           case ArrowRightEnd.code:
             activeInputRef.current.setSelectionRange(maxLength, maxLength);
             break;
+          // 左 光标位置向前移动一位
+          case ArrowLeft.code:
+            index = selectionEnd - 1 > 0 ? selectionEnd - 1 : 0;
+            activeInputRef.current.setSelectionRange(index, index);
+            break;
+          // 右 光标位置向后移动一位
+          case ArrowRight.code:
+            index = selectionEnd + 1 > maxLength ? maxLength : selectionEnd + 1;
+            activeInputRef.current.setSelectionRange(index, index);
+            break;
+          // 选择全部 光标范围设置为 0-最后
           case SelectAll.code:
             activeInputRef.current.setSelectionRange(0, maxLength);
             break;
+          // 开始选择 标记为选择模式
           case StartSelect.code:
             cursorMode.current = 'select';
             break;
         }
       } else {
+        // 选择模式
         switch (e.code) {
+          // 上 || 最左 选择 0   如果开始位置和结束位置一样，到 光标开始位置 ，否则 到 光标结束位置
           case ArrowUp.code:
           case ArrowLeftFirst.code:
-            activeInputRef.current.setSelectionRange(0, selectionEnd);
+            activeInputRef.current.setSelectionRange(
+              0,
+              selectionEnd === selectionStart ? selectionStart : selectionEnd,
+            );
             break;
+          // 下 || 最右 选择 光标开始位置 到 最后
+          case ArrowDown.code:
+          case ArrowRightEnd.code:
+            activeInputRef.current.setSelectionRange(selectionStart, maxLength);
+            break;
+          // 左 光标位置向前移动一位
           case ArrowLeft.code:
             index = selectionStart - 1 > 0 ? selectionStart - 1 : 0;
             activeInputRef.current.setSelectionRange(index, selectionEnd);
             break;
+          // 右 光标位置向后移动一位
           case ArrowRight.code:
             if (selectionEnd < maxLength) {
               index =
@@ -369,13 +387,7 @@ const useInput = ({
             }
 
             break;
-          case ArrowDown.code:
-          case ArrowRightEnd.code:
-            activeInputRef.current.setSelectionRange(
-              selectionEnd,
-              value.length,
-            );
-            break;
+
           case SelectAll.code:
             activeInputRef.current.setSelectionRange(0, maxLength);
             break;
@@ -481,7 +493,6 @@ const useInput = ({
       } else if (document.execCommand) {
         activeInputRef.current.select();
         document.execCommand('copy');
-        activeInputRef.current.setSelectionRange(value.length, value.length);
         console.log('copy success');
       } else {
         console.error('copy error');

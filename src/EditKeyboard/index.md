@@ -25,7 +25,7 @@ export default () => {
   });
   return (
     <div>
-      <input />
+      <input value="123456789" />
       <div style={{ width: 500, height: 320, margin: '0 auto' }}>
         <EditKeyboard onClick={onClick} />
       </div>
