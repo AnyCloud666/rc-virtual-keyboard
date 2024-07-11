@@ -40,6 +40,7 @@ export default () => {
       <div style={{ margin: '0 auto', textAlign: 'center' }}>
         <input
           placeholder="可使用虚拟键盘"
+          style={{ marginBottom: 60 }}
           value={value}
           onInput={(e) => {
             {

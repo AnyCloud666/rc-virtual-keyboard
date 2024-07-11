@@ -1,5 +1,7 @@
 import React, { CSSProperties, useState } from 'react';
-import { symbolKeys } from '../keys';
+import { Backspace, Enter, symbolKeys } from '../keys';
+import { ReactComponent as DeleteSvg } from '../svg/delete.svg';
+import { ReactComponent as EnterSvg } from '../svg/enter.svg';
 import { VKB } from '../typing';
 import './style.css';
 
@@ -61,6 +63,20 @@ const SymbolKeyboard = ({
             </div>
           );
         })}
+      </div>
+      <div className="symbol-key-control">
+        <div
+          className="symbol-key-control-delete"
+          onClick={() => onClick && onClick(Backspace)}
+        >
+          <DeleteSvg />
+        </div>
+        <div
+          className="symbol-key-control-enter"
+          onClick={() => onClick && onClick(Enter)}
+        >
+          <EnterSvg />
+        </div>
       </div>
     </div>
   );

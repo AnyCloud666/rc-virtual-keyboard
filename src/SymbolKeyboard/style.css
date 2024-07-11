@@ -64,12 +64,14 @@
 
 
 .symbol-key-tab-item:active {
+  color: var(--vkb-key-active-font-color);
   background-color: var(--vkb-key-active-background);
   box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
   border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
 }
 
 .symbol-key-tab-item-active {
+  color: var(--vkb-key-active-font-color);
   background-color: var(--vkb-key-active-background);
   box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
   border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
@@ -85,7 +87,11 @@
 
   gap: var(--vkb-key-gap);
 
+
   margin-left: calc((100% - var(--vkb-key-gap) * 4) / 5 + var(--vkb-key-gap));
+
+  margin-bottom: calc(20% - var(--vkb-key-gap));
+
   width: calc((100% - var(--vkb-key-gap) * 4) / 5 * 4 + var(--vkb-key-gap) * 3);
   height: 100%;
   border-radius: var(--vkb-key-borer-radius);
@@ -96,8 +102,8 @@
 
 
 .symbol-key-content::-webkit-scrollbar {
-  width: 2px;
-  height: 2px;
+  width: 0px;
+  height: 0px;
 }
 
 .symbol-key-content::-webkit-scrollbar-thumb {
@@ -129,6 +135,7 @@
 
 
 .symbol-key-item:active {
+  color: var(--vkb-key-active-font-color);
   background-color: var(--vkb-key-active-background);
   box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
   border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
@@ -140,4 +147,51 @@
   right: var(--vkb-key-gap);
   font-size: var(--vkb-key-tips-font-size);
   color: var(--vkb-key-tips-color);
+}
+
+
+.symbol-key-control {
+  position: absolute;
+
+  bottom: 0;
+  right: 0;
+
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: var(--vkb-key-gap);
+
+  width: calc(40% - var(--vkb-key-gap) * 3 / 4);
+  height: calc(20% - var(--vkb-key-gap) * 4 / 5);
+}
+
+
+
+
+.symbol-key-control-delete,
+.symbol-key-control-enter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border-radius: var(--vkb-key-borer-radius);
+  background-color: var(--vkb-key-background);
+}
+
+.symbol-key-control-delete:active,
+.symbol-key-control-enter:active {
+  color: var(--vkb-key-active-font-color);
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+
+
+.symbol-key-control-delete>svg,
+.symbol-key-control-enter>svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
 }
