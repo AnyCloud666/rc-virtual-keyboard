@@ -17,15 +17,18 @@ nav:
 常用的编辑键盘
 
 ```jsx
-import { EditKeyboard } from 'react-virtual-keyboard';
+import { EditKeyboard, useInput, keys } from 'react-virtual-keyboard';
 
 export default () => {
-  const onClick = (e) => {
-    console.log('EditKeyboard e: ', e);
-  };
+  const { onClick } = useInput({
+    defaultActiveKeyboard: keys.editType,
+  });
   return (
-    <div style={{ width: 500, height: 320, margin: '0 auto' }}>
-      <EditKeyboard onClick={onClick} />
+    <div>
+      <input />
+      <div style={{ width: 500, height: 320, margin: '0 auto' }}>
+        <EditKeyboard onClick={onClick} />
+      </div>
     </div>
   );
 };

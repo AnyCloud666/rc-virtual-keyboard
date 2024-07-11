@@ -24,6 +24,7 @@ const EditKeyboard = ({
   style,
   styles,
   onClick,
+  onMouseDown = (e) => e.preventDefault(),
 }: {
   style?: CSSProperties;
   styles?: {
@@ -35,8 +36,9 @@ const EditKeyboard = ({
     editKeyControl?: CSSProperties;
   };
   onClick?: (e: VKB.KeyboardAttributeType) => void;
+  onMouseDown?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 }) => {
-  const [keys, setKeys] = useState(cursorKeys);
+  const [tempCursorKeys, setTempCursorKKeys] = useState(cursorKeys);
 
   const [isSelect, setSelect] = useState(false);
 
@@ -49,16 +51,16 @@ const EditKeyboard = ({
         cursorKeys[2].key = '开始选择';
         setSelect(false);
       }
-      setKeys([...cursorKeys]);
+      setTempCursorKKeys([...cursorKeys]);
     }
 
     onClick && onClick(e);
   };
 
   return (
-    <div style={style} className="edit-keyboard">
+    <div style={style} className="edit-keyboard" onMouseDown={onMouseDown}>
       <div style={styles?.keyCursor} className="edit-key-cursor">
-        {keys.map((item, index) => {
+        {tempCursorKeys.map((item, index) => {
           return (
             <div
               style={styles?.cursorItem}
