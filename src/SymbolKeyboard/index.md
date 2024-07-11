@@ -17,15 +17,18 @@ nav:
 常用的符号键盘
 
 ```jsx
-import { SymbolKeyboard } from 'react-virtual-keyboard';
+import { SymbolKeyboard, useInput, keys } from 'react-virtual-keyboard';
 
 export default () => {
-  const onClick = (e) => {
-    console.log('SymbolKeyboard e: ', e);
-  };
+  const { onClick } = useInput({
+    defaultActiveKeyboard: keys.symbolType,
+  });
   return (
-    <div style={{ width: 500, height: 320, margin: '0 auto' }}>
-      <SymbolKeyboard onClick={onClick} />
+    <div>
+      <input />
+      <div style={{ width: 500, height: 320, margin: '0 auto' }}>
+        <SymbolKeyboard onClick={onClick} />
+      </div>
     </div>
   );
 };

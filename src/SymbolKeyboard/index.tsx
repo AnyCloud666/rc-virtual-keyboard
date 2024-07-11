@@ -7,6 +7,7 @@ const SymbolKeyboard = ({
   style,
   styles,
   onClick,
+  onMouseDown = (e) => e.preventDefault(),
 }: {
   style?: CSSProperties;
   styles?: {
@@ -17,11 +18,12 @@ const SymbolKeyboard = ({
     symbolKeyItemTips?: CSSProperties;
   };
   onClick?: (e: VKB.KeyboardAttributeType) => void;
+  onMouseDown?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 }) => {
   const [activeSymbol, setActiveSymbol] = useState(symbolKeys[0]);
 
   return (
-    <div style={style} className="symbol-keyboard">
+    <div style={style} className="symbol-keyboard" onMouseDown={onMouseDown}>
       <div style={styles?.symbolKeyTab} className="symbol-key-tab">
         {symbolKeys.map((item) => {
           return (
