@@ -1,6 +1,6 @@
 import { useDebounceFn, useEventListener } from 'ahooks';
 import React, { CSSProperties, useEffect, useRef, useState } from 'react';
-import { Backspace } from '../keys';
+import { Backspace, Enter } from '../keys';
 import { ReactComponent as DeleteSvg } from '../svg/delete.svg';
 import { ReactComponent as EnterSvg } from '../svg/enter.svg';
 
@@ -52,8 +52,7 @@ const WriteKeyboard = ({
   const writeContentRef = useRef<HTMLDivElement | null>(null);
   const allowMove = useRef(false);
   const imgUrl = useRef('');
-  /** 临时输入区引用 */
-  const tempInputAreaRef = useRef<HTMLDivElement | null>(null);
+
   const [canvasRect, setCanvasRect] = useState({
     width: '200px',
     height: '200px',
@@ -64,6 +63,7 @@ const WriteKeyboard = ({
       canvasCTX.current.clearRect(0, 0, 10000, 10000);
       if (imgUrl.current) {
         imgUrl.current = '';
+        onDraw && onDraw('');
       } else {
         onClick && onClick(Backspace);
       }
@@ -82,19 +82,6 @@ const WriteKeyboard = ({
       wait: 1000,
     },
   );
-
-  /** 翻页 */
-  const onMore = (type: string) => {
-    if (tempInputAreaRef.current) {
-      const width = tempInputAreaRef.current.offsetWidth;
-      tempInputAreaRef.current.scrollTo({
-        left:
-          tempInputAreaRef.current.scrollLeft +
-          (type === 'add' ? width : -width) / 10,
-        behavior: 'smooth',
-      });
-    }
-  };
 
   useEventListener(
     'mousedown',
@@ -189,7 +176,7 @@ const WriteKeyboard = ({
         <div
           style={styles?.writeControlEnter}
           className="write-control-enter"
-          onClick={generateImage.run}
+          onClick={() => onClick && onClick(Enter)}
         >
           {/* Enter */}
           <EnterSvg />

@@ -633,8 +633,12 @@ const useInput = ({
    * @param {string} imgUrl
    */
   const onDraw = async (imgUrl: string) => {
-    const res = await onImg2Words(imgUrl);
-    setWords(res);
+    if (imgUrl) {
+      const res = await onImg2Words(imgUrl);
+      setWords(res);
+    } else {
+      setWords([]);
+    }
   };
 
   useEffect(() => {
