@@ -3,9 +3,8 @@ import React, { CSSProperties, useEffect, useRef, useState } from 'react';
 import { Backspace } from '../keys';
 import { ReactComponent as DeleteSvg } from '../svg/delete.svg';
 import { ReactComponent as EnterSvg } from '../svg/enter.svg';
-import { ReactComponent as LeftSvg } from '../svg/left.svg';
-import { ReactComponent as RightSvg } from '../svg/right.svg';
 
+import WordTempList from '../WordTempList';
 import { VKB } from '../typing';
 import './style.css';
 const WriteKeyboard = ({
@@ -161,43 +160,7 @@ const WriteKeyboard = ({
   return (
     <div style={style} className="write-keyboard" onMouseDown={onMouseDown}>
       {words && words.length > 0 && (
-        <div style={styles?.writeKeyboardTemp} className="write-keyboard-temp">
-          <div
-            style={styles?.writeKeyboardTempLeft}
-            className="write-keyboard-temp-left"
-            onClick={() => onMore('minus')}
-          >
-            <LeftSvg />
-          </div>
-          <div
-            style={styles?.writeKeyboardTempList}
-            className="write-keyboard-temp-list"
-            ref={tempInputAreaRef}
-          >
-            {words?.map((item, index) => {
-              return (
-                <div
-                  key={index}
-                  style={styles?.writeKeyboardTempChar}
-                  className="write-keyboard-temp-char"
-                  onClick={() => {
-                    onDelete();
-                    onSelectWord && onSelectWord(item);
-                  }}
-                >
-                  {item}
-                </div>
-              );
-            })}
-          </div>
-          <div
-            style={styles?.writeKeyboardTempRight}
-            className="write-keyboard-temp-right"
-            onClick={() => onMore('add')}
-          >
-            <RightSvg />
-          </div>
-        </div>
+        <WordTempList words={words} onSelectWord={onSelectWord} />
       )}
       <div
         style={styles?.writeContent}

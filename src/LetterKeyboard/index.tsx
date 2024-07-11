@@ -1,10 +1,8 @@
-import React, { CSSProperties, useEffect, useRef, useState } from 'react';
-
-import { ReactComponent as LeftSvg } from '../svg/left.svg';
-import { ReactComponent as RightSvg } from '../svg/right.svg';
+import React, { CSSProperties, useEffect, useState } from 'react';
 
 import { CapsLock, EN, letterKeys, letterType, Shift, ZH } from '../keys';
 import { VKB } from '../typing';
+import WordTempList from '../WordTempList';
 import './style.css';
 
 /** 字母键盘 */
@@ -58,9 +56,6 @@ const LetterKeyboard = ({
   onChangeInputMode?: (mode: VKB.InputMode) => void;
   onSelectWord?: (words: string) => void;
 }) => {
-  /** 临时输入区引用 */
-  const tempInputAreaRef = useRef<HTMLDivElement | null>(null);
-
   const [keys, setKeys] = useState(letterKeys);
 
   /** 内部过滤 */
@@ -110,19 +105,6 @@ const LetterKeyboard = ({
     onClick && onClick(e);
   };
 
-  /** 翻页 */
-  const onMore = (type: string) => {
-    if (tempInputAreaRef.current) {
-      const width = tempInputAreaRef.current.offsetWidth;
-      tempInputAreaRef.current.scrollTo({
-        left:
-          tempInputAreaRef.current.scrollLeft +
-          (type === 'add' ? width : -width) / 10,
-        behavior: 'smooth',
-      });
-    }
-  };
-
   useEffect(() => {
     if (inputMode === 'zh') {
       const tempKeys = letterKeys.map((item) => {
@@ -139,49 +121,11 @@ const LetterKeyboard = ({
   return (
     <div style={style} className="letter-keyboard" onMouseDown={onMouseDown}>
       {inputMode === ZH && inputValue && (
-        <div
-          style={styles?.letterKeyboardTemp}
-          className="letter-keyboard-temp"
-        >
-          <div
-            style={styles?.letterKeyboardTempPinyin}
-            className="letter-keyboard-temp-pinyin"
-          >
-            {inputValue}
-          </div>
-          <div
-            style={styles?.letterKeyboardTempLeft}
-            className="letter-keyboard-temp-left"
-            onClick={() => onMore('minus')}
-          >
-            <LeftSvg />
-          </div>
-          <div
-            style={styles?.letterKeyboardTempList}
-            className="letter-keyboard-temp-list"
-            ref={tempInputAreaRef}
-          >
-            {words?.map((item, index) => {
-              return (
-                <div
-                  key={index}
-                  style={styles?.letterKeyboardTempChar}
-                  className="letter-keyboard-temp-char"
-                  onClick={() => onSelectWord && onSelectWord(item)}
-                >
-                  {item}
-                </div>
-              );
-            })}
-          </div>
-          <div
-            style={styles?.letterKeyboardTempRight}
-            className="letter-keyboard-temp-right"
-            onClick={() => onMore('add')}
-          >
-            <RightSvg />
-          </div>
-        </div>
+        <WordTempList
+          words={words}
+          inputValue={inputValue}
+          onSelectWord={onSelectWord}
+        />
       )}
 
       <div style={styles?.letterKeyboardArea} className="letter-keyboard-area">
