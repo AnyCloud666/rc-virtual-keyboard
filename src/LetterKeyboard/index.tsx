@@ -35,18 +35,6 @@ const LetterKeyboard = ({
     letterShiftBig?: CSSProperties;
     /** 非选中模式 */
     letterShiftSmall?: CSSProperties;
-    /** 输入法区域 */
-    letterKeyboardTemp?: CSSProperties;
-    /** 当前输入的拼音 */
-    letterKeyboardTempPinyin?: CSSProperties;
-    /** 向左选择 */
-    letterKeyboardTempLeft?: CSSProperties;
-    /** 向右选择 */
-    letterKeyboardTempRight?: CSSProperties;
-    /** 拼音转中文的列表 */
-    letterKeyboardTempList?: CSSProperties;
-    /** 拼音转中文的单个汉字 */
-    letterKeyboardTempChar?: CSSProperties;
   };
   words?: string[];
   inputValue?: string;

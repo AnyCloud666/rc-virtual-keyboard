@@ -250,6 +250,23 @@ const useInput = ({
 
   /** 删除 */
   const onBackspace = (e: VKB.KeyboardAttributeType) => {
+    if (inputMode === ZH) {
+      const value = inputValue.slice(0, inputValue.length - 1);
+      const transformMsg = (onPinyin2Words && onPinyin2Words(value)) || {
+        pinyin: value,
+        words: [],
+      };
+      setInputValue(value);
+      setWords([value, ...transformMsg.words]);
+
+      if (value) return;
+
+      if (!jumpDelete.current) {
+        jumpDelete.current = true;
+        return;
+      }
+    }
+
     if (activeInputRef.current) {
       if (validateInputType(activeInputRef.current)) {
         console.error('disabled type: ', [
@@ -260,23 +277,6 @@ const useInput = ({
           'if you need type="number" please use data-vkb-type="number" replace',
         );
         return;
-      }
-
-      if (inputMode === ZH) {
-        const value = inputValue.slice(0, inputValue.length - 1);
-        const transformMsg = (onPinyin2Words && onPinyin2Words(value)) || {
-          pinyin: value,
-          words: [],
-        };
-        setInputValue(value);
-        setWords([value, ...transformMsg.words]);
-
-        if (value) return;
-
-        if (!value && !jumpDelete.current) {
-          jumpDelete.current = true;
-          return;
-        }
       }
 
       // 获取光标位置
