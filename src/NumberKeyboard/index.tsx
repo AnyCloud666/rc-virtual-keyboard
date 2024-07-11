@@ -8,6 +8,7 @@ const NumberKeyboard = ({
   style,
   styles,
   onClick,
+  onMouseDown = (e) => e.preventDefault(),
 }: {
   style?: CSSProperties;
   styles?: {
@@ -15,9 +16,10 @@ const NumberKeyboard = ({
     numberKeyItem?: CSSProperties;
   };
   onClick?: (e: VKB.KeyboardAttributeType) => void;
+  onMouseDown?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 }) => {
   return (
-    <div style={style} className="number-keyboard">
+    <div style={style} className="number-keyboard" onMouseDown={onMouseDown}>
       {numberKeys.map((item) => {
         return (
           <div
