@@ -75,12 +75,14 @@
 }
 
 .setting-keyboard-box-item:active {
+  color: var(--vkb-key-active-font-color);
   background-color: var(--vkb-key-active-background);
   box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
   border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
 }
 
 .setting-keyboard-box-item-active {
+  color: var(--vkb-key-active-font-color);
   background-color: var(--vkb-key-active-background);
   box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
   border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
