@@ -1,6 +1,6 @@
 import { useEventListener } from 'ahooks';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import imgToWordV1 from 'react-virtual-keyboard/utils/ocr';
+import { log } from 'react-virtual-keyboard/utils/log';
 import {
   ArrowDown,
   ArrowLeft,
@@ -33,6 +33,7 @@ import {
   settingType,
 } from '../keys';
 import { VKB } from '../typing';
+import imgToWordV1 from '../utils/ocr';
 import { pinyin2ChineseV1 } from '../utils/pinyin';
 
 const useInput = ({
@@ -122,6 +123,22 @@ const useInput = ({
     positionMode ?? localStorage?.getItem(VKB_POSITION_MODE) ?? 'float',
   );
 
+  /**
+   * 禁用 type 类型异常日志提示
+   *
+   */
+  const disabledTypeLog = () => {
+    log({
+      type: 'error',
+      message: `disabled type ${[...invalidInputType, ...needHandleInputType]}`,
+    });
+    log({
+      type: 'error',
+      message:
+        'if you need type="number" please use data-vkb-type="number" replace',
+    });
+  };
+
   /** 失去焦点 */
   const onBlur = useCallback(() => {
     activeInputRef.current = null;
@@ -198,13 +215,7 @@ const useInput = ({
       // if (!(await handleInputType(activeInputRef.current))) return;
 
       if (validateInputType(activeInputRef.current)) {
-        console.error('disabled type', [
-          ...invalidInputType,
-          ...needHandleInputType,
-        ]);
-        console.error(
-          'if you need type="number" please use data-vkb-type="number" replace',
-        );
+        disabledTypeLog();
         return;
       }
 
@@ -269,13 +280,7 @@ const useInput = ({
 
     if (activeInputRef.current) {
       if (validateInputType(activeInputRef.current)) {
-        console.error('disabled type: ', [
-          ...invalidInputType,
-          ...needHandleInputType,
-        ]);
-        console.error(
-          'if you need type="number" please use data-vkb-type="number" replace',
-        );
+        disabledTypeLog;
         return;
       }
 
@@ -303,13 +308,7 @@ const useInput = ({
   const onCursor = (e: VKB.KeyboardAttributeType) => {
     if (activeInputRef.current) {
       if (validateInputType(activeInputRef.current)) {
-        console.error('disabled type: ', [
-          ...invalidInputType,
-          ...needHandleInputType,
-        ]);
-        console.error(
-          'if you need type="number" please use data-vkb-type="number" replace',
-        );
+        disabledTypeLog();
         return;
       }
 
@@ -417,7 +416,10 @@ const useInput = ({
         } else inputList[0]?.focus();
       }
     } catch (error) {
-      console.log('error: ', error);
+      log({
+        type: 'error',
+        message: error,
+      });
     }
   };
 
@@ -451,12 +453,6 @@ const useInput = ({
       (inputEvent as any).simulated = true;
       activeInputRef.current.dispatchEvent(inputEvent);
 
-      // TODO: ant 的 input 的 change 事件无法被触发
-      const changeEvent = new Event('change', { bubbles: true });
-      // 标记 触发change事件
-      (changeEvent as any).simulated = true;
-      activeInputRef.current.dispatchEvent(changeEvent);
-
       onChange &&
         onChange({
           code: '-1',
@@ -470,7 +466,6 @@ const useInput = ({
     } else {
       setInputValue('');
       setWords([]);
-      console.error('input type = email or number not allow input chinese');
     }
   };
 
@@ -480,7 +475,7 @@ const useInput = ({
       const selectionStart = activeInputRef.current.selectionStart ?? 0;
       const selectionEnd = activeInputRef.current.selectionEnd ?? 0;
       if (selectionStart === selectionEnd) {
-        console.warn('no have copy content');
+        log({ type: 'warning', message: 'vkb: no have copy content' });
         return;
       }
       const value = activeInputRef.current.value.slice(
@@ -489,13 +484,13 @@ const useInput = ({
       );
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(value);
-        console.log('copy success');
+        log({ type: 'success', message: 'vkb: copy success' });
       } else if (document.execCommand) {
         activeInputRef.current.select();
         document.execCommand('copy');
-        console.log('copy success');
+        log({ type: 'success', message: 'vkb: copy success' });
       } else {
-        console.error('copy error');
+        log({ type: 'error', message: 'vkb: copy error' });
       }
     }
   };
@@ -513,17 +508,19 @@ const useInput = ({
           value.slice(0, selectionStart) + text + value.slice(selectionEnd);
         activeInputRef.current.value = value;
         emitInputEvent();
-        console.log('paste success');
+
+        log({ type: 'success', message: 'vkb: paste success' });
       } else if (document.execCommand) {
         activeInputRef.current.focus();
         const r = document.execCommand('paste', true);
         emitInputEvent();
-        console.log(`paste ${r ? 'success' : 'error'}`);
+        log({
+          type: r ? 'success' : 'error',
+          message: `vkb: paste ${r ? 'success' : 'error'}`,
+        });
       } else {
-        console.error(' paste error ');
+        log({ type: 'error', message: 'vkb: paste error' });
       }
-
-      // value = value.slice(0,start) +  value.slice(start)
     }
   };
 
