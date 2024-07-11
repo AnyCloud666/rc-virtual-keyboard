@@ -191,10 +191,9 @@ const useInput = ({
   /** 输入 */
   const onInput = async (e: VKB.KeyboardAttributeType) => {
     if (activeInputRef.current && typeof e.key === 'string') {
-      const vkbNotEmpty = activeInputRef.current.dataset?.vkbNotEmpty;
       const vkbNotInput =
         activeInputRef.current.dataset?.vkbNotInput?.split(',');
-      console.log('vkbNotInput: ', vkbNotInput);
+
       // 处理类型
       // if (!(await handleInputType(activeInputRef.current))) return;
 
@@ -284,8 +283,6 @@ const useInput = ({
       const selectionStart = activeInputRef.current.selectionStart ?? 0;
       const selectionEnd = activeInputRef.current.selectionEnd ?? 0;
       const value = activeInputRef.current.value;
-
-      console.log('value: ', value);
 
       const tempValue =
         value.slice(

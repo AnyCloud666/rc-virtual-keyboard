@@ -26,9 +26,9 @@ export default () => {
     onClick,
     inputMode,
     inputValue,
-    chinese,
+    words,
     onChangeInputMode,
-    onSelectChinese,
+    onSelectWord,
   } = useInput({
     defaultActiveKeyboard: keys.letterType,
     onEnter: () => {
@@ -53,11 +53,11 @@ export default () => {
       <div style={{ width: 500, height: 320, margin: '0 auto' }}>
         <LetterKeyboard
           inputValue={inputValue}
-          chinese={chinese}
+          words={words}
           inputMode={inputMode}
           onClick={onClick}
           onChangeInputMode={onChangeInputMode}
-          onSelectChinese={onSelectChinese}
+          onSelectWord={onSelectWord}
           onMouseDown={(e) => {
             // 防止失去焦点
             e?.preventDefault?.();
