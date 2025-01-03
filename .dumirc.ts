@@ -1,13 +1,14 @@
 import { defineConfig } from 'dumi';
 
-const repo = 'react-vitrual-keyboard';
+const repo = 'rc-virtual-keyboard';
 
 export default defineConfig({
   outputPath: 'docs-dist',
-  logo:process.env.NODE_ENV === 'production' ? `/${repo}/logo.png` : '/logo.png',
+  logo:
+    process.env.NODE_ENV === 'production' ? `/${repo}/logo.png` : '/logo.png',
   base: process.env.NODE_ENV === 'production' ? `/${repo}/` : '/',
   publicPath: process.env.NODE_ENV === 'production' ? `/${repo}/` : '/',
   themeConfig: {
-    name: 'react-virtual-keyboard',
+    name: 'rc-virtual-keyboard',
   },
 });

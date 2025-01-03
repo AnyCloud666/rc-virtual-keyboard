@@ -17,7 +17,7 @@ nav:
 支持拖动
 
 ```jsx
-import { DragBlock } from 'react-virtual-keyboard';
+import { DragBlock } from 'rc-virtual-keyboard';
 
 export default () => {
   return (

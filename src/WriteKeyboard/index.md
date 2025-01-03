@@ -11,6 +11,7 @@ nav:
     title: 手写键
     order: 1
 ---
+
 # 手写键
 
 手写识别，暂未完成，请等待
@@ -20,7 +21,7 @@ nav:
 将书写的图片进行导出，采用第三方进行识别...
 
 ```jsx
-import { WriteKeyboard } from 'react-virtual-keyboard';
+import { WriteKeyboard } from 'rc-virtual-keyboard';
 
 export default () => {
   const onClick = (e) => {

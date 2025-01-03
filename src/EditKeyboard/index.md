@@ -17,7 +17,7 @@ nav:
 常用的编辑键盘
 
 ```jsx
-import { EditKeyboard } from 'react-virtual-keyboard';
+import { EditKeyboard } from 'rc-virtual-keyboard';
 
 export default () => {
   const onClick = (e) => {

@@ -18,7 +18,7 @@ nav:
 
 ```jsx
 import { useState } from 'react';
-import { LetterKeyboard, useInput, keys } from 'react-virtual-keyboard';
+import { LetterKeyboard, useInput, keys } from 'rc-virtual-keyboard';
 
 export default () => {
   const [value, setValue] = useState('');
@@ -73,7 +73,7 @@ export default () => {
 
 | 属性       | 说明                   | 类型       | 默认值 |
 | ---------- | ---------------------- | ---------- | ------ |
-| inputMode  | 输入模式               | zh \| en   | en     |
+| inputMode  | 输入模式               | zh\| en    | en     |
 | inputValue | 输入的值               | string     | ''     |
 | chinese    | 中文输入状态获得的结果 | string\[\] | \[\]   |
 
@@ -82,7 +82,7 @@ export default () => {
 | 方法              | 说明                                                                  | 类型                                                        | 默认值 |
 | ----------------- | --------------------------------------------------------------------- | ----------------------------------------------------------- | ------ |
 | onClick           | 点击事件                                                              | (e: VKB.KeyboardAttributeType) => void                      | -      |
-| onChangeInputMode | 改变输入模式                                                          | (mode:'zh' \| 'en')=>void                                   | -      |
+| onChangeInputMode | 改变输入模式                                                          | (mode:'zh'\| 'en')=>void                                    | -      |
 | onMouseDown       | 鼠标按下事件,如果不想失去输入框的焦点，应该实现该方法，并阻止默认事件 | (e: React.MouseEvent\<HTMLDivElement, MouseEvent\>) => void | -      |
 | onChangeInputMode | 改变输入模式                                                          | (mode:'zh'\|'en')=>void                                     | -      |
 | onSelectChinese   | 选择的中文                                                            | (chinese:string)=>void                                      | -      |

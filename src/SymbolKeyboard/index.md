@@ -17,7 +17,7 @@ nav:
 常用的符号键盘
 
 ```jsx
-import { SymbolKeyboard } from 'react-virtual-keyboard';
+import { SymbolKeyboard } from 'rc-virtual-keyboard';
 
 export default () => {
   const onClick = (e) => {

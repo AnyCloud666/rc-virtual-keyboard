@@ -1,10 +1,10 @@
 {
-  "name": "react-virtual-keyboard",
+  "name": "rc-virtual-keyboard",
   "version": "0.0.1",
   "description": "virtual keyboard",
   "repository": {
     "type": "git",
-    "url": "https://github.com/AnyCloud666/react-vitrual-keyboard.git"
+    "url": "https://github.com/AnyCloud666/rc-vitrual-keyboard.git"
   },
   "license": "MIT",
   "main": "dist/index.js",

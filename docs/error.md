@@ -26,7 +26,7 @@ import {
   EditKeyboardTab,
   SettingKeyboardTab,
   WriteKeyboardTab,
-} from 'react-virtual-keyboard';
+} from 'rc-virtual-keyboard';
 
 export default () => {
   const [show, setShow] = useState(false);

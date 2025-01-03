@@ -17,7 +17,7 @@ nav:
 常用的数字键盘
 
 ```jsx
-import { NumberKeyboard } from 'react-virtual-keyboard';
+import { NumberKeyboard } from 'rc-virtual-keyboard';
 
 export default () => {
   const onClick = (e) => {

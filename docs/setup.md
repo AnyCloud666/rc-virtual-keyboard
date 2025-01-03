@@ -4,20 +4,20 @@
 
 ```cmd
 # npm 包管理器
-npm install react-vitrual-keyboard
+npm install rc-vitrual-keyboard
 
 # yarn 包管理器
-yarn install react-vitrual-keyboard
+yarn install rc-vitrual-keyboard
 
 # pnpm 包管理器
-pnpm install react-vitrual-keyboard
+pnpm install rc-vitrual-keyboard
 ```
 
 ## 使用
 
 ```js
 import { useState } from 'react';
-import { useVirtualKeyboard, keys } from 'react-virtual-keyboard';
+import { useVirtualKeyboard, keys } from 'rc-virtual-keyboard';
 
 export default () => {
   const [show, setShow] = useState(false);

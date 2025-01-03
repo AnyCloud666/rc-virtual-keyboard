@@ -16,7 +16,7 @@ nav:
 在组合键盘时使用改组件，对组件进行配置，单独使用无效
 
 ```jsx
-import { SettingKeyboard } from 'react-virtual-keyboard';
+import { SettingKeyboard } from 'rc-virtual-keyboard';
 
 export default () => {
   const onClick = (e) => {
@@ -32,10 +32,10 @@ export default () => {
 
 ## 属性
 
-| 属性         | 说明     | 类型                                                        | 默认值 |
-| ------------ | -------- | ----------------------------------------------------------- | ------ |
-| themeMode    | 主题模式 | light \| dark \| 自定义                                     | light  |
-| positionMode | 位置模式 | fixedBottom \| fixedTop \| fixedLeft \| fixedRight \| float | float  |
+| 属性         | 说明     | 类型                                                       | 默认值 |
+| ------------ | -------- | ---------------------------------------------------------- | ------ |
+| themeMode    | 主题模式 | light\| dark \| 自定义                                     | light  |
+| positionMode | 位置模式 | fixedBottom\| fixedTop \| fixedLeft \| fixedRight \| float | float  |
 
 ## 方法
 

@@ -1,7 +1,4 @@
-# react-virtual-keyboard
-
-[![NPM version](https://img.shields.io/npm/v/react-virtual-keyboard.svg?style=flat)](https://npmjs.org/package/react-virtual-keyboard)
-[![NPM downloads](http://img.shields.io/npm/dm/react-virtual-keyboard.svg?style=flat)](https://npmjs.org/package/react-virtual-keyboard)
+# rc-virtual-keyboard
 
 virtual keyboard
 
@@ -40,11 +37,11 @@ $ pnpm run doctor
 
 ## document
 
-see you[https://anycloud666.github.io/react-vitrual-keyboard/setup]
+see you[https://anycloud666.github.io/rc-vitrual-keyboard/setup]
 
-see you[https://anycloud666.github.io/react-vitrual-keyboard/setup]
+see you[https://anycloud666.github.io/rc-vitrual-keyboard/setup]
 
-see you[https://anycloud666.github.io/react-vitrual-keyboard/setup]
+see you[https://anycloud666.github.io/rc-vitrual-keyboard/setup]
 
 one star!one star!!!one star!!!
 
