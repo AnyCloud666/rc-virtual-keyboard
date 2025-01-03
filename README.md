@@ -38,6 +38,16 @@ $ pnpm run docs:preview
 $ pnpm run doctor
 ```
 
+## document
+
+see you[https://anycloud666.github.io/react-vitrual-keyboard/setup]
+
+see you[https://anycloud666.github.io/react-vitrual-keyboard/setup]
+
+see you[https://anycloud666.github.io/react-vitrual-keyboard/setup]
+
+one star!one star!!!one star!!!
+
 ## LICENSE
 
 MIT
