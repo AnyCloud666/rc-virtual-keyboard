@@ -1,0 +1,637 @@
+:root {
+  --vkb-background: #f2f5fa;
+  --vkb-key-color: #000;
+  --vkb-key-background: #ffffff;
+  --vkb-key-active-background: #dce1e7;
+  --vkb-key-active-font-color: #1677ff;
+  --vkb-key-border-color: #f0f0f0;
+  --vkb-key-active-border-color: #dce1e7;
+  --vkb-key-border-width: 1px;
+  --vkb-key-shadow-color: #f0f0f0;
+  --vkb-key-active-shadow-color: #dce1e7;
+  --vkb-key-shadow-width: 4px;
+  --vkb-key-tips-color: #ccc;
+  --vkb-key-tips-font-size: 12px;
+  --vkb-key-scroll-bar-color: #ccc;
+  --vkb-key-gap: 6px;
+  --vkb-key-borer-radius: 4px;
+  --vkb-key-font-size: 14px;
+  --vkb-keyboard-tab: 40px;
+  --vkb-keyboard-svg-size: 26px;
+}
+.edit-keyboard {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, calc((100% - var(--vkb-key-gap) * 4) / 5));
+  grid-template-rows: repeat(3, calc((100% - var(--vkb-key-gap) * 2) / 3));
+  gap: var(--vkb-key-gap);
+  height: 100%;
+}
+.edit-key-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background-color: var(--vkb-key-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  border-radius: var(--vkb-key-borer-radius);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.edit-key-cursor {
+  display: grid;
+  grid-template-columns: repeat(3, calc((100% - var(--vkb-key-gap) * 2) / 3));
+  grid-template-rows: repeat(4, calc((100% - var(--vkb-key-gap) * 3) / 4));
+  gap: var(--vkb-key-gap);
+  width: calc(300% + var(--vkb-key-gap) * 2);
+  height: calc(300% + var(--vkb-key-gap) * 2);
+}
+.cursor-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  color: var(--vkb-key-color);
+  fill: var(--vkb-key-color);
+  background-color: var(--vkb-key-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  border-radius: var(--vkb-key-borer-radius);
+  box-sizing: border-box;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.cursor-item svg {
+  width: 28px;
+}
+.cursor-item-active {
+  fill: var(--vkb-key-active-font-color);
+  color: var(--vkb-key-active-font-color);
+}
+.cursor-item:active {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+.cursor-item:nth-child(1) {
+  grid-column: 2;
+}
+.cursor-item:nth-child(n + 2):nth-child(-n + 4) {
+  grid-row: 2;
+}
+.cursor-item:nth-child(5) {
+  grid-column: 2;
+  grid-row: 3;
+}
+.cursor-item:nth-child(6) {
+  grid-row: 4;
+  width: calc(150% + var(--vkb-key-gap) / 2);
+}
+.cursor-item:nth-child(7) {
+  grid-row: 4;
+  width: calc(150% + var(--vkb-key-gap) / 2);
+  margin-left: calc(50% + var(--vkb-key-gap) / 2);
+}
+.edit-key-control:active {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+.edit-key-control:nth-child(2) {
+  grid-column: 4;
+}
+.edit-key-control:nth-child(3) {
+  grid-column: 5;
+}
+.edit-key-control:nth-child(4) {
+  grid-column: 4;
+  grid-row: 2;
+}
+.edit-key-control:nth-child(5) {
+  grid-column: 5;
+  grid-row: 2;
+}
+.edit-key-control:nth-child(6) {
+  grid-column: 4;
+  grid-row: 3;
+  width: calc(200% + var(--vkb-key-gap));
+}
+.edit-key-control:nth-child(7) {
+  grid-column: 5;
+  grid-row: 3;
+}
+.edit-key-control > svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+}
+.letter-keyboard {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  color: var(--vkb-key-color);
+  background-color: var(--vkb-background);
+}
+.letter-keyboard-temp {
+  position: absolute;
+  top: -52px;
+  display: flex;
+  gap: var(--vkb-key-gap);
+  width: 100%;
+  height: var(--vkb-keyboard-tab);
+  padding: var(--vkb-key-gap) 0;
+  background-color: var(--vkb-background);
+}
+.letter-keyboard-temp-pinyin {
+  position: absolute;
+  z-index: 1;
+  top: calc(var(--vkb-keyboard-tab) / -2);
+  left: 0;
+  padding: 0 var(--vkb-key-gap);
+  height: calc(var(--vkb-keyboard-tab) / 2);
+  width: min-content;
+  background-color: var(--vkb-background);
+}
+.letter-keyboard-temp-list {
+  display: flex;
+  gap: var(--vkb-key-gap);
+  width: 80%;
+  height: 100%;
+  overflow: hidden;
+}
+.letter-keyboard-temp-char {
+  display: flex;
+  align-items: center;
+  width: min-content;
+  padding: 0 10px;
+  height: 100%;
+  background-color: var(--vkb-key-background);
+  cursor: pointer;
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  box-sizing: border-box;
+}
+.letter-keyboard-temp-right,
+.letter-keyboard-temp-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(10% - var(--vkb-key-gap));
+  height: 100%;
+  color: var(--vkb-key-color);
+  fill: var(--vkb-key-color);
+  background-color: var(--vkb-key-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  box-sizing: border-box;
+}
+.letter-keyboard-temp-right svg,
+.letter-keyboard-temp-left svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+}
+.letter-keyboard-temp-char:active,
+.letter-keyboard-temp-right:active,
+.letter-keyboard-temp-left:active {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+.letter-keyboard-temp-right:active svg,
+.letter-keyboard-left:active svg {
+  fill: var(--vkb-key-active-font-color);
+}
+.letter-keyboard-area {
+  display: grid;
+  grid-template-columns: repeat(10, calc((100% - var(--vkb-key-gap) * 9) / 10));
+  gap: var(--vkb-key-gap);
+  height: 100%;
+}
+.letter-key-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background-color: var(--vkb-key-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  box-sizing: border-box;
+  border-radius: var(--vkb-key-borer-radius);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.letter-key-item:active {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+.letter-key-item:nth-child(n + 11):nth-child(-n + 19) {
+  margin-left: calc(50% + var(--vkb-key-gap) / 2);
+  width: 100%;
+}
+.letter-key-item:nth-child(20) {
+  grid-column: 1;
+  grid-row: 3;
+  width: calc(150% + var(--vkb-key-gap) / 2);
+}
+.letter-key-item:nth-child(n + 21):nth-child(-n + 28) {
+  grid-column: auto;
+  grid-row: 3;
+  margin-left: calc(50% + var(--vkb-key-gap) / 2);
+}
+.letter-key-item:nth-child(28) {
+  width: calc(150% + var(--vkb-key-gap) / 2);
+}
+.letter-key-item:nth-child(n + 29) {
+  grid-row: 4;
+}
+.letter-key-item:nth-child(29) {
+  width: calc(200% + var(--vkb-key-gap));
+}
+.letter-key-item:nth-child(30) {
+  margin-left: calc(100% + var(--vkb-key-gap));
+  width: calc(600% + var(--vkb-key-gap) * 5);
+}
+.letter-key-item:nth-child(31) {
+  margin-left: calc(600% + var(--vkb-key-gap) * 6);
+  width: calc(200% + var(--vkb-key-gap));
+}
+.letter-caps-lock-small,
+.letter-shift-small {
+  font-size: 12px;
+}
+.letter-key-item > svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+}
+.number-keyboard {
+  display: grid;
+  grid-template-columns: repeat(4, calc((100% - var(--vkb-key-gap) * 3) / 4));
+  height: 100%;
+  gap: var(--vkb-key-gap);
+}
+.number-key-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--vkb-key-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  box-sizing: border-box;
+  border-radius: var(--vkb-key-borer-radius);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.number-key-item:active {
+  color: var(--vkb-key-active-font-color);
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+.number-key-item > svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+}
+.setting-keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vkb-key-gap);
+  height: 100%;
+  overflow: auto;
+}
+.setting-keyboard::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.setting-keyboard::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 5px;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+}
+.setting-keyboard:hover::-webkit-scrollbar-thumb {
+  background: var(--vkb-key-scroll-bar-color);
+  border-radius: 5px;
+}
+.setting-keyboard-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vkb-key-gap);
+}
+.setting-keyboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vkb-key-gap);
+}
+.setting-keyboard-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--vkb-key-gap);
+  width: 100%;
+}
+.setting-keyboard-box-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  color: var(--vkb-key-color);
+  fill: var(--vkb-key-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  border-radius: var(--vkb-key-borer-radius);
+  background-color: var(--vkb-key-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  box-sizing: border-box;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.setting-keyboard-box-item > svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+}
+.setting-keyboard-box-item:active,
+.setting-keyboard-box-item-active {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+.symbol-keyboard {
+  position: relative;
+  display: flex;
+  height: 100%;
+  gap: var(--vkb-key-gap);
+}
+.symbol-key-tab {
+  position: absolute;
+  width: calc((100% - var(--vkb-key-gap) * 4) / 5);
+  height: 100%;
+  border-radius: var(--vkb-key-borer-radius);
+  overflow: auto;
+  transition: all 0.3s;
+}
+.symbol-key-tab::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+}
+.symbol-key-tab::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 5px;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+}
+.symbol-key-tab:hover::-webkit-scrollbar-thumb {
+  background: var(--vkb-key-scroll-bar-color);
+  border-radius: 5px;
+}
+.symbol-key-tab-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--vkb-key-gap);
+  height: calc((100% - var(--vkb-key-gap) * 4) / 5);
+  border-radius: var(--vkb-key-borer-radius);
+  background-color: var(--vkb-key-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  box-sizing: border-box;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.symbol-key-tab-item:last-child {
+  margin-bottom: 0;
+}
+.symbol-key-tab-item:active,
+.symbol-key-tab-item-active {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+.symbol-key-content {
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: var(--vkb-key-gap);
+  margin-left: calc((100% - var(--vkb-key-gap) * 4) / 5 + var(--vkb-key-gap));
+  width: calc((100% - var(--vkb-key-gap) * 4) / 5 * 4 + var(--vkb-key-gap) * 3);
+  height: 100%;
+  border-radius: var(--vkb-key-borer-radius);
+  overflow: auto;
+  transition: all 0.3s;
+}
+.symbol-key-content::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+}
+.symbol-key-content::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 5px;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+}
+.symbol-key-content:hover::-webkit-scrollbar-thumb {
+  background: var(--vkb-key-scroll-bar-color);
+  border-radius: 5px;
+}
+.symbol-key-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc((100% - var(--vkb-key-gap) * 3) / 4);
+  height: calc((100% - var(--vkb-key-gap) * 4) / 5);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border-radius: var(--vkb-key-borer-radius);
+  background-color: var(--vkb-key-background);
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.symbol-key-item:active {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+.symbol-key-item-tips {
+  position: absolute;
+  bottom: var(--vkb-key-gap);
+  right: var(--vkb-key-gap);
+  font-size: var(--vkb-key-tips-font-size);
+  color: var(--vkb-key-tips-color);
+}
+.write-keyboard {
+  display: flex;
+  gap: var(--vkb-key-gap);
+  width: 100%;
+  height: 100%;
+  background-color: var(--vkb-background);
+}
+@media (aspect-ratio: 1/1) {
+  div {
+    background: #f9a;
+  }
+}
+.write-content {
+  position: relative;
+  height: 100%;
+  width: 80%;
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  border-radius: var(--vkb-key-borer-radius);
+  box-sizing: border-box;
+  background-color: var(--vkb-key-background);
+}
+.write-content-canvas:hover {
+  cursor: crosshair;
+}
+.write-content-tips {
+  position: absolute;
+  left: var(--vkb-key-gap);
+  bottom: var(--vkb-key-gap);
+  color: var(--vkb-key-tips-color);
+  font-size: var(--vkb-key-tips-font-size);
+}
+.write-control {
+  width: 20%;
+}
+.write-control-backspace,
+.write-control-enter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: calc(50% - var(--vkb-key-gap) / 2);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  background-color: var(--vkb-key-background);
+  box-sizing: border-box;
+  border-radius: var(--vkb-key-borer-radius);
+}
+.write-control-enter {
+  margin-top: 6px;
+}
+.write-control-backspace:active,
+.write-control-enter:active {
+  border: var(--vkb-key-active-border-width) solid
+    var(--vkb-key-active-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  background-color: var(--vkb-key-active-background);
+}
+.write-control-backspace > svg,
+.write-control-enter > svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+}
+.virtual-keyboard-var {
+  --vkb-background: #f2f5fa;
+  --vkb-key-color: #000;
+  --vkb-key-background: #fff;
+  --vkb-key-active-background: #dce1e7;
+  --vkb-key-active-font-color: #1677ff;
+  --vkb-key-border-color: #f0f0f0;
+  --vkb-key-active-border-color: #dce1e7;
+  --vkb-key-border-width: 1px;
+  --vkb-key-shadow-color: #f0f0f0;
+  --vkb-key-active-shadow-color: #dce1e7;
+  --vkb-key-shadow-width: 4px;
+  --vkb-key-tips-color: #ccc;
+  --vkb-key-tips-font-size: 12px;
+  --vkb-key-scroll-bar-color: #ccc;
+  --vkb-key-gap: 6px;
+  --vkb-key-borer-radius: 4px;
+  --vkb-key-font-size: 14px;
+  --vkb-keyboard-tab: 40px;
+  --vkb-keyboard-svg-size: 26px;
+}
+.virtual-keyboard-var-dark {
+  --vkb-background: #141414;
+  --vkb-key-color: #fff;
+  --vkb-key-background: #141414;
+  --vkb-key-active-background: #424242;
+  --vkb-key-active-font-color: #1677ff;
+  --vkb-key-border-color: #424242;
+  --vkb-key-active-border-color: #424242;
+  --vkb-key-border-width: 1px;
+  --vkb-key-shadow-color: #424242;
+  --vkb-key-active-shadow-color: #424242;
+  --vkb-key-shadow-width: 4px;
+  --vkb-key-tips-color: #ccc;
+  --vkb-key-tips-font-size: 12px;
+  --vkb-key-scroll-bar-color: #ccc;
+  --vkb-key-gap: 6px;
+  --vkb-key-borer-radius: 4px;
+  --vkb-key-font-size: 14px;
+  --vkb-keyboard-tab: 40px;
+  --vkb-keyboard-svg-size: 26px;
+}
+.virtual-keyboard {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  font-size: var(--vkb-key-font-size);
+  color: var(--vkb-key-color);
+  background-color: var(--vkb-background);
+  border-radius: var(--vkb-key-borer-radius);
+  box-sizing: border-box;
+  user-select: none;
+  transition: all 0.3s;
+  -webkit-tap-highlight-color: transparent;
+}
+.virtual-keyboard-tab {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--vkb-key-gap);
+  width: calc(100% - var(--vkb-key-gap) * 2);
+  height: var(--vkb-keyboard-tab);
+  padding: var(--vkb-key-gap);
+}
+.keyboard-tab,
+.keyboard-tab-move,
+.keyboard-tab-down {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--vkb-keyboard-tab);
+  color: var(--vkb-key-color);
+  fill: var(--vkb-key-color);
+  border-radius: var(--vkb-key-borer-radius);
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: all 0.3s;
+  overflow: hidden;
+}
+.keyboard-tab-move {
+  cursor: move;
+}
+.keyboard-tab:hover,
+.keyboard-tab-active {
+  fill: var(--vkb-key-active-font-color);
+  background-color: var(--vkb-key-active-background);
+}
+.keyboard-tab svg,
+.keyboard-tab-move svg,
+.keyboard-tab-down svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+}
+.virtual-keyboard-content {
+  height: calc(100% - var(--vkb-keyboard-tab) - var(--vkb-key-gap) * 2);
+  padding: 0 var(--vkb-key-gap) var(--vkb-key-gap);
+  box-sizing: border-box;
+}
+.virtual-drag-block {
+  position: fixed;
+  top: -10000px;
+  user-select: none;
+}
+.virtual-drag-block {
+  position: fixed;
+  top: -10000px;
+  user-select: none;
+  -webkit-user-select: none;
+}
