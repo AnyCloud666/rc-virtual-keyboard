@@ -217,3 +217,26 @@ export default () => {
   );
 };
 ```
+
+## Uncaught SyntaxError: The requested module '/node_modules/@wwi/react-virtual-keyboard/dist/svg/bottom.svg?import' does not provide an export named 'ReactComponent'
+
+- 在 vite 项目中配置 vite-plugin-svgr
+
+```js
+defineConfig({
+  plugins: [
+    // 支持 import BottomSvg from './Bottom.svg?react' 写法
+    svgr(),
+    // 支持 import { ReactComponent as BottomSvg } from './Bottom.svg' 写法
+    svgr({
+      svgrOptions: {
+        exportType: 'named',
+        ref: true,
+        svgo: false,
+        titleProp: true,
+      },
+      include: '**/*.svg',
+    }),
+  ],
+});
+```
