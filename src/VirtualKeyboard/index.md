@@ -43,9 +43,9 @@ export default () => {
 
   return (
     <>
-      {/* <div>可使用左侧虚拟键盘</div> */}
+      {/* <div>可使用右侧虚拟键盘</div> */}
       <input
-        placeholder="可使用左侧虚拟键盘"
+        placeholder="可使用右侧虚拟键盘"
         onInput={(e) => {
           setValue(e.target.value);
           console.log('value', e.target.value);
