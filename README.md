@@ -29,6 +29,15 @@ $ pnpm run doctor
 
 ## use
 
+```bash
+npm install rc-virtual-keyboard --save
+
+pnpm install rc-virtual-keyboard --save
+
+yarn add rc-virtual-keyboard --save
+
+```
+
 ```ts
 import { useState } from 'react';
 import { useVirtualKeyboard, keys } from 'rc-virtual-keyboard';
@@ -75,16 +84,15 @@ export default () => {
     </>
   );
 };
-
 ```
 
 ## document
 
-see you[https://anycloud666.github.io/rc-vitrual-keyboard/setup]
+see you[https://anycloud666.github.io/rc-virtual-keyboard]
 
-see you[https://anycloud666.github.io/rc-vitrual-keyboard/setup]
+see you[https://anycloud666.github.io/rc-virtual-keyboard]
 
-see you[https://anycloud666.github.io/rc-vitrual-keyboard/setup]
+see you[https://anycloud666.github.io/rc-virtual-keyboard]
 
 one star!one star!!!one star!!!
 

@@ -6,5 +6,5 @@ hero:
     - text: 快速开始
       link: /setup
     - text: GitHub
-      link: /hello
+      link: https://github.com/AnyCloud666/rc-virtual-keyboard
 ---
