@@ -6,6 +6,7 @@
     "esModuleInterop": true,
     "jsx": "react",
     "baseUrl": "./",
+    "downlevelIteration": true,
     "paths": {
       "@@/*": [".dumi/tmp/*"],
       "react-vitrual-keyboard": ["src"],

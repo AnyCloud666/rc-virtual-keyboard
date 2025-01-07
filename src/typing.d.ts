@@ -41,6 +41,7 @@ declare namespace VKB {
       onChangeInputMode: (mode: InputMode) => void;
       onChangeInputMode: (mode: VKB.InputMode) => void;
       onSelectChinese: (chinese: string) => void;
+      onRecognition: (url: string) => void;
     }) => JSX.Element;
   };
 

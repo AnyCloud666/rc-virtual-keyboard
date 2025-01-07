@@ -76,6 +76,13 @@ export const CapsLock: VKB.KeyboardAttributeType = {
   keyCode: 20,
   keyType: controlsType,
 };
+/** 清除键 */
+export const Clear: VKB.KeyboardAttributeType = {
+  code: 'Clear',
+  key: 'Clear',
+  keyCode: -12,
+  keyType: controlsType,
+};
 
 /** ---------------------------光标类--------------------------- */
 

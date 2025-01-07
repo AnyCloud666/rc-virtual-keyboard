@@ -69,7 +69,21 @@ export const WriteKeyboardTab: VKB.KeyboardTabItem = {
   id: 'write',
   label: <WriteSvg />,
   name: '手写板',
-  Component: ({ onClick }) => <WriteKeyboard onClick={onClick} />,
+  Component: ({
+    chinese,
+    onMouseDown,
+    onSelectChinese,
+    onRecognition,
+    onClick,
+  }) => (
+    <WriteKeyboard
+      chinese={chinese}
+      onClick={onClick}
+      onMouseDown={onMouseDown}
+      onRecognition={onRecognition}
+      onSelectChinese={onSelectChinese}
+    />
+  ),
 };
 /** 设置tab */
 export const SettingKeyboardTab: VKB.KeyboardTabItem = {

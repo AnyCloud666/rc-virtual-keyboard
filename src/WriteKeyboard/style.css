@@ -1,4 +1,12 @@
 .write-keyboard {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  color: var(--vkb-key-color);
+  background-color: var(--vkb-background);
+}
+
+.write-keyboard-area {
   display: flex;
   gap: var(--vkb-key-gap);
   width: 100%;
@@ -6,9 +14,63 @@
   background-color: var(--vkb-background);
 }
 
+.write-keyboard-temp {
+  position: absolute;
+  top: -52px;
+  display: flex;
+  gap: var(--vkb-key-gap);
+  width: 100%;
+  height: var(--vkb-keyboard-tab);
+  padding: var(--vkb-key-gap) 0;
+  background-color: var(--vkb-background);
+}
+
+.write-keyboard-temp-list {
+  display: flex;
+  gap: var(--vkb-key-gap);
+  width: 80%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.write-keyboard-temp-right,
+.write-keyboard-temp-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(10% - var(--vkb-key-gap));
+  height: 100%;
+  color: var(--vkb-key-color);
+  fill: var(--vkb-key-color);
+  background-color: var(--vkb-key-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  box-sizing: border-box;
+}
+
+.write-keyboard-temp-right svg,
+.write-keyboard-temp-left svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+}
+
+.write-keyboard-temp-char:active,
+.write-keyboard-temp-right:active,
+.write-keyboard-temp-left:active {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+
+.write-keyboard-temp-right:active svg,
+.write-keyboard-left:active svg {
+  fill: var(--vkb-key-active-font-color);
+}
+
 @media (aspect-ratio: 1/1) {
   div {
     background: #f9a;
+
     /* red */
   }
 }
@@ -17,6 +79,7 @@
   position: relative;
   height: 100%;
   width: 80%;
+
   /* aspect-ratio: 1/1; */
   border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
   box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
@@ -27,10 +90,10 @@
 
 .write-content-canvas:hover {
   /* width: 100%; */
+
   /* height: 100%; */
   cursor: crosshair;
 }
-
 
 .write-content-tips {
   position: absolute;
@@ -42,7 +105,6 @@
 
 .write-control {
   width: 20%;
-
 }
 
 .write-control-backspace,
@@ -65,13 +127,14 @@
 
 .write-control-backspace:active,
 .write-control-enter:active {
-  border: var(--vkb-key-active-border-width) solid var(--vkb-key-active-border-color);
+  border: var(--vkb-key-active-border-width) solid
+    var(--vkb-key-active-border-color);
   box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
   background-color: var(--vkb-key-active-background);
 }
 
-.write-control-backspace>svg,
-.write-control-enter>svg {
+.write-control-backspace > svg,
+.write-control-enter > svg {
   width: var(--vkb-keyboard-svg-size);
   height: var(--vkb-keyboard-svg-size);
 }

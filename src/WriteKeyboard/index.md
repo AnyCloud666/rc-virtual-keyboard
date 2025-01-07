@@ -17,15 +17,37 @@ nav:
 将书写的图片进行导出，采用第三方进行识别...TODO
 
 ```jsx
-import { WriteKeyboard } from 'rc-virtual-keyboard';
-
+import { WriteKeyboard, useInput, keys } from 'rc-virtual-keyboard';
+import { useState } from 'react';
 export default () => {
-  const onClick = (e) => {
-    console.log('WriteKeyboard e: ', e);
-  };
+  const [value, setValue] = useState('');
+  const {
+    onClick,
+    inputMode,
+    inputValue,
+    chinese,
+    onChangeInputMode,
+    onSelectChinese,
+    onRecognition,
+  } = useInput({
+    defaultActiveKeyboard: keys.letterType,
+    onEnter: () => {
+      console.log('回车了');
+    },
+  });
   return (
     <div style={{ width: 500, height: 320, margin: '0 auto' }}>
-      <WriteKeyboard onClick={onClick} />
+      <input />
+      <WriteKeyboard
+        chinese={chinese}
+        onMouseDown={(e) => {
+          // 防止失去焦点
+          e?.preventDefault?.();
+        }}
+        onSelectChinese={onSelectChinese}
+        onClick={onClick}
+        onRecognition={onRecognition}
+      />
     </div>
   );
 };

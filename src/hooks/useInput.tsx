@@ -1,5 +1,6 @@
 import { useEventListener } from 'ahooks';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import Tesseract from 'tesseract.js';
 import {
   ArrowDown,
   ArrowLeft,
@@ -8,6 +9,7 @@ import {
   ArrowRightEnd,
   ArrowUp,
   Backspace,
+  Clear,
   Copy,
   DarkTheme,
   EN,
@@ -182,6 +184,29 @@ const useInput = ({
       (inputEvent as any).simulated = true;
       activeInputRef.current.dispatchEvent(inputEvent);
     }
+  };
+
+  /** 识别 */
+  const onRecognition = (url: string) => {
+    const str: string[] = [];
+
+    Promise.allSettled([
+      Tesseract.recognize(url, 'chi_sim').then((result) => {
+        console.log('result: ', result);
+        result.data.words.forEach((item) => {
+          str.push(item.text);
+        });
+      }),
+      Tesseract.recognize(url).then((result) => {
+        console.log('result: ', result);
+        result.data.words.forEach((item) => {
+          str.push(item.text);
+        });
+      }),
+    ]).then(() => {
+      setChinese([...new Set(str)]);
+      console.log('str: ', str);
+    });
   };
 
   /** 输入 */
@@ -449,13 +474,11 @@ const useInput = ({
           keyCode: -1,
           keyType: 'chinese',
         });
-
-      setInputValue('');
     } else {
-      setInputValue('');
-      setChinese([]);
       console.error('input type = email or number not allow input chinese');
     }
+    setInputValue('');
+    setChinese([]);
   };
 
   /** 拷贝 */
@@ -512,6 +535,12 @@ const useInput = ({
     }
   };
 
+  /** 清空临时输入区域 */
+  const onClear = () => {
+    // setInputValue('');
+    setChinese([]);
+  };
+
   /** 控制类 */
   const onControl = (e: VKB.KeyboardAttributeType) => {
     switch (e.code) {
@@ -549,6 +578,8 @@ const useInput = ({
       case SelectAll.code:
         onCursor(e);
         break;
+      case Clear.code:
+        onClear();
     }
   };
 
@@ -638,6 +669,7 @@ const useInput = ({
     onSelectChinese,
     onChangeInputMode,
     setActiveKeyboard,
+    onRecognition,
   };
 };
 
