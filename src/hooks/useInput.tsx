@@ -1,6 +1,5 @@
 import { useEventListener } from 'ahooks';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import Tesseract from 'tesseract.js';
 import {
   ArrowDown,
   ArrowLeft,
@@ -34,6 +33,7 @@ import {
   settingType,
 } from '../keys';
 import { VKB } from '../typing';
+import { imgToWordV1 } from '../utils/imgToWord';
 import { pinyin2ChineseV1 } from '../utils/pinyin';
 
 const useInput = ({
@@ -46,6 +46,7 @@ const useInput = ({
   onThemeModeChange,
   onPositionModeChange,
   onPinyin2Chinese = pinyin2ChineseV1,
+  onImageToWord = imgToWordV1,
 }: {
   /** 主题模式 */
   themeMode?: string;
@@ -65,6 +66,8 @@ const useInput = ({
   onPositionModeChange?: (mode: string) => void;
   /** 拼音转汉字，自定义实现拼音转汉字，默认采用最简单的单字输入模式 */
   onPinyin2Chinese?: (value: string) => { pinyin: string; chinese: string[] };
+  /** 图片转文字，自定义实现图片转文字，默认采用 tesseract.js 识别图片文字 */
+  onImageToWord?: (url: string) => Promise<string[]>;
 }) => {
   /** 光标选择模式 */
   const cursorMode = useRef('index');
@@ -187,26 +190,14 @@ const useInput = ({
   };
 
   /** 识别 */
-  const onRecognition = (url: string) => {
-    const str: string[] = [];
-
-    Promise.allSettled([
-      Tesseract.recognize(url, 'chi_sim').then((result) => {
-        console.log('result: ', result);
-        result.data.words.forEach((item) => {
-          str.push(item.text);
-        });
-      }),
-      Tesseract.recognize(url).then((result) => {
-        console.log('result: ', result);
-        result.data.words.forEach((item) => {
-          str.push(item.text);
-        });
-      }),
-    ]).then(() => {
-      setChinese([...new Set(str)]);
-      console.log('str: ', str);
-    });
+  const onRecognition = async (url: string) => {
+    try {
+      const result = await onImageToWord(url);
+      setChinese([...new Set(result)]);
+    } catch (error) {
+      console.log('error: ', error);
+      setChinese([]);
+    }
   };
 
   /** 输入 */
