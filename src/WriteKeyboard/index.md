@@ -14,7 +14,9 @@ nav:
 
 # 手写键
 
-将书写的图片进行导出，采用第三方进行识别...TODO
+默认采用 `tesseract.js` 图片转文字
+
+由于识别度较低,可自定义实现 `onImageToWord:(url:string)=>Promise<string>` 方法, 传入图片 url, 返回文字内容
 
 ```jsx
 import { WriteKeyboard, useInput, keys } from 'rc-virtual-keyboard';
@@ -34,6 +36,7 @@ export default () => {
     onEnter: () => {
       console.log('回车了');
     },
+    // 在这里实现onImageToWord方法
   });
   return (
     <div style={{ width: 500, height: 320, margin: '0 auto' }}>
@@ -55,15 +58,17 @@ export default () => {
 
 ## 属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-| ---- | ---- | ---- | ------ |
-| -    | -    | -    | -      |
+| 属性    | 说明           | 类型     | 默认值 |
+| ------- | -------------- | -------- | ------ |
+| chinese | 识别之后的文字 | string[] | []     |
 
 ## 方法
 
-| 方法    | 说明     | 类型                                   | 默认值 |
-| ------- | -------- | -------------------------------------- | ------ |
-| onClick | 点击事件 | (e: VKB.KeyboardAttributeType) => void | -      |
+| 方法            | 说明     | 类型                                   | 默认值 |
+| --------------- | -------- | -------------------------------------- | ------ |
+| onClick         | 点击事件 | (e: VKB.KeyboardAttributeType) => void | -      |
+| onSelectChinese | 选择中文 | (chinese: string) => void              | -      |
+| onRecognition   | 识别图片 | (url: string) => void                  | -      |
 
 ## 支持的样式 token
 

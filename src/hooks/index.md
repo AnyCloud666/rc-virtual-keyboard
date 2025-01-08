@@ -27,6 +27,7 @@ nav:
 | onThemeModeChange     | 主题改变                                                       | (mode: string) => void                                   | -                |
 | onPositionModeChange  | 位置改变                                                       | (mode: string) => void                                   | -                |
 | onPinyin2Chinese      | 拼音转汉字，自定义实现拼音转汉字，默认采用最简单的单字输入模式 | (value: string) => { pinyin: string; chinese: string[] } | pinyin2ChineseV1 |
+| onImageToWord         | 图片转文字，自定义实现图片转文字，默认采用最简单的单字输入模式 | (image: string) => Promise<string[]>                     | imageToWordV1    |
 
 ## 结果
 
