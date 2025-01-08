@@ -125,11 +125,27 @@ const WriteKeyboard = ({
     }
   }, []);
 
+  /** 翻页 */
+  const onMore = (type: string) => {
+    if (tempInputAreaRef.current) {
+      const width = tempInputAreaRef.current.offsetWidth;
+      tempInputAreaRef.current.scrollTo({
+        left:
+          tempInputAreaRef.current.scrollLeft +
+          (type === 'add' ? width : -width) / 10,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   return (
     <div className="write-keyboard" onMouseDown={onMouseDown}>
       {chinese && chinese.length > 0 && (
         <div className="write-keyboard-temp">
-          <div className="write-keyboard-temp-left">
+          <div
+            className="write-keyboard-temp-left"
+            onClick={() => onMore('minus')}
+          >
             <LeftSvg />
           </div>
           <div className="write-keyboard-temp-list" ref={tempInputAreaRef}>
@@ -148,7 +164,10 @@ const WriteKeyboard = ({
               );
             })}
           </div>
-          <div className="write-keyboard-temp-right">
+          <div
+            className="write-keyboard-temp-right"
+            onClick={() => onMore('add')}
+          >
             <RightSvg />
           </div>
         </div>
