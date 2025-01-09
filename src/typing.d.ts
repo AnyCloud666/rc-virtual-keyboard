@@ -124,12 +124,20 @@ declare namespace VKB {
     themeMode?: string;
     /** 位置模式 */
     positionMode?: string;
+    /** 按键音效 */
+    useKeydownAudio?: 'Y' | 'N';
+    /** 按键音效 url */
+    keydownAudioUrl?: string;
     /** 显示 ,传入的必须是 setStatus 重新 render */
     setShow: (s: boolean) => void;
     /** 设置主题模式 */
     setThemeMode: (mode: string) => void;
     /** 设置位置模式 */
     setPositionMode: (mode: string) => void;
+    /** 设置是否使用按键音效 */
+    setUseKeydownAudio: (use: 'Y' | 'N') => void;
+    /** 设置按键音效 url */
+    setKeydownAudioUrl: (url: string) => void;
     /** 操作时的回调,通过ctx 重写 onChange 实现 */
     onChange?: (e: VKB.KeyboardAttributeType) => void;
     /** 回车 通过 ctx 重写 onEnter 实现*/

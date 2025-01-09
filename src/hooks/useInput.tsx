@@ -51,6 +51,8 @@ const useInput = ({
   onChangeShow,
   onThemeModeChange,
   onPositionModeChange,
+  onUseKeydownAudioChange,
+  onKeydownAudioUrlChange,
   onPinyin2Chinese = pinyin2ChineseV1,
   onImageToWord = imgToWordV1,
 }: {
@@ -74,6 +76,9 @@ const useInput = ({
   onThemeModeChange?: (mode: string) => void;
   /** 位置模式改变 */
   onPositionModeChange?: (mode: string) => void;
+  /** 开启按键音效 */
+  onUseKeydownAudioChange?: (mode: 'Y' | 'N') => void;
+  onKeydownAudioUrlChange?: (url: string) => void;
   /** 拼音转汉字，自定义实现拼音转汉字，默认采用最简单的单字输入模式 */
   onPinyin2Chinese?: (value: string) => { pinyin: string; chinese: string[] };
   /** 图片转文字，自定义实现图片转文字，默认采用 tesseract.js 识别图片文字 */
@@ -608,6 +613,8 @@ const useInput = ({
           vkbKeydownAudio === 'Y' ? 'N' : 'Y',
         );
         setVkbKeydownAudio(vkbKeydownAudio === 'Y' ? 'N' : 'Y');
+        onUseKeydownAudioChange &&
+          onUseKeydownAudioChange(vkbKeydownAudio === 'Y' ? 'N' : 'Y');
         break;
     }
   };

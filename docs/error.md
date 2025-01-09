@@ -218,7 +218,7 @@ export default () => {
 };
 ```
 
-## Uncaught SyntaxError: The requested module '/node_modules/@wwi/react-virtual-keyboard/dist/svg/bottom.svg?import' does not provide an export named 'ReactComponent'
+## Uncaught SyntaxError: The requested module '/node_modules/rc-virtual-keyboard/dist/svg/bottom.svg?import' does not provide an export named 'ReactComponent'
 
 - 在 vite 项目中配置 vite-plugin-svgr
 

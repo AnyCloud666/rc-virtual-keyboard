@@ -37,6 +37,7 @@ export default () => {
   const [positionMode, setPositionMode] = useState(
     localStorage?.getItem(keys.VKB_POSITION_MODE) ?? 'float',
   );
+  const [useKeydownAudio, setUseKeydownAudio] = useState('N');
   const [value, setValue] = useState('');
   const { VirtualKeyboard, InitVirtualKeyBoardCtx, VirtualKeyboardProvide } =
     useVirtualKeyboard();
@@ -63,6 +64,8 @@ export default () => {
           setThemeMode,
           positionMode,
           setPositionMode,
+          useKeydownAudio,
+          setUseKeydownAudio,
           theme: {},
           virtualKeyboardTab: [
             LetterKeyboardTab,

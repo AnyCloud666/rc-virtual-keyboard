@@ -28,11 +28,15 @@ const CompositionKeyboard = ({
   hiddenLabel = <BottomSvg />,
   themeMode = LightTheme.code,
   positionMode = FloatPosition.code,
+  useKeydownAudio = 'Y',
+  keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
   onEnter,
   onChange,
   onChangeShow,
   onThemeModeChange,
   onPositionModeChange,
+  onUseKeydownAudioChange,
+  onKeydownAudioUrlChange,
 }: {
   /** 显示拖拽 */
   showDragHandle?: boolean;
@@ -52,6 +56,10 @@ const CompositionKeyboard = ({
   themeMode?: string;
   /** 位置 */
   positionMode?: string;
+  /** 是否使用键盘按键声音 */
+  useKeydownAudio?: 'Y' | 'N';
+  /** 键盘按键声音地址 */
+  keydownAudioUrl?: string;
   /** enter 方法回调 */
   onEnter?: () => void;
   /** 输入回调 */
@@ -62,6 +70,10 @@ const CompositionKeyboard = ({
   onThemeModeChange?: (mode: string) => void;
   /** 位置模式改变 */
   onPositionModeChange?: (mode: string) => void;
+  /** 使用改变 */
+  onUseKeydownAudioChange?: (mode: 'Y' | 'N') => void;
+  /** 地址改变 */
+  onKeydownAudioUrlChange?: (url: string) => void;
 }) => {
   const {
     inputMode,
@@ -81,11 +93,15 @@ const CompositionKeyboard = ({
     themeMode,
     positionMode,
     defaultActiveKeyboard,
+    useKeydownAudio,
+    keydownAudioUrl,
     onChange,
     onEnter,
     onChangeShow,
     onThemeModeChange,
     onPositionModeChange,
+    onUseKeydownAudioChange,
+    onKeydownAudioUrlChange,
     onPinyin2Chinese: pinyin2ChineseV1,
   });
 

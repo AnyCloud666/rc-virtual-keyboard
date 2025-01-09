@@ -23,9 +23,13 @@ export const InitVirtualKeyBoardCtx: VKB.KeyBoardCtxType = {
   theme: {},
   themeMode: 'light',
   positionMode: 'float',
+  useKeydownAudio: 'Y',
+  keydownAudioUrl: '/audio/typing-sound-02-229861.mp3',
   setShow: () => {},
   setThemeMode: () => {},
   setPositionMode: () => {},
+  setUseKeydownAudio: () => {},
+  setKeydownAudioUrl: () => {},
   onChange: () => {},
 };
 
@@ -95,10 +99,14 @@ export const VirtualKeyboard = () => {
           positionMode={virtualKeyboardCtx.positionMode}
           virtualKeyboardTab={virtualKeyboardCtx.virtualKeyboardTab}
           showDragHandle={virtualKeyboardCtx.showDragHandle}
+          useKeydownAudio={virtualKeyboardCtx.useKeydownAudio}
+          keydownAudioUrl={virtualKeyboardCtx.keydownAudioUrl}
           onChangeShow={virtualKeyboardCtx.setShow}
           onChange={virtualKeyboardCtx.onChange}
           onThemeModeChange={virtualKeyboardCtx.setThemeMode}
           onPositionModeChange={virtualKeyboardCtx.setPositionMode}
+          onKeydownAudioUrlChange={virtualKeyboardCtx.setKeydownAudioUrl}
+          onUseKeydownAudioChange={virtualKeyboardCtx.setUseKeydownAudio}
         />
       </DragBlock>
     </>

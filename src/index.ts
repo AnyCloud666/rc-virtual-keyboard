@@ -9,12 +9,12 @@ import {
 import * as keys from './keys';
 export {
   EditKeyboardTab,
-  keys,
   LetterKeyboardTab,
   NumberKeyboardTab,
   SettingKeyboardTab,
   SymbolKeyboardTab,
   WriteKeyboardTab,
+  keys,
 };
 
 export { default as NumberKeyboard } from './NumberKeyboard';
@@ -36,5 +36,4 @@ export { default as CompositionKeyboard } from './CompositionKeyboard';
 export { default as useVirtualKeyboard } from './VirtualKeyboard';
 
 export { default as useInput } from './hooks/useInput';
-
 // export {* as kyes } from './keys';

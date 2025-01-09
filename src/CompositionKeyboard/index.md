@@ -49,6 +49,7 @@ export default () => {
             SymbolKeyboardTab,
             WriteKeyboardTab,
             EditKeyboardTab,
+            SettingKeyboardTab,
           ]}
           showDragHandle={false}
           showHiddenHandle={false}
