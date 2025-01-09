@@ -33,6 +33,18 @@ const WriteKeyboard = ({
     height: '200px',
   });
 
+  function downloadCanvas(str: string) {
+    let link = document.createElement('a');
+
+    link.download = 'canvas_image.png';
+
+    link.href = str;
+
+    link.click();
+
+    link.remove();
+  }
+
   const onDelete = () => {
     if (canvasCTX.current && chinese.length > 0) {
       canvasCTX.current.clearRect(0, 0, 10000, 10000);
@@ -48,6 +60,7 @@ const WriteKeyboard = ({
 
         onRecognition && onRecognition(tempUrl);
 
+        // downloadCanvas(tempUrl);
         // let writeImgEl = document.body.querySelector("#write-img") as HTMLImageElement;
         // console.log("writeImgEl: ", writeImgEl);
         // if (!writeImgEl) {

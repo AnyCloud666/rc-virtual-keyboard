@@ -7,6 +7,7 @@ import {
   ArrowRight,
   ArrowRightEnd,
   ArrowUp,
+  BackgroundAudio,
   Backspace,
   Clear,
   Copy,
@@ -24,6 +25,7 @@ import {
   Space,
   StartSelect,
   Tab,
+  VKB_KEYDOWN_MODE,
   VKB_POSITION_MODE,
   VKB_THEME_MODE,
   ZH,
@@ -36,10 +38,14 @@ import { VKB } from '../typing';
 import { imgToWordV1 } from '../utils/imgToWord';
 import { pinyin2ChineseV1 } from '../utils/pinyin';
 
+let audio: HTMLAudioElement;
+
 const useInput = ({
   themeMode = LightTheme.code,
   positionMode = FloatPosition.code,
   defaultActiveKeyboard = numberType,
+  useKeydownAudio = 'Y',
+  keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
   onChange,
   onEnter,
   onChangeShow,
@@ -54,6 +60,10 @@ const useInput = ({
   positionMode?: string;
   /** 默认活跃的键盘 */
   defaultActiveKeyboard?: string;
+  /** 使用按键音效 */
+  useKeydownAudio?: 'Y' | 'N';
+  /** 按键音效url */
+  keydownAudioUrl?: string;
   /** enter 方法回调 */
   onEnter?: () => void;
   /** 输入回调 */
@@ -114,7 +124,6 @@ const useInput = ({
   const cacheInputFocus = useRef(new WeakSet());
 
   /** 颜色主题 */
-
   const [vkbThemeMode, setVkbThemeMode] = useState(
     themeMode ?? localStorage?.getItem(VKB_THEME_MODE) ?? 'float',
   );
@@ -122,6 +131,8 @@ const useInput = ({
   const [vkbPositionMode, setVkbPositionMode] = useState(
     positionMode ?? localStorage?.getItem(VKB_POSITION_MODE) ?? 'float',
   );
+  /** 按键音效 */
+  const [vkbKeydownAudio, setVkbKeydownAudio] = useState(useKeydownAudio);
 
   /** 失去焦点 */
   const onBlur = useCallback(() => {
@@ -206,7 +217,6 @@ const useInput = ({
       const vkbNotEmpty = activeInputRef.current.dataset?.vkbNotEmpty;
       const vkbNotInput =
         activeInputRef.current.dataset?.vkbNotInput?.split(',');
-      console.log('vkbNotInput: ', vkbNotInput);
       // 处理类型
       // if (!(await handleInputType(activeInputRef.current))) return;
 
@@ -592,6 +602,13 @@ const useInput = ({
         onPositionModeChange && onPositionModeChange(e.code);
         localStorage?.setItem(VKB_THEME_MODE, e.code);
         break;
+      case BackgroundAudio.code:
+        localStorage?.setItem(
+          VKB_KEYDOWN_MODE,
+          vkbKeydownAudio === 'Y' ? 'N' : 'Y',
+        );
+        setVkbKeydownAudio(vkbKeydownAudio === 'Y' ? 'N' : 'Y');
+        break;
     }
   };
 
@@ -604,6 +621,10 @@ const useInput = ({
       onSetting(e);
     } else {
       onInput(e);
+    }
+    if (audio && vkbKeydownAudio === 'Y') {
+      audio.pause();
+      audio.play();
     }
   };
 
@@ -640,6 +661,19 @@ const useInput = ({
     }
   };
 
+  /** 创建按键背景音乐 */
+  const createBackgroundAudio = () => {
+    audio = document.body.querySelector(
+      '#keyboard-bg-audio',
+    ) as HTMLAudioElement;
+    if (!audio) {
+      audio = document.createElement('audio');
+      document.body.appendChild(audio);
+      audio.id = 'keyboard-bg-audio';
+    }
+    audio.src = keydownAudioUrl;
+  };
+
   useEffect(() => {
     setVkbThemeMode(themeMode);
   }, [themeMode]);
@@ -648,11 +682,20 @@ const useInput = ({
     setVkbPositionMode(positionMode);
   }, [positionMode]);
 
+  useEffect(() => {
+    setVkbKeydownAudio(useKeydownAudio);
+  }, [useKeydownAudio]);
+
+  useEffect(() => {
+    createBackgroundAudio();
+  }, []);
+
   return {
     inputMode,
     inputValue,
     vkbThemeMode,
     vkbPositionMode,
+    vkbKeydownAudio,
     chinese,
     activeKeyboard,
     onClick,

@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import { ReactComponent as BackgroundAudioSvg } from './svg/background-audio.svg';
 import { ReactComponent as BottomSvg } from './svg/bottom.svg';
 import { ReactComponent as DeleteSvg } from './svg/delete.svg';
 import { ReactComponent as EnterSvg } from './svg/enter.svg';
@@ -37,6 +38,8 @@ export const EN = 'en';
 export const VKB_THEME_MODE = 'VKB_THEME_MODE';
 /** 位置模式key */
 export const VKB_POSITION_MODE = 'VKB_POSITION_MODE';
+/** 按键音效key */
+export const VKB_KEYDOWN_MODE = 'VKB_KEYDOWN_MODE';
 
 /** ---------------------------功能控制类--------------------------- */
 /** 删除 */
@@ -933,6 +936,16 @@ export const FloatPosition: VKB.KeyboardAttributeType = {
   description: '浮动',
 };
 
+/** ---------------------------位置--------------------------- */
+/** 开启 */
+export const BackgroundAudio: VKB.KeyboardAttributeType = {
+  key: <BackgroundAudioSvg />,
+  code: 'backgroundAudio',
+  keyCode: 11001,
+  keyType: settingType,
+  description: '开启按键音效',
+};
+
 /** 数字键 */
 export const numberKeys: VKB.KeyboardAttributeType[] = [
   Numpad1,
@@ -1127,4 +1140,8 @@ export const positionKeys: VKB.KeyboardAttributeType[] = [
   FixedTopPosition,
   FixedLeftPosition,
   FixedRightPosition,
+];
+/** 背景音乐键 */
+export const backgroundAudioKeys: VKB.KeyboardAttributeType[] = [
+  BackgroundAudio,
 ];

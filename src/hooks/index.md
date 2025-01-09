@@ -16,18 +16,20 @@ nav:
 
 ## 参数
 
-| 参数                  | 说明                                                           | 类型                                                     | 默认值           |
-| --------------------- | -------------------------------------------------------------- | -------------------------------------------------------- | ---------------- |
-| themeMode             | 主题模式                                                       | string                                                   | -                |
-| positionMode          | 位置模式                                                       | string                                                   | -                |
-| defaultActiveKeyboard | 默认选中的键盘                                                 | string                                                   | -                |
-| onEnter               | enter 方法回调                                                 | ()=>void                                                 | -                |
-| onChange              | 输入回调                                                       | (e: VKB.KeyboardAttributeType) => void                   | -                |
-| onChangeShow          | 显示/隐藏                                                      | (s: boolean) => void                                     | -                |
-| onThemeModeChange     | 主题改变                                                       | (mode: string) => void                                   | -                |
-| onPositionModeChange  | 位置改变                                                       | (mode: string) => void                                   | -                |
-| onPinyin2Chinese      | 拼音转汉字，自定义实现拼音转汉字，默认采用最简单的单字输入模式 | (value: string) => { pinyin: string; chinese: string[] } | pinyin2ChineseV1 |
-| onImageToWord         | 图片转文字，自定义实现图片转文字，默认采用最简单的单字输入模式 | (image: string) => Promise<string[]>                     | imageToWordV1    |
+| 参数                  | 说明                                                           | 类型                                                     | 默认值                              |
+| --------------------- | -------------------------------------------------------------- | -------------------------------------------------------- | ----------------------------------- |
+| themeMode             | 主题模式                                                       | string                                                   | -                                   |
+| positionMode          | 位置模式                                                       | string                                                   | -                                   |
+| useKeydownAudio       | 使用按键音效                                                   | 'Y'\|'N'                                                 | 'Y'                                 |
+| keydownAudioUrl       | 按键音效 url                                                   | string                                                   | \/audio\/typing-sound-02-229861.mp3 |
+| defaultActiveKeyboard | 默认选中的键盘                                                 | string                                                   | -                                   |
+| onEnter               | enter 方法回调                                                 | ()=>void                                                 | -                                   |
+| onChange              | 输入回调                                                       | (e: VKB.KeyboardAttributeType) => void                   | -                                   |
+| onChangeShow          | 显示/隐藏                                                      | (s: boolean) => void                                     | -                                   |
+| onThemeModeChange     | 主题改变                                                       | (mode: string) => void                                   | -                                   |
+| onPositionModeChange  | 位置改变                                                       | (mode: string) => void                                   | -                                   |
+| onPinyin2Chinese      | 拼音转汉字，自定义实现拼音转汉字，默认采用最简单的单字输入模式 | (value: string) => { pinyin: string; chinese: string[] } | pinyin2ChineseV1                    |
+| onImageToWord         | 图片转文字，自定义实现图片转文字，默认采用最简单的单字输入模式 | (image: string) => Promise<string[]>                     | imageToWordV1                       |
 
 ## 结果
 

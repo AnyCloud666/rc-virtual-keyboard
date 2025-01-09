@@ -28,3 +28,14 @@ export function imgToWordV1(img: string): Promise<string[]> {
     });
   });
 }
+
+/**
+ * TODO: 图片转文字方法
+ *
+ * @export
+ * @param {string} img
+ * @return {*}  {Promise<string[]>}
+ */
+export function imgToWordV2(img: string): Promise<string[]> {
+  return Promise.resolve([]);
+}

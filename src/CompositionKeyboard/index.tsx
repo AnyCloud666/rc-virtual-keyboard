@@ -68,6 +68,7 @@ const CompositionKeyboard = ({
     inputValue,
     vkbThemeMode,
     vkbPositionMode,
+    vkbKeydownAudio,
     chinese,
     activeKeyboard,
     setActiveKeyboard,
@@ -139,6 +140,7 @@ const CompositionKeyboard = ({
               inputMode={inputMode}
               themeMode={vkbThemeMode}
               positionMode={vkbPositionMode}
+              vkbKeydownAudio={vkbKeydownAudio}
               chinese={chinese}
               onClick={onClick}
               onChangeInputMode={onChangeInputMode}

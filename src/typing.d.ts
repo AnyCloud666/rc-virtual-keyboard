@@ -34,6 +34,7 @@ declare namespace VKB {
       themeMode: string;
       inputMode: InputMode;
       positionMode: string;
+      vkbKeydownAudio: string;
       inputValue: string;
       chinese: string[];
       onMouseDown: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
