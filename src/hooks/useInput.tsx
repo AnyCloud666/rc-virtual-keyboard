@@ -219,7 +219,11 @@ const useInput = ({
   /** 输入 */
   const onInput = async (e: VKB.KeyboardAttributeType) => {
     if (activeInputRef.current && typeof e.key === 'string') {
+      let value = activeInputRef.current.value;
+      const selectionStart = activeInputRef.current.selectionStart || 0;
+      const selectionEnd = activeInputRef.current.selectionEnd || 0;
       const vkbNotEmpty = activeInputRef.current.dataset?.vkbNotEmpty;
+      const vkbNotEmptyTrim = activeInputRef.current.dataset?.vkbNotEmptyTrim;
       const vkbNotInput =
         activeInputRef.current.dataset?.vkbNotInput?.split(',');
       // 处理类型
@@ -239,12 +243,22 @@ const useInput = ({
       if (vkbNotInput?.includes(e.key)) {
         return;
       }
+      if (vkbNotEmpty === 'true' && e.code === Space.code) {
+        return;
+      }
+      if (
+        vkbNotEmptyTrim === 'true' &&
+        e.code === Space.code &&
+        (selectionStart === 0 || selectionEnd === value.length - 1)
+      ) {
+        return;
+      }
       if (
         inputMode === ZH &&
         e.key !== Space.code &&
         activeKeyboard === letterType
       ) {
-        const value = inputValue + e.key;
+        value = value + e.key;
 
         const transformMsg = (onPinyin2Chinese && onPinyin2Chinese(value)) || {
           pinyin: value,
@@ -254,10 +268,6 @@ const useInput = ({
         setChinese([value, ...transformMsg.chinese]);
         jumpDelete.current = false;
       } else {
-        let value = activeInputRef.current.value;
-
-        const selectionEnd = activeInputRef.current.selectionEnd || 0;
-
         // 处理 type = 'number' 时输入的其他字符
         if (isAllowInputNumber(inputType.current, value, e.key)) return;
 

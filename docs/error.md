@@ -218,6 +218,34 @@ export default () => {
 };
 ```
 
+## 禁用空格输入
+
+- 存在需求，不想输入空格 上加入 `data-vkb-not-empty` 属性去禁用
+
+```jsx
+export default () => {
+  return (
+    <>
+      <input placeholder="禁止输入空格" data-vkb-not-empty />
+    </>
+  );
+};
+```
+
+## 禁用两端空格输入，中间输入空格不禁用
+
+- 存在需求，不想输入两端空格 上加入 `data-vkb-not-empty-trim` 属性去禁用
+
+```jsx
+export default () => {
+  return (
+    <>
+      <input placeholder="禁止输入两端空格" data-vkb-not-empty-trim />
+    </>
+  );
+};
+```
+
 ## Uncaught SyntaxError: The requested module '/node_modules/rc-virtual-keyboard/dist/svg/bottom.svg?import' does not provide an export named 'ReactComponent'
 
 - 在 vite 项目中配置 vite-plugin-svgr
