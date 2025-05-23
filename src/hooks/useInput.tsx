@@ -222,6 +222,7 @@ const useInput = ({
       let value = activeInputRef.current.value;
       const selectionStart = activeInputRef.current.selectionStart || 0;
       const selectionEnd = activeInputRef.current.selectionEnd || 0;
+      console.log('selectionEnd: ', selectionEnd, value.length);
       const vkbNotEmpty = activeInputRef.current.dataset?.vkbNotEmpty;
       const vkbNotEmptyTrim = activeInputRef.current.dataset?.vkbNotEmptyTrim;
       const vkbNotInput =
@@ -249,7 +250,7 @@ const useInput = ({
       if (
         vkbNotEmptyTrim === 'true' &&
         e.code === Space.code &&
-        (selectionStart === 0 || selectionEnd === value.length - 1)
+        (selectionStart === 0 || selectionEnd === value.length)
       ) {
         return;
       }
