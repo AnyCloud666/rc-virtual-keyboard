@@ -222,7 +222,6 @@ const useInput = ({
       let value = activeInputRef.current.value;
       const selectionStart = activeInputRef.current.selectionStart || 0;
       const selectionEnd = activeInputRef.current.selectionEnd || 0;
-      console.log('selectionEnd: ', selectionEnd, value.length);
       const vkbNotEmpty = activeInputRef.current.dataset?.vkbNotEmpty;
       const vkbNotEmptyTrim = activeInputRef.current.dataset?.vkbNotEmptyTrim;
       const vkbNotInput =
@@ -260,7 +259,6 @@ const useInput = ({
         activeKeyboard === letterType
       ) {
         value = value + e.key;
-
         const transformMsg = (onPinyin2Chinese && onPinyin2Chinese(value)) || {
           pinyin: value,
           chinese: [],
@@ -272,15 +270,25 @@ const useInput = ({
         // 处理 type = 'number' 时输入的其他字符
         if (isAllowInputNumber(inputType.current, value, e.key)) return;
 
-        value =
-          value.slice(0, selectionEnd) + e.key + value.slice(selectionEnd);
+        if (selectionStart === selectionEnd) {
+          // 相同进行插入
+          value =
+            value.slice(0, selectionStart) +
+            e.key +
+            value.slice(selectionStart);
+        } else {
+          // 不同的将选中的进行的进行替换为最新的
+          value =
+            value.slice(0, selectionStart) + e.key + value.slice(selectionEnd);
+        }
 
-        activeInputRef.current.setSelectionRange(
-          selectionEnd + 1,
-          selectionEnd + 1,
-        );
         // 修改 value
         activeInputRef.current.value = value;
+
+        activeInputRef.current.setSelectionRange(
+          selectionStart + 1,
+          selectionStart + 1,
+        );
 
         emitInputEvent();
       }
