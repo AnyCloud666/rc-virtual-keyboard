@@ -46,6 +46,7 @@ const useInput = ({
   defaultActiveKeyboard = numberType,
   useKeydownAudio = 'Y',
   keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
+  autoPopup = true,
   onChange,
   onEnter,
   onChangeShow,
@@ -66,6 +67,8 @@ const useInput = ({
   useKeydownAudio?: 'Y' | 'N';
   /** 按键音效url */
   keydownAudioUrl?: string;
+  /** 自动弹出 */
+  autoPopup?: boolean;
   /** enter 方法回调 */
   onEnter?: () => void;
   /** 输入回调 */
@@ -145,8 +148,12 @@ const useInput = ({
     inputType.current = '';
   }, []);
   /** 获得焦点 */
-  const onFocus = useCallback(() => {
-    onChangeShow && onChangeShow(true);
+  const onFocus = useCallback((e: FocusEvent) => {
+    const activeElement = e.target as HTMLInputElement;
+    const vkbAutoPopup = activeElement?.dataset?.vkbAutoPopup ?? 'true';
+    if (autoPopup && vkbAutoPopup === 'true') {
+      onChangeShow && onChangeShow(true);
+    }
   }, []);
 
   /** 寻找聚焦有效的input */
@@ -154,6 +161,7 @@ const useInput = ({
     const activeElement = e.target as HTMLInputElement;
     const vkbDisabled = activeElement.dataset?.vkbDisabled;
     const vkbType = activeElement.dataset?.vkbType ?? '';
+    const vkbAutoPopup = activeElement.dataset?.vkbAutoPopup ?? 'true';
     if (
       activeElement?.tagName === 'INPUT' &&
       [...effectiveInputType, ...needHandleInputType].includes(
@@ -164,7 +172,9 @@ const useInput = ({
       inputType.current = vkbType;
       activeInputRef.current = activeElement;
       if (!cacheInputFocus.current.has(activeElement)) {
-        onChangeShow && onChangeShow(true);
+        if (autoPopup && vkbAutoPopup === 'true') {
+          onChangeShow && onChangeShow(true);
+        }
         cacheInputFocus.current.add(activeElement);
         activeInputRef.current.addEventListener('blur', onBlur);
         activeInputRef.current.addEventListener('focus', onFocus);
@@ -689,6 +699,7 @@ const useInput = ({
 
   /** 创建按键背景音乐 */
   const createBackgroundAudio = () => {
+    if (!keydownAudioUrl) return;
     audio = document.body.querySelector(
       '#keyboard-bg-audio',
     ) as HTMLAudioElement;

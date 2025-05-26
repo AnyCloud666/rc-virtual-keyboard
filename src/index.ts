@@ -36,4 +36,3 @@ export { default as CompositionKeyboard } from './CompositionKeyboard';
 export { default as useVirtualKeyboard } from './VirtualKeyboard';
 
 export { default as useInput } from './hooks/useInput';
-// export {* as kyes } from './keys';

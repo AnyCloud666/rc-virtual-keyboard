@@ -246,6 +246,23 @@ export default () => {
 };
 ```
 
+## 单个输入框禁止弹出虚拟键盘
+
+- 存在需求，单个输入框禁止弹出虚拟键盘，在 `input` 上加入 `data-vkb-auto-popup` 属性设置为 `false`
+
+```jsx
+export default () => {
+  return (
+    <>
+      <input
+        placeholder="单个输入框禁止弹出虚拟键盘"
+        data-vkb-auto-popup={false}
+      />
+    </>
+  );
+};
+```
+
 ## Uncaught SyntaxError: The requested module '/node_modules/rc-virtual-keyboard/dist/svg/bottom.svg?import' does not provide an export named 'ReactComponent'
 
 - 在 vite 项目中配置 vite-plugin-svgr
@@ -268,3 +285,8 @@ defineConfig({
   ],
 });
 ```
+
+## 按键声音播放异常
+
+- 检查默认的音频文件是否存在 /public/audio/typing-sound-02-229861.mp3
+- 导入正确的 keydownAudioUrl
