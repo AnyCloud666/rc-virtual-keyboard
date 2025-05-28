@@ -268,7 +268,7 @@ const useInput = ({
         e.key !== Space.code &&
         activeKeyboard === letterType
       ) {
-        value = value + e.key;
+        const value = inputValue + e.key;
         const transformMsg = (onPinyin2Chinese && onPinyin2Chinese(value)) || {
           pinyin: value,
           chinese: [],
