@@ -53,12 +53,14 @@
     "tesseract.js": "^5.1.1"
   },
   "devDependencies": {
+    "@ant-design/pro-components": "^2.8.7",
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@umijs/lint": "^4.0.0",
     "ahooks": "^3.8.0",
+    "antd": "5.20.6",
     "dumi": "^2.3.0",
     "eslint": "^8.23.0",
     "father": "^4.1.0",

@@ -257,6 +257,9 @@ export default () => {
       <input
         placeholder="单个输入框禁止弹出虚拟键盘"
         data-vkb-auto-popup={false}
+        onInput={(e) => {
+          console.log('e: ', e);
+        }}
       />
     </>
   );
@@ -290,3 +293,115 @@ defineConfig({
 
 - 检查默认的音频文件是否存在 /public/audio/typing-sound-02-229861.mp3
 - 导入正确的 keydownAudioUrl
+
+## antd Input 组件如何使用虚拟键盘
+
+- 在虚拟键盘内部，触发了 input, change 事件，将触发 Input 组件的 onInput, onChange 事件
+
+```js
+import { Simulate } from 'react-dom/test-utils';
+const emitInputEvent = () => {
+  if (!activeInputRef.current) return;
+  Simulate?.change?.(activeInputRef.current);
+  Simulate?.input?.(activeInputRef.current);
+};
+```
+
+```jsx
+import { useState } from 'react';
+import { Input } from 'antd';
+export default () => {
+  const [value, setValue] = useState();
+
+  return (
+    <Input
+      placeholder="antd Input 组件使用虚拟键盘"
+      value={value}
+      onInput={(e) => {
+        console.log('e: onInput', e);
+        setValue(e.target.value);
+      }}
+      onChange={(e) => {
+        console.log('e: onChange', e);
+      }}
+    />
+  );
+};
+```
+
+## antd InputNumber 组件如何使用虚拟键盘
+
+- 在虚拟键盘内部，触发了 input, change 事件，将触发 InputNumber 组件的 onInput, onChange 事件
+
+```jsx
+import { useState, useRef } from 'react';
+import { InputNumber } from 'antd';
+
+export default () => {
+  const [value, setValue] = useState();
+
+  return (
+    <InputNumber
+      placeholder="antd InputNumber 组件使用虚拟键盘"
+      value={value}
+      onInput={(e) => {
+        console.log('e: onInput', e);
+      }}
+      onChange={(e) => {
+        console.log('e: onChange', e);
+      }}
+    />
+  );
+};
+```
+
+## ProComponents ProFormText 组件如何使用虚拟键盘
+
+- 在虚拟键盘内部，触发了 input, change 事件，将触发 ProFormText 组件的 onInput, onChange 事件
+
+```jsx
+import { useState } from 'react';
+import { ProFormText } from '@ant-design/pro-components';
+export default () => {
+  const [value, setValue] = useState();
+
+  return (
+    <ProFormText
+      placeholder="ProComponents ProFormText 组件使用虚拟键盘"
+      value={value}
+      fieldProps={{
+        onInput: (e) => {
+          console.log('e: onInput', e);
+          setValue(e.target.value);
+        },
+        onChange: (e) => {
+          console.log('e: onChange', e);
+        },
+      }}
+    />
+  );
+};
+```
+
+## ProComponents ProFormDigit 组件如何使用虚拟键盘
+
+- 在虚拟键盘内部，触发了 input, change 事件，将触发 ProFormDigit 组件的 onInput, onChange 事件
+
+```jsx
+import { ProFormDigit } from '@ant-design/pro-components';
+export default () => {
+  return (
+    <ProFormDigit
+      placeholder="ProComponents ProFormDigit 组件使用虚拟键盘"
+      fieldProps={{
+        onInput: (e) => {
+          console.log('ProFormDigit: onInput', e);
+        },
+        onChange: (e) => {
+          console.log('ProFormDigit: onChange', e);
+        },
+      }}
+    />
+  );
+};
+```

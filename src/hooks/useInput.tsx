@@ -1,5 +1,6 @@
 import { useEventListener } from 'ahooks';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Simulate } from 'react-dom/test-utils';
 import {
   ArrowDown,
   ArrowLeft,
@@ -207,12 +208,9 @@ const useInput = ({
 
   /** 触发 input 事件 */
   const emitInputEvent = () => {
-    if (activeInputRef.current) {
-      const inputEvent = new Event('input', { bubbles: true });
-      // 标记 触发input事件
-      (inputEvent as any).simulated = true;
-      activeInputRef.current.dispatchEvent(inputEvent);
-    }
+    if (!activeInputRef.current) return;
+    Simulate?.change?.(activeInputRef.current);
+    Simulate?.input?.(activeInputRef.current);
   };
 
   /** 识别 */
