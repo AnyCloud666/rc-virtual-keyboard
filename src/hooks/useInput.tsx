@@ -489,16 +489,7 @@ const useInput = ({
         chinese.length + selectionEnd,
       );
 
-      const inputEvent = new Event('input', { bubbles: true });
-      // 标记 触发input事件
-      (inputEvent as any).simulated = true;
-      activeInputRef.current.dispatchEvent(inputEvent);
-
-      // TODO: ant 的 input 的 change 事件无法被触发
-      const changeEvent = new Event('change', { bubbles: true });
-      // 标记 触发change事件
-      (changeEvent as any).simulated = true;
-      activeInputRef.current.dispatchEvent(changeEvent);
+      emitInputEvent();
 
       onChange &&
         onChange({
@@ -530,7 +521,7 @@ const useInput = ({
       if (navigator.clipboard) {
         await navigator.clipboard.writeText(value);
         console.log('copy success');
-      } else if (document.execCommand) {
+      } else if (document.queryCommandSupported('copy')) {
         activeInputRef.current.select();
         document.execCommand('copy');
         activeInputRef.current.setSelectionRange(value.length, value.length);
@@ -555,16 +546,16 @@ const useInput = ({
         activeInputRef.current.value = value;
         emitInputEvent();
         console.log('paste success');
-      } else if (document.execCommand) {
+      } else if (document.queryCommandSupported('paste')) {
         activeInputRef.current.focus();
-        const r = document.execCommand('paste', true);
+        const r = document.execCommand('paste');
         emitInputEvent();
         console.log(`paste ${r ? 'success' : 'error'}`);
       } else {
-        console.error(' paste error ');
+        console.error(
+          'paste error navigator.clipboard and document.execCommand not support,You may need https',
+        );
       }
-
-      // value = value.slice(0,start) +  value.slice(start)
     }
   };
 

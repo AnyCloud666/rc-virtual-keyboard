@@ -405,3 +405,14 @@ export default () => {
   );
 };
 ```
+
+## rc-virtual-keyboard 文档中可以复制，粘贴，但是本地运行就不可以了
+
+- 1. `navigator.clipboard`, `document.execCommand('paste')` 需要 https 才支持，安全策略
+- 2. 参考 [navigator.clipboard](https://developer.mozilla.org/zh-CN/docs/Web/API/Navigator/clipboard)
+- 3. 参考 [execCommand](https://developer.mozilla.org/zh-CN/docs/Web/API/Document/execCommand#paste)
+
+解决方法：
+
+- 将链接协议改为 https
+- 进行浏览器设置->站点权限->剪切板->允许
