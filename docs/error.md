@@ -406,6 +406,38 @@ export default () => {
 };
 ```
 
+## antd form 表单中无需监听 onInput onChange 事件
+
+```jsx
+import { useState, useRef } from 'react';
+import { InputNumber, Form, Button } from 'antd';
+
+export default () => {
+  const [value, setValue] = useState();
+
+  return (
+    <Form
+      onFinish={(value) => {
+        console.log('value: ', value);
+      }}
+    >
+      <Form.Item name="number" label="数组">
+        <InputNumber
+          placeholder="antd InputNumber 组件使用虚拟键盘"
+          value={value}
+        />
+      </Form.Item>
+
+      <Form.Item>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+      </Form.Item>
+    </Form>
+  );
+};
+```
+
 ## rc-virtual-keyboard 文档中可以复制，粘贴，但是本地运行就不可以了
 
 - 1. `navigator.clipboard`, `document.execCommand('paste')` 需要 https 才支持，安全策略
@@ -416,3 +448,7 @@ export default () => {
 
 - 将链接协议改为 https
 - 进行浏览器设置->站点权限->剪切板->允许
+
+```
+
+```
