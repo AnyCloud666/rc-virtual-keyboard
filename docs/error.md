@@ -275,6 +275,8 @@ defineConfig({
 ## antd Input 组件如何使用虚拟键盘
 
 - 在虚拟键盘内部，触发了 input, change 事件，将触发 Input 组件的 onInput, onChange, onKeyDown, onKeyPress, onKeyUp 事件
+- **_注意_**：onKeyDown，onKeyPress，onKeyUp 事件对象是不完整的，对应的`key`, `keyCode`, `code`可能存在差异
+- **_注意_**：只在字母键和数字键触发 onInput，onChange，onKeyDown，onKeyPress，onKeyUp 事件
 
 ```js
 import { Simulate } from 'react-dom/test-utils';
