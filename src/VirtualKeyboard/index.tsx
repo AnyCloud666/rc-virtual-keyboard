@@ -140,7 +140,7 @@ const VirtualKeyboardProvider = ({
   const [useKeydownAudio, setUseKeydownAudio] = useLocalStorageState<
     'Y' | 'N' | undefined
   >(VKB_KEYDOWN_MODE, {
-    defaultValue: 'N',
+    defaultValue: 'Y',
   });
 
   return (

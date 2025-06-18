@@ -26,7 +26,6 @@ import {
   Space,
   StartSelect,
   Tab,
-  VKB_KEYDOWN_MODE,
   VKB_POSITION_MODE,
   VKB_THEME_MODE,
   ZH,
@@ -602,7 +601,6 @@ const useInput = ({
       case DarkTheme.code:
         setVkbThemeMode(e.code);
         onThemeModeChange && onThemeModeChange(e.code);
-        localStorage?.setItem(VKB_THEME_MODE, e.code);
         break;
       case FixedBottomPosition.code:
       case FixedTopPosition.code:
@@ -611,13 +609,8 @@ const useInput = ({
       case FloatPosition.code:
         setVkbPositionMode(e.code);
         onPositionModeChange && onPositionModeChange(e.code);
-        localStorage?.setItem(VKB_THEME_MODE, e.code);
         break;
       case BackgroundAudio.code:
-        localStorage?.setItem(
-          VKB_KEYDOWN_MODE,
-          vkbKeydownAudio === 'Y' ? 'N' : 'Y',
-        );
         setVkbKeydownAudio(vkbKeydownAudio === 'Y' ? 'N' : 'Y');
         onUseKeydownAudioChange &&
           onUseKeydownAudioChange(vkbKeydownAudio === 'Y' ? 'N' : 'Y');
