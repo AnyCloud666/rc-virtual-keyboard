@@ -48,8 +48,6 @@ const useInput = ({
   useKeydownAudio = 'Y',
   keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
   autoPopup = true,
-  onChange,
-  onEnter,
   onChangeShow,
   onThemeModeChange,
   onPositionModeChange,
@@ -70,10 +68,6 @@ const useInput = ({
   keydownAudioUrl?: string;
   /** 自动弹出 */
   autoPopup?: boolean;
-  /** enter 方法回调 */
-  onEnter?: () => void;
-  /** 输入回调 */
-  onChange?: (e: VKB.KeyboardAttributeType) => void;
   /** 显示/隐藏 */
   onChangeShow?: (s: boolean) => void;
   /** 主题改变 */
@@ -490,14 +484,6 @@ const useInput = ({
       );
 
       emitInputEvent();
-
-      onChange &&
-        onChange({
-          code: '-1',
-          key: value,
-          keyCode: -1,
-          keyType: 'chinese',
-        });
     } else {
       console.error('input type = email or number not allow input chinese');
     }
@@ -578,7 +564,8 @@ const useInput = ({
         break;
       // 回车
       case Enter.code:
-        onEnter && onEnter();
+        // onEnter && onEnter();
+        // TODO
         break;
       // 复制
       case Copy.code:
@@ -639,7 +626,6 @@ const useInput = ({
 
   /** 点击事件分发 */
   const onClick = (e: VKB.KeyboardAttributeType) => {
-    onChange && onChange(e);
     if (e.keyType === controlsType) {
       onControl(e);
     } else if (e.keyType === settingType) {

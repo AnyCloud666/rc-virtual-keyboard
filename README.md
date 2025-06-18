@@ -43,16 +43,8 @@ import { useState } from 'react';
 import { useVirtualKeyboard, keys } from 'rc-virtual-keyboard';
 
 export default () => {
-  const [show, setShow] = useState(false);
-  const [themeMode, setThemeMode] = useState(
-    localStorage?.getItem(keys.VKB_THEME_MODE) ?? 'light',
-  );
-  const [positionMode, setPositionMode] = useState(
-    localStorage?.getItem(keys.VKB_POSITION_MODE) ?? 'float',
-  );
   const [value, setValue] = useState('');
-  const { VirtualKeyboard, InitVirtualKeyBoardCtx, VirtualKeyboardProvide } =
-    useVirtualKeyboard();
+  const { VirtualKeyboard, VirtualKeyboardProvide } = useVirtualKeyboard();
 
   return (
     <>
@@ -65,20 +57,7 @@ export default () => {
         }}
       />
       <div>value：{value}</div>
-      <VirtualKeyboardProvide
-        value={{
-          ...InitVirtualKeyBoardCtx,
-          width: '500px',
-          height: '320px',
-          show,
-          setShow,
-          themeMode,
-          setThemeMode,
-          positionMode,
-          setPositionMode,
-          theme: {},
-        }}
-      >
+      <VirtualKeyboardProvide>
         <VirtualKeyboard />
       </VirtualKeyboardProvide>
     </>

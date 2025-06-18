@@ -30,8 +30,6 @@ const CompositionKeyboard = ({
   positionMode = FloatPosition.code,
   useKeydownAudio = 'Y',
   keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
-  onEnter,
-  onChange,
   onChangeShow,
   onThemeModeChange,
   onPositionModeChange,
@@ -60,10 +58,6 @@ const CompositionKeyboard = ({
   useKeydownAudio?: 'Y' | 'N';
   /** 键盘按键声音地址 */
   keydownAudioUrl?: string;
-  /** enter 方法回调 */
-  onEnter?: () => void;
-  /** 输入回调 */
-  onChange?: (e: VKB.KeyboardAttributeType) => void;
   /** 显示/隐藏虚拟键盘 */
   onChangeShow?: (b: boolean) => void;
   /** 主题改变 */
@@ -95,8 +89,6 @@ const CompositionKeyboard = ({
     defaultActiveKeyboard,
     useKeydownAudio,
     keydownAudioUrl,
-    onChange,
-    onEnter,
     onChangeShow,
     onThemeModeChange,
     onPositionModeChange,

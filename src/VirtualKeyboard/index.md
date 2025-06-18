@@ -30,17 +30,8 @@ import {
 } from 'rc-virtual-keyboard';
 
 export default () => {
-  const [show, setShow] = useState(false);
-  const [themeMode, setThemeMode] = useState(
-    localStorage?.getItem(keys.VKB_THEME_MODE) ?? 'light',
-  );
-  const [positionMode, setPositionMode] = useState(
-    localStorage?.getItem(keys.VKB_POSITION_MODE) ?? 'float',
-  );
-  const [useKeydownAudio, setUseKeydownAudio] = useState('N');
   const [value, setValue] = useState('');
-  const { VirtualKeyboard, InitVirtualKeyBoardCtx, VirtualKeyboardProvide } =
-    useVirtualKeyboard();
+  const { VirtualKeyboard, VirtualKeyboardProvider } = useVirtualKeyboard();
 
   return (
     <>
@@ -51,34 +42,14 @@ export default () => {
           setValue(e.target.value);
           console.log('value', e.target.value);
         }}
+        onKeyDown={(e) => {
+          console.log('e: ', e);
+        }}
       />
       <div>value：{value}</div>
-      <VirtualKeyboardProvide
-        value={{
-          ...InitVirtualKeyBoardCtx,
-          width: '500px',
-          height: '320px',
-          show,
-          setShow,
-          themeMode,
-          setThemeMode,
-          positionMode,
-          setPositionMode,
-          useKeydownAudio,
-          setUseKeydownAudio,
-          theme: {},
-          virtualKeyboardTab: [
-            LetterKeyboardTab,
-            NumberKeyboardTab,
-            SymbolKeyboardTab,
-            WriteKeyboardTab,
-            EditKeyboardTab,
-            SettingKeyboardTab,
-          ],
-        }}
-      >
+      <VirtualKeyboardProvider>
         <VirtualKeyboard />
-      </VirtualKeyboardProvide>
+      </VirtualKeyboardProvider>
     </>
   );
 };

@@ -103,44 +103,47 @@ declare namespace VKB {
 
   type ThemeKeys = keyof Theme;
 
-  type KeyBoardCtxType = {
+  type KeyBoardCtxTypBase = {
     /** 宽度 */
     width?: string;
     /** 高度 */
     height?: string;
+    /** icon 宽度 */
+    iconWidth?: string;
+    /** icon 高度 */
+    iconHeight?: string;
     /** 层级 */
     zIndex?: string | number;
-    /** 显示移动句柄 & 允许移动 */
-    showDragHandle?: boolean;
-    /** 是否显示 */
-    show: boolean;
-    /** 当前输入框的值 */
-    value?: string;
+    /** 按键音效 url */
+    keydownAudioUrl?: string;
     /** 自定义键盘内容 */
     virtualKeyboardTab?: KeyboardTabItem[];
     /** 自定义主题,当使用了主题变量时，主题变量的权重更高 */
     theme?: Partial<Theme>;
+  };
+
+  type KeyBoardCtxType = KeyBoardCtxTypBase & {
+    /** 显示移动句柄 & 允许移动 */
+    showDragHandle?: boolean;
+    /** 是否显示 */
+    show?: boolean;
+    /** 当前输入框的值 */
+    value?: string;
     /** 主题模式 */
     themeMode?: string;
     /** 位置模式 */
     positionMode?: string;
     /** 按键音效 */
     useKeydownAudio?: 'Y' | 'N';
-    /** 按键音效 url */
-    keydownAudioUrl?: string;
     /** 显示 ,传入的必须是 setStatus 重新 render */
-    setShow: (s: boolean) => void;
+    setShow?: (s: boolean) => void;
     /** 设置主题模式 */
-    setThemeMode: (mode: string) => void;
+    setThemeMode?: (mode: string) => void;
     /** 设置位置模式 */
-    setPositionMode: (mode: string) => void;
+    setPositionMode?: (mode: string) => void;
     /** 设置是否使用按键音效 */
-    setUseKeydownAudio: (use: 'Y' | 'N') => void;
+    setUseKeydownAudio?: (use: 'Y' | 'N') => void;
     /** 设置按键音效 url */
-    setKeydownAudioUrl: (url: string) => void;
-    /** 操作时的回调,通过ctx 重写 onChange 实现 */
-    onChange?: (e: VKB.KeyboardAttributeType) => void;
-    /** 回车 通过 ctx 重写 onEnter 实现*/
-    onEnter?: () => void;
+    setKeydownAudioUrl?: (url: string) => void;
   };
 }

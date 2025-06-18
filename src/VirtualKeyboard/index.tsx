@@ -1,36 +1,36 @@
-import React, { createContext, useContext, useMemo } from 'react';
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 import CompositionKeyboard from '../CompositionKeyboard';
 
 import DragBlock from '../DragBlock';
 
+import { useLocalStorageState } from 'ahooks';
 import {
   FixedBottomPosition,
   FixedLeftPosition,
   FixedRightPosition,
   FixedTopPosition,
   FloatPosition,
+  VKB_KEYDOWN_MODE,
+  VKB_POSITION_MODE,
+  VKB_THEME_MODE,
 } from '../keys';
 import { ReactComponent as KeyBoardSvg } from '../svg/out-keyboard.svg';
 import { VKB } from '../typing';
 
 /** 初始的 ctx 值 */
-export const InitVirtualKeyBoardCtx: VKB.KeyBoardCtxType = {
-  show: false,
+export const InitVirtualKeyBoardCtx: VKB.KeyBoardCtxTypBase = {
   width: '500px',
   height: '320px',
+  iconWidth: '100px',
+  iconHeight: '100px',
   zIndex: 9999,
-  showDragHandle: true,
-  theme: {},
-  themeMode: 'light',
-  positionMode: 'float',
-  useKeydownAudio: 'Y',
   keydownAudioUrl: '/audio/typing-sound-02-229861.mp3',
-  setShow: () => {},
-  setThemeMode: () => {},
-  setPositionMode: () => {},
-  setUseKeydownAudio: () => {},
-  setKeydownAudioUrl: () => {},
-  onChange: () => {},
 };
 
 export const VirtualKeyboardContext = createContext<VKB.KeyBoardCtxType>(
@@ -79,10 +79,15 @@ export const VirtualKeyboard = () => {
       <DragBlock
         resizeOverRight={true}
         onClick={() => {
-          virtualKeyboardCtx.setShow(true);
+          virtualKeyboardCtx?.setShow?.(true);
         }}
       >
-        <KeyBoardSvg style={{ width: 100, height: 100 }}></KeyBoardSvg>
+        <KeyBoardSvg
+          style={{
+            width: virtualKeyboardCtx.iconWidth,
+            height: virtualKeyboardCtx.iconHeight,
+          }}
+        />
       </DragBlock>
       <DragBlock
         autoKeepRight={false}
@@ -102,7 +107,6 @@ export const VirtualKeyboard = () => {
           useKeydownAudio={virtualKeyboardCtx.useKeydownAudio}
           keydownAudioUrl={virtualKeyboardCtx.keydownAudioUrl}
           onChangeShow={virtualKeyboardCtx.setShow}
-          onChange={virtualKeyboardCtx.onChange}
           onThemeModeChange={virtualKeyboardCtx.setThemeMode}
           onPositionModeChange={virtualKeyboardCtx.setPositionMode}
           onKeydownAudioUrlChange={virtualKeyboardCtx.setKeydownAudioUrl}
@@ -113,13 +117,57 @@ export const VirtualKeyboard = () => {
   );
 };
 
+const VirtualKeyboardProvider = ({
+  children,
+  value = InitVirtualKeyBoardCtx,
+}: {
+  children?: ReactNode;
+  value?: VKB.KeyBoardCtxTypBase;
+}) => {
+  const [show, setShow] = useState(false);
+
+  const [themeMode, setThemeMode] = useLocalStorageState(VKB_THEME_MODE, {
+    defaultValue: 'light',
+  });
+
+  const [positionMode, setPositionMode] = useLocalStorageState(
+    VKB_POSITION_MODE,
+    {
+      defaultValue: 'float',
+    },
+  );
+
+  const [useKeydownAudio, setUseKeydownAudio] = useLocalStorageState<
+    'Y' | 'N' | undefined
+  >(VKB_KEYDOWN_MODE, {
+    defaultValue: 'N',
+  });
+
+  return (
+    <VirtualKeyboardContext.Provider
+      value={{
+        show,
+        setShow,
+        positionMode,
+        setPositionMode,
+        useKeydownAudio,
+        setUseKeydownAudio,
+        themeMode,
+        setThemeMode,
+        ...value,
+      }}
+    >
+      {children}
+    </VirtualKeyboardContext.Provider>
+  );
+};
+
 const useVirtualKeyboard = () => {
   const virtualKeyboardCtx = useContext(VirtualKeyboardContext);
 
   return {
-    InitVirtualKeyBoardCtx,
     virtualKeyboardCtx,
-    VirtualKeyboardProvide: VirtualKeyboardContext.Provider,
+    VirtualKeyboardProvider,
     VirtualKeyboard,
   };
 };
