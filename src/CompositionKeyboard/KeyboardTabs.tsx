@@ -30,6 +30,8 @@ export const LetterKeyboardTab: VKB.KeyboardTabItem = {
     onMouseDown,
     onChangeInputMode,
     onSelectChinese,
+    onKeyDown,
+    onKeyUp,
   }) => (
     <LetterKeyboard
       inputValue={inputValue}
@@ -39,6 +41,8 @@ export const LetterKeyboardTab: VKB.KeyboardTabItem = {
       onMouseDown={onMouseDown}
       onChangeInputMode={onChangeInputMode}
       onSelectChinese={onSelectChinese}
+      onKeyDown={onKeyDown}
+      onKeyUp={onKeyUp}
     />
   ),
 };
@@ -48,7 +52,9 @@ export const NumberKeyboardTab: VKB.KeyboardTabItem = {
   id: 'number',
   label: <NumberSvg />,
   name: '数字键',
-  Component: ({ onClick }) => <NumberKeyboard onClick={onClick} />,
+  Component: ({ onClick, onKeyUp, onKeyDown }) => (
+    <NumberKeyboard onClick={onClick} onKeyDown={onKeyDown} onKeyUp={onKeyUp} />
+  ),
 };
 /** 符号键tab */
 export const SymbolKeyboardTab: VKB.KeyboardTabItem = {

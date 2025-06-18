@@ -37,8 +37,7 @@ export default () => {
     localStorage?.getItem(keys.VKB_POSITION_MODE) ?? 'float',
   );
   const [value, setValue] = useState('');
-  const { VirtualKeyboard, InitVirtualKeyBoardCtx, VirtualKeyboardProvide } =
-    useVirtualKeyboard();
+  const { VirtualKeyboard, VirtualKeyboardProvider } = useVirtualKeyboard();
 
   return (
     <>
@@ -73,30 +72,9 @@ export default () => {
         <input type="datetime" />
       </div>
 
-      <VirtualKeyboardProvide
-        value={{
-          ...InitVirtualKeyBoardCtx,
-          width: '500px',
-          height: '320px',
-          show,
-          setShow,
-          themeMode,
-          setThemeMode,
-          positionMode,
-          setPositionMode,
-          theme: {},
-          virtualKeyboardTab: [
-            LetterKeyboardTab,
-            NumberKeyboardTab,
-            SymbolKeyboardTab,
-            WriteKeyboardTab,
-            EditKeyboardTab,
-            SettingKeyboardTab,
-          ],
-        }}
-      >
+      <VirtualKeyboardProvider>
         <VirtualKeyboard />
-      </VirtualKeyboardProvide>
+      </VirtualKeyboardProvider>
     </>
   );
 };
@@ -296,7 +274,7 @@ defineConfig({
 
 ## antd Input 组件如何使用虚拟键盘
 
-- 在虚拟键盘内部，触发了 input, change 事件，将触发 Input 组件的 onInput, onChange 事件
+- 在虚拟键盘内部，触发了 input, change 事件，将触发 Input 组件的 onInput, onChange, onKeyDown, onKeyPress, onKeyUp 事件
 
 ```js
 import { Simulate } from 'react-dom/test-utils';
@@ -305,6 +283,50 @@ const emitInputEvent = () => {
   Simulate?.change?.(activeInputRef.current);
   Simulate?.input?.(activeInputRef.current);
 };
+
+  /** 点击事件分发 */
+  const onClick = (e: VKB.KeyboardAttributeType) => {
+    if (e.keyType === controlsType) {
+      onControl(e);
+    } else if (e.keyType === settingType) {
+      onSetting(e);
+    } else {
+      onInput(e);
+    }
+    if (audio && vkbKeydownAudio === 'Y') {
+      audio.pause();
+      audio.play();
+    }
+
+    if (!activeInputRef.current) return;
+    Simulate?.keyPress?.(activeInputRef.current, {
+      keyCode: e.keyCode,
+      code: e.code,
+      key: e.key,
+      target: activeInputRef.current,
+    } as SyntheticEventData);
+  };
+  /** 鼠标按下事件 模拟 键盘按下事件模式*/
+  const onKeyDown = (e: VKB.KeyboardAttributeType) => {
+    if (!activeInputRef.current) return;
+    Simulate?.keyDown?.(activeInputRef.current, {
+      keyCode: e.keyCode,
+      code: e.code,
+      key: e.key,
+      target: activeInputRef.current,
+    } as SyntheticEventData);
+  };
+  /** 鼠标抬起事件 模拟 键盘抬起事件模式 */
+  const onKeyUp = (e: VKB.KeyboardAttributeType) => {
+    if (!activeInputRef.current) return;
+    Simulate?.keyUp?.(activeInputRef.current, {
+      keyCode: e.keyCode,
+      code: e.code,
+      key: e.key,
+      target: activeInputRef.current,
+    } as SyntheticEventData);
+  };
+
 ```
 
 ```jsx
@@ -323,6 +345,15 @@ export default () => {
       }}
       onChange={(e) => {
         console.log('e: onChange', e);
+      }}
+      onKeyDown={(e) => {
+        console.log('e: onKeyDown', e);
+      }}
+      onKeyUp={(e) => {
+        console.log('e: onKeyUp', e);
+      }}
+      onKeyPress={(e) => {
+        console.log('e: onKeyPress', e);
       }}
     />
   );

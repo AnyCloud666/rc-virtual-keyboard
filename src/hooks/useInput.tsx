@@ -1,6 +1,6 @@
 import { useEventListener } from 'ahooks';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Simulate } from 'react-dom/test-utils';
+import { Simulate, SyntheticEventData } from 'react-dom/test-utils';
 import {
   ArrowDown,
   ArrowLeft,
@@ -591,6 +591,7 @@ const useInput = ({
         break;
       case Clear.code:
         onClear();
+        break;
     }
   };
 
@@ -637,6 +638,34 @@ const useInput = ({
       audio.pause();
       audio.play();
     }
+
+    if (!activeInputRef.current) return;
+    Simulate?.keyPress?.(activeInputRef.current, {
+      keyCode: e.keyCode,
+      code: e.code,
+      key: e.key,
+      target: activeInputRef.current,
+    } as SyntheticEventData);
+  };
+  /** 鼠标按下事件 模拟 键盘按下事件模式*/
+  const onKeyDown = (e: VKB.KeyboardAttributeType) => {
+    if (!activeInputRef.current) return;
+    Simulate?.keyDown?.(activeInputRef.current, {
+      keyCode: e.keyCode,
+      code: e.code,
+      key: e.key,
+      target: activeInputRef.current,
+    } as SyntheticEventData);
+  };
+  /** 鼠标抬起事件 模拟 键盘抬起事件模式 */
+  const onKeyUp = (e: VKB.KeyboardAttributeType) => {
+    if (!activeInputRef.current) return;
+    Simulate?.keyUp?.(activeInputRef.current, {
+      keyCode: e.keyCode,
+      code: e.code,
+      key: e.key,
+      target: activeInputRef.current,
+    } as SyntheticEventData);
   };
 
   /** 通过事件冒泡的形式递归向上寻找，没有找到则不阻止冒泡 */
@@ -716,6 +745,8 @@ const useInput = ({
     onChangeInputMode,
     setActiveKeyboard,
     onRecognition,
+    onKeyDown,
+    onKeyUp,
   };
 };
 

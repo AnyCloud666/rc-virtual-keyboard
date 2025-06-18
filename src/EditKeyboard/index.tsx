@@ -59,7 +59,7 @@ const EditKeyboard = ({
             >
               {item.code && cursorSvg[item.code]
                 ? cursorSvg[item.code]
-                : item.key}
+                : item.renderKey || item.key}
             </div>
           );
         })}
@@ -72,7 +72,7 @@ const EditKeyboard = ({
             title={item.description}
             onClick={() => onClickEdit(item)}
           >
-            {item.key}
+            {item.renderKey || item.key}
           </div>
         );
       })}

@@ -27,10 +27,7 @@ declare namespace VKB {
     id: KeyType;
     label: ReactNode;
     name: string;
-    Component: ({
-      onClick,
-      onChangeInputMode,
-    }: {
+    Component: (props: {
       themeMode: string;
       inputMode: InputMode;
       positionMode: string;
@@ -43,6 +40,8 @@ declare namespace VKB {
       onChangeInputMode: (mode: VKB.InputMode) => void;
       onSelectChinese: (chinese: string) => void;
       onRecognition: (url: string) => void;
+      onKeyDown: (e: VKB.KeyboardAttributeType) => void;
+      onKeyUp: (e: VKB.KeyboardAttributeType) => void;
     }) => JSX.Element;
   };
 
@@ -51,7 +50,9 @@ declare namespace VKB {
     /** 对应的键盘code */
     code: string;
     /** 对应的字符串 */
-    key: string | ReactNode;
+    key: string;
+    /** 对应的渲染内容 */
+    renderKey?: string | ReactNode;
     /** 对应的键码 */
     keyCode: number;
     /** 键类型 */

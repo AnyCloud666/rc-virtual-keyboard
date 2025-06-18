@@ -16,6 +16,8 @@ const LetterKeyboard = ({
   onMouseDown,
   onChangeInputMode,
   onSelectChinese,
+  onKeyDown,
+  onKeyUp,
 }: {
   chinese?: string[];
   inputValue?: string;
@@ -24,6 +26,8 @@ const LetterKeyboard = ({
   onMouseDown?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   onChangeInputMode?: (mode: VKB.InputMode) => void;
   onSelectChinese?: (chinese: string) => void;
+  onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
+  onKeyUp?: (e: VKB.KeyboardAttributeType) => void;
 }) => {
   /** 临时输入区引用 */
   const tempInputAreaRef = useRef<HTMLDivElement | null>(null);
@@ -34,7 +38,7 @@ const LetterKeyboard = ({
   const onClickLetter = (e: VKB.KeyboardAttributeType) => {
     if (e.code === CapsLock.code) {
       // 大小写转换
-      if (e.key === '小') {
+      if (e.renderKey === '小') {
         const tempKeys = letterKeys.map((item) => {
           const tempItem = { ...item };
           if (item.keyType === letterType && typeof item.key === 'string') {
@@ -42,11 +46,11 @@ const LetterKeyboard = ({
           }
 
           if (item.code === CapsLock.code) {
-            tempItem.key = '大';
+            tempItem.renderKey = '大';
           }
 
           if (item.code === Shift.code) {
-            tempItem.key = '英';
+            tempItem.renderKey = '英';
             onChangeInputMode && onChangeInputMode(EN);
           }
 
@@ -58,11 +62,11 @@ const LetterKeyboard = ({
       }
     } else if (e.code === Shift.code) {
       // 中英文切换
-      if (e.key === '英') {
+      if (e.renderKey === '英') {
         const tempKeys = letterKeys.map((item) => {
           const tempItem = { ...item };
           if (item.code === Shift.code) {
-            tempItem.key = '中';
+            tempItem.renderKey = '中';
             onChangeInputMode && onChangeInputMode(ZH);
           }
           return tempItem;
@@ -95,7 +99,7 @@ const LetterKeyboard = ({
       const tempKeys = letterKeys.map((item) => {
         const tempItem = { ...item };
         if (item.code === Shift.code) {
-          tempItem.key = '中';
+          tempItem.renderKey = '中';
         }
         return tempItem;
       });
@@ -143,25 +147,35 @@ const LetterKeyboard = ({
               className="letter-key-item"
               title={item.description}
               key={item.keyCode}
-              onClick={() => onClickLetter(item)}
+              onClick={() => {
+                onKeyDown?.(item);
+                onClickLetter(item);
+                onKeyUp?.(item);
+              }}
             >
               {item.code === 'CapsLock' ? (
                 <div className="letter-caps-lock">
-                  <span className="letter-caps-lock-big"> {item.key}</span>/
+                  <span className="letter-caps-lock-big">
+                    {item.renderKey || item.key}
+                  </span>
+                  /
                   <span className="letter-caps-lock-small">
-                    {item.key === '大' ? '小' : '大'}
+                    {item.renderKey === '大' ? '小' : '大'}
                   </span>
                 </div>
               ) : // item.key
               item.code === 'Shift' ? (
                 <div className="letter-shift">
-                  <span className="letter-shift-big">{item.key}</span>/
+                  <span className="letter-shift-big">
+                    {item.renderKey || item.key}
+                  </span>
+                  /
                   <span className="letter-shift-small">
-                    {item.key === '英' ? '中' : '英'}
+                    {item.renderKey === '英' ? '中' : '英'}
                   </span>
                 </div>
               ) : (
-                item.key
+                item.renderKey || item.key
               )}
             </div>
           );

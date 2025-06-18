@@ -6,8 +6,12 @@ import './style.css';
 /** 数字键盘 */
 const NumberKeyboard = ({
   onClick,
+  onKeyDown,
+  onKeyUp,
 }: {
   onClick?: (e: VKB.KeyboardAttributeType) => void;
+  onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
+  onKeyUp?: (e: VKB.KeyboardAttributeType) => void;
 }) => {
   return (
     <div className="number-keyboard">
@@ -16,9 +20,13 @@ const NumberKeyboard = ({
           <div
             className="number-key-item"
             key={item.keyCode}
-            onClick={() => onClick && onClick(item)}
+            onClick={() => {
+              onKeyDown?.(item);
+              onClick?.(item);
+              onKeyUp?.(item);
+            }}
           >
-            {item.key}
+            {item.renderKey || item.key}
           </div>
         );
       })}

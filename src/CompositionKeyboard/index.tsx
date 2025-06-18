@@ -83,6 +83,9 @@ const CompositionKeyboard = ({
     onSelectChinese,
     onChangeInputMode,
     onRecognition,
+    onKeyDown,
+
+    onKeyUp,
   } = useInput({
     themeMode,
     positionMode,
@@ -158,6 +161,8 @@ const CompositionKeyboard = ({
                 e.preventDefault();
               }}
               onRecognition={onRecognition}
+              onKeyDown={onKeyDown}
+              onKeyUp={onKeyUp}
             />
           ) : (
             ''

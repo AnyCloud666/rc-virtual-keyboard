@@ -42,9 +42,6 @@ export default () => {
           setValue(e.target.value);
           console.log('value', e.target.value);
         }}
-        onKeyDown={(e) => {
-          console.log('e: ', e);
-        }}
       />
       <div>value：{value}</div>
       <VirtualKeyboardProvider>

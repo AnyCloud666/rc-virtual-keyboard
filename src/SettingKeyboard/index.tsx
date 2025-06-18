@@ -32,7 +32,7 @@ const SettingKeyboard = ({
                   onClick={() => onClick(item)}
                   title={item.description}
                 >
-                  {item.key}
+                  {item.renderKey || item.key}
                 </div>
                 <div>{item.description}</div>
               </div>
@@ -56,7 +56,7 @@ const SettingKeyboard = ({
                   onClick={() => onClick(item)}
                   title={item.description}
                 >
-                  {item.key}
+                  {item.renderKey || item.key}
                 </div>
                 <div>{item.description}</div>
               </div>
@@ -79,7 +79,7 @@ const SettingKeyboard = ({
                   onClick={() => onClick(item)}
                   title={item.description}
                 >
-                  {item.key}
+                  {item.renderKey || item.key}
                 </div>
               </div>
             );
