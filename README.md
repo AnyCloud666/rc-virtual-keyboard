@@ -44,7 +44,7 @@ import { useVirtualKeyboard, keys } from 'rc-virtual-keyboard';
 
 export default () => {
   const [value, setValue] = useState('');
-  const { VirtualKeyboard, VirtualKeyboardProvide } = useVirtualKeyboard();
+  const { VirtualKeyboard, VirtualKeyboardProvider } = useVirtualKeyboard();
 
   return (
     <>
@@ -57,9 +57,9 @@ export default () => {
         }}
       />
       <div>value：{value}</div>
-      <VirtualKeyboardProvide>
+      <VirtualKeyboardProvider>
         <VirtualKeyboard />
-      </VirtualKeyboardProvide>
+      </VirtualKeyboardProvider>
     </>
   );
 };
