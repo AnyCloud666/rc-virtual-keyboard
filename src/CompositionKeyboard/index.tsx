@@ -84,7 +84,6 @@ const CompositionKeyboard = ({
     onChangeInputMode,
     onRecognition,
     onKeyDown,
-
     onKeyUp,
   } = useInput({
     themeMode,
