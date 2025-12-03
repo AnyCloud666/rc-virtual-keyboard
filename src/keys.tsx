@@ -964,19 +964,23 @@ export const numberKeys: VKB.KeyboardAttributeType[] = [
   Numpad2,
   Numpad3,
   NumpadAdd,
+  Backspace,
+
   Numpad4,
   Numpad5,
   Numpad6,
   NumpadSubtract,
+
   Numpad7,
   Numpad8,
   Numpad9,
-  NumpadDecimal,
-  Numpad0,
   NumpadMultiply,
+  Enter,
+
+  Numpad0,
+  NumpadDecimal,
+  NumpadPercentage,
   NumpadDivide,
-  // Enter,
-  Backspace,
 ];
 
 /** 字母键 */

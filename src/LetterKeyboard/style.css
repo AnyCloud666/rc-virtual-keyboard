@@ -49,6 +49,7 @@
   border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
   box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
   box-sizing: border-box;
+  user-select: none;
 }
 
 .letter-keyboard-temp-right,

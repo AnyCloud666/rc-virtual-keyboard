@@ -1,4 +1,4 @@
-@import url(../var.css);
+@import url('../var.css');
 
 .symbol-keyboard {
   position: relative;
@@ -7,19 +7,14 @@
   gap: var(--vkb-key-gap);
 }
 
-
-
 .symbol-key-tab {
   position: absolute;
   width: calc((100% - var(--vkb-key-gap) * 4) / 5);
   height: 100%;
   border-radius: var(--vkb-key-borer-radius);
-
   overflow: auto;
   transition: all 0.3s;
-
 }
-
 
 .symbol-key-tab::-webkit-scrollbar {
   width: 2px;
@@ -37,31 +32,25 @@
   border-radius: 5px;
 }
 
-
 .symbol-key-tab-item {
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: var(--vkb-key-gap);
-
   height: calc((100% - var(--vkb-key-gap) * 4) / 5);
-
   border-radius: var(--vkb-key-borer-radius);
   background-color: var(--vkb-key-background);
   border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
   box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
   box-sizing: border-box;
-
   transition: all 0.3s;
-
   cursor: pointer;
+  user-select: none;
 }
 
 .symbol-key-tab-item:last-child {
   margin-bottom: 0;
 }
-
-
 
 .symbol-key-tab-item:active {
   background-color: var(--vkb-key-active-background);
@@ -75,25 +64,20 @@
   border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
 }
 
-
 .symbol-key-content {
   position: absolute;
-
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
-
   gap: var(--vkb-key-gap);
-
   margin-left: calc((100% - var(--vkb-key-gap) * 4) / 5 + var(--vkb-key-gap));
   width: calc((100% - var(--vkb-key-gap) * 4) / 5 * 4 + var(--vkb-key-gap) * 3);
   height: 100%;
   border-radius: var(--vkb-key-borer-radius);
-
   overflow: auto;
   transition: all 0.3s;
+  user-select: none;
 }
-
 
 .symbol-key-content::-webkit-scrollbar {
   width: 2px;
@@ -116,9 +100,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: calc((100% - var(--vkb-key-gap) * 3) / 4);
-  height: calc((100% - var(--vkb-key-gap)* 4) / 5);
+  height: calc((100% - var(--vkb-key-gap) * 4) / 5);
   border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
   box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
   border-radius: var(--vkb-key-borer-radius);
@@ -126,7 +109,6 @@
   box-sizing: border-box;
   cursor: pointer;
 }
-
 
 .symbol-key-item:active {
   background-color: var(--vkb-key-active-background);
