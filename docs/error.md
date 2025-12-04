@@ -277,6 +277,7 @@ defineConfig({
 - 在虚拟键盘内部，触发了 input, change 事件，将触发 Input 组件的 onInput, onChange, onKeyDown, onKeyPress, onKeyUp 事件
 - **_注意_**：onKeyDown，onKeyPress，onKeyUp 事件对象是不完整的，对应的`key`, `keyCode`, `code`可能存在差异
 - **_注意_**：只在字母键和数字键触发 onInput，onChange，onKeyDown，onKeyPress，onKeyUp 事件
+- **_注意_**：onInput 事件不同于 onChange 事件，用 onInput 事件 + 受控组件无法更新状态，推荐使用 onChange 事件 + 受控组件更新状态
 
 ```js
 import { Simulate } from 'react-dom/test-utils';
