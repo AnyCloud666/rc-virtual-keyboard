@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import useContinuousTrigger from '../hooks/useContinuousTrigger';
 import { symbolKeys } from '../keys';
 import { VKB } from '../typing';
 import './style.css';
@@ -9,6 +10,10 @@ const SymbolKeyboard = ({
   onClick: (e: VKB.KeyboardAttributeType) => void;
 }) => {
   const [activeSymbol, setActiveSymbol] = useState(symbolKeys[0]);
+  const { startContinuousTrigger, stopContinuousTrigger } =
+    useContinuousTrigger<VKB.KeyboardAttributeType>({
+      onTrigger: onClick,
+    });
 
   return (
     <div className="symbol-keyboard">
@@ -33,7 +38,19 @@ const SymbolKeyboard = ({
             <div
               className="symbol-key-item"
               key={item.keyCode}
-              onClick={() => onClick(item)}
+              onClick={(e) => e.preventDefault()}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                startContinuousTrigger(item);
+              }}
+              onMouseUp={stopContinuousTrigger}
+              onMouseLeave={stopContinuousTrigger}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                startContinuousTrigger(item);
+              }}
+              onTouchEnd={stopContinuousTrigger}
+              onTouchCancel={stopContinuousTrigger}
             >
               {item.key}
               <span className="symbol-key-item-tips">

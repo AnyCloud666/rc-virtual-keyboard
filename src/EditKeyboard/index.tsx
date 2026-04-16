@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { cursorKeys, editKeys } from '../keys';
+import useContinuousTrigger from '../hooks/useContinuousTrigger';
+import { Backspace, cursorKeys, editKeys } from '../keys';
 
 import { ReactComponent as BottomSvg } from '../svg/bottom.svg';
 import { ReactComponent as LeftFirstSvg } from '../svg/left-first.svg';
@@ -44,10 +45,22 @@ const EditKeyboard = ({
     onClick && onClick(e);
   };
 
+  const { startContinuousTrigger, stopContinuousTrigger } =
+    useContinuousTrigger<VKB.KeyboardAttributeType>({
+      onTrigger: onClickEdit,
+    });
+
+  const isRepeatableCursorKey = (item: VKB.KeyboardAttributeType) =>
+    ['ArrowLeft', 'ArrowRight', 'ArrowLeftFirst', 'ArrowRightEnd'].includes(
+      item.code,
+    );
+
   return (
     <div className="edit-keyboard">
       <div className="edit-key-cursor">
         {keys.map((item, index) => {
+          const isRepeatable = isRepeatableCursorKey(item);
+
           return (
             <div
               className={`cursor-item ${
@@ -55,7 +68,43 @@ const EditKeyboard = ({
               }`}
               key={item.keyCode}
               title={item.description}
-              onClick={() => onClickEdit(item)}
+              onClick={() => {
+                if (!isRepeatable) {
+                  onClickEdit(item);
+                }
+              }}
+              onMouseDown={(e) => {
+                if (!isRepeatable) return;
+
+                e.preventDefault();
+                startContinuousTrigger(item);
+              }}
+              onMouseUp={() => {
+                if (!isRepeatable) return;
+
+                stopContinuousTrigger();
+              }}
+              onMouseLeave={() => {
+                if (!isRepeatable) return;
+
+                stopContinuousTrigger();
+              }}
+              onTouchStart={(e) => {
+                if (!isRepeatable) return;
+
+                e.preventDefault();
+                startContinuousTrigger(item);
+              }}
+              onTouchEnd={() => {
+                if (!isRepeatable) return;
+
+                stopContinuousTrigger();
+              }}
+              onTouchCancel={() => {
+                if (!isRepeatable) return;
+
+                stopContinuousTrigger();
+              }}
             >
               {item.code && cursorSvg[item.code]
                 ? cursorSvg[item.code]
@@ -65,12 +114,50 @@ const EditKeyboard = ({
         })}
       </div>
       {editKeys.map((item) => {
+        const isBackspace = item.code === Backspace.code;
+
         return (
           <div
             className="edit-key-control"
             key={item.keyCode}
             title={item.description}
-            onClick={() => onClickEdit(item)}
+            onClick={() => {
+              if (!isBackspace) {
+                onClickEdit(item);
+              }
+            }}
+            onMouseDown={(e) => {
+              if (!isBackspace) return;
+
+              e.preventDefault();
+              startContinuousTrigger(item);
+            }}
+            onMouseUp={() => {
+              if (!isBackspace) return;
+
+              stopContinuousTrigger();
+            }}
+            onMouseLeave={() => {
+              if (!isBackspace) return;
+
+              stopContinuousTrigger();
+            }}
+            onTouchStart={(e) => {
+              if (!isBackspace) return;
+
+              e.preventDefault();
+              startContinuousTrigger(item);
+            }}
+            onTouchEnd={() => {
+              if (!isBackspace) return;
+
+              stopContinuousTrigger();
+            }}
+            onTouchCancel={() => {
+              if (!isBackspace) return;
+
+              stopContinuousTrigger();
+            }}
           >
             {item.renderKey || item.key}
           </div>

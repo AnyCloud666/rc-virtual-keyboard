@@ -36,12 +36,16 @@
   width: 80%;
   height: 100%;
   overflow: hidden;
+  flex-wrap: nowrap;
+  align-items: stretch;
 }
 
 .letter-keyboard-temp-char {
   display: flex;
   align-items: center;
-  width: min-content;
+  justify-content: center;
+  width: fit-content;
+  min-width: max-content;
   padding: 0 10px;
   height: 100%;
   background-color: var(--vkb-key-background);
@@ -50,6 +54,9 @@
   box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
   box-sizing: border-box;
   user-select: none;
+  flex-shrink: 0;
+  white-space: nowrap;
+  word-break: keep-all;
 }
 
 .letter-keyboard-temp-right,

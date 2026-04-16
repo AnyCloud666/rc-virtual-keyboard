@@ -1,5 +1,6 @@
 import { useDebounceFn, useEventListener } from 'ahooks';
 import React, { useEffect, useRef, useState } from 'react';
+import useContinuousTrigger from '../hooks/useContinuousTrigger';
 import { ReactComponent as DeleteSvg } from '../svg/delete.svg';
 import { ReactComponent as EnterSvg } from '../svg/enter.svg';
 import { ReactComponent as LeftSvg } from '../svg/left.svg';
@@ -53,6 +54,11 @@ const WriteKeyboard = ({
       onClick && onClick(Backspace);
     }
   };
+
+  const { startContinuousTrigger, stopContinuousTrigger } =
+    useContinuousTrigger<void>({
+      onTrigger: onDelete,
+    });
   const generateImage = useDebounceFn(
     () => {
       if (canvasRef.current) {
@@ -196,7 +202,22 @@ const WriteKeyboard = ({
           <div className="write-content-tips">单字</div>
         </div>
         <div className="write-control">
-          <div className="write-control-backspace" onClick={onDelete}>
+          <div
+            className="write-control-backspace"
+            onClick={(e) => e.preventDefault()}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              startContinuousTrigger();
+            }}
+            onMouseUp={stopContinuousTrigger}
+            onMouseLeave={stopContinuousTrigger}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              startContinuousTrigger();
+            }}
+            onTouchEnd={stopContinuousTrigger}
+            onTouchCancel={stopContinuousTrigger}
+          >
             {/* Del */}
             <DeleteSvg />
           </div>
