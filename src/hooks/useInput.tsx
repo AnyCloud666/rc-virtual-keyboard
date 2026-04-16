@@ -41,6 +41,11 @@ import {
   SimulateEventData,
   setNativeInputValue,
 } from '../utils/simulate';
+import {
+  EFFECTIVE_INPUT_TYPES,
+  INVALID_INPUT_TYPES,
+  NEED_HANDLE_INPUT_TYPES,
+} from './constants';
 
 let audio: HTMLAudioElement;
 
@@ -90,29 +95,6 @@ const useInput = ({
 }) => {
   /** 光标选择模式 */
   const cursorMode = useRef('index');
-  /** 无效 type */
-  const invalidInputType = [
-    'week',
-    'month',
-    'time',
-    'datetime-local',
-    'date',
-    'datetime',
-    'submit',
-    'reset',
-    'range',
-    'radio',
-    'image',
-    'hidden',
-    'file',
-    'color',
-    'checkbox',
-    'button',
-  ];
-  /** 有效 type */
-  const effectiveInputType = ['text', 'search', 'tel', 'password', 'url'];
-  /** 需处理 type */
-  const needHandleInputType = ['number', 'email'];
   /** input type 为 number，email 造成的一些异常 selection 相关属性无法使用 */
   const inputType = useRef('');
   /** 当前活动的input */
@@ -154,7 +136,7 @@ const useInput = ({
 
     return !!(
       activeElement?.tagName === 'INPUT' &&
-      [...effectiveInputType, ...needHandleInputType].includes(
+      [...EFFECTIVE_INPUT_TYPES, ...NEED_HANDLE_INPUT_TYPES].includes(
         activeElement?.type ?? '',
       ) &&
       activeElement.dataset?.vkbDisabled !== 'true'
@@ -257,7 +239,58 @@ const useInput = ({
    * @return {*}
    */
   const validateInputType = (inputEl: HTMLInputElement) => {
-    return [...invalidInputType, ...needHandleInputType].includes(inputEl.type);
+    return [...INVALID_INPUT_TYPES, ...NEED_HANDLE_INPUT_TYPES].includes(
+      inputEl.type,
+    );
+  };
+
+  const reportInvalidInputType = () => {
+    console.error('disabled type', [
+      ...INVALID_INPUT_TYPES,
+      ...NEED_HANDLE_INPUT_TYPES,
+    ]);
+    console.error(
+      'if you need type="number" please use data-vkb-type="number" replace',
+    );
+  };
+
+  const getSelectionInfo = (inputEl: HTMLInputElement) => {
+    const selectionStart = inputEl.selectionStart ?? 0;
+    const selectionEnd = inputEl.selectionEnd ?? 0;
+
+    return {
+      value: inputEl.value,
+      selectionStart,
+      selectionEnd,
+      isCollapsed: selectionStart === selectionEnd,
+    };
+  };
+
+  const applyInputValue = (
+    inputEl: HTMLInputElement,
+    value: string,
+    selectionStart?: number,
+    selectionEnd?: number,
+  ) => {
+    setNativeInputValue(inputEl, value);
+
+    if (
+      typeof selectionStart === 'number' &&
+      typeof selectionEnd === 'number' &&
+      typeof inputEl.setSelectionRange === 'function'
+    ) {
+      inputEl.setSelectionRange(selectionStart, selectionEnd);
+    }
+  };
+
+  const updateChineseCandidates = (value: string) => {
+    const transformMsg = (onPinyin2Chinese && onPinyin2Chinese(value)) || {
+      pinyin: value,
+      chinese: [],
+    };
+
+    setInputValue(value);
+    setChinese([value, ...transformMsg.chinese]);
   };
 
   /**
@@ -297,11 +330,10 @@ const useInput = ({
   };
 
   /** 输入 */
-  const onInput = async (e: VKB.KeyboardAttributeType) => {
+  const onInput = (e: VKB.KeyboardAttributeType) => {
     if (activeInputRef.current && typeof e.key === 'string') {
-      let value = activeInputRef.current.value;
-      const selectionStart = activeInputRef.current.selectionStart || 0;
-      const selectionEnd = activeInputRef.current.selectionEnd || 0;
+      let { value, selectionStart, selectionEnd, isCollapsed } =
+        getSelectionInfo(activeInputRef.current);
       const vkbNotEmpty = activeInputRef.current.dataset?.vkbNotEmpty;
       const vkbNotEmptyTrim = activeInputRef.current.dataset?.vkbNotEmptyTrim;
       const vkbNotInput =
@@ -310,13 +342,7 @@ const useInput = ({
       // if (!(await handleInputType(activeInputRef.current))) return;
 
       if (validateInputType(activeInputRef.current)) {
-        console.error('disabled type', [
-          ...invalidInputType,
-          ...needHandleInputType,
-        ]);
-        console.error(
-          'if you need type="number" please use data-vkb-type="number" replace',
-        );
+        reportInvalidInputType();
         return;
       }
 
@@ -338,19 +364,13 @@ const useInput = ({
         e.key !== Space.code &&
         activeKeyboard === letterType
       ) {
-        const value = inputValue + e.key;
-        const transformMsg = (onPinyin2Chinese && onPinyin2Chinese(value)) || {
-          pinyin: value,
-          chinese: [],
-        };
-        setInputValue(value);
-        setChinese([value, ...transformMsg.chinese]);
+        updateChineseCandidates(inputValue + e.key);
         jumpDelete.current = false;
       } else {
         // 处理 type = 'number' 时输入的其他字符
         if (isAllowInputNumber(inputType.current, value, e.key)) return;
 
-        if (selectionStart === selectionEnd) {
+        if (isCollapsed) {
           // 相同进行插入
           value =
             value.slice(0, selectionStart) +
@@ -364,9 +384,9 @@ const useInput = ({
 
         // 通过原生 setter 更新 value，尽量保证 React 受控组件、
         // antd InputNumber / Form 等场景能正确感知到值变化。
-        setNativeInputValue(activeInputRef.current, value);
-
-        activeInputRef.current.setSelectionRange(
+        applyInputValue(
+          activeInputRef.current,
+          value,
           selectionStart + 1,
           selectionStart + 1,
         );
@@ -380,24 +400,13 @@ const useInput = ({
   const onBackspace = (e: VKB.KeyboardAttributeType) => {
     if (activeInputRef.current) {
       if (validateInputType(activeInputRef.current)) {
-        console.error('disabled type: ', [
-          ...invalidInputType,
-          ...needHandleInputType,
-        ]);
-        console.error(
-          'if you need type="number" please use data-vkb-type="number" replace',
-        );
+        reportInvalidInputType();
         return;
       }
 
       if (inputMode === ZH) {
         const value = inputValue.slice(0, inputValue.length - 1);
-        const transformMsg = (onPinyin2Chinese && onPinyin2Chinese(value)) || {
-          pinyin: value,
-          chinese: [],
-        };
-        setInputValue(value);
-        setChinese([value, ...transformMsg.chinese]);
+        updateChineseCandidates(value);
 
         if (value) return;
 
@@ -408,19 +417,17 @@ const useInput = ({
       }
 
       // 获取光标位置
-      const selectionStart = activeInputRef.current.selectionStart ?? 0;
-      const selectionEnd = activeInputRef.current.selectionEnd ?? 0;
-      const value = activeInputRef.current.value;
+      const { selectionStart, selectionEnd, value, isCollapsed } =
+        getSelectionInfo(activeInputRef.current);
 
       const tempValue =
-        value.slice(
-          0,
-          selectionStart - (selectionStart === selectionEnd ? 1 : 0),
-        ) + value.slice(selectionEnd);
-      setNativeInputValue(activeInputRef.current, tempValue);
-      activeInputRef.current.setSelectionRange(
-        selectionStart - (selectionStart === selectionEnd ? 1 : 0),
-        selectionStart === selectionEnd ? selectionEnd - 1 : selectionStart,
+        value.slice(0, selectionStart - (isCollapsed ? 1 : 0)) +
+        value.slice(selectionEnd);
+      applyInputValue(
+        activeInputRef.current,
+        tempValue,
+        selectionStart - (isCollapsed ? 1 : 0),
+        isCollapsed ? selectionEnd - 1 : selectionStart,
       );
 
       // 删除后补发输入事件，驱动上层受控状态同步。
@@ -432,22 +439,14 @@ const useInput = ({
   const onCursor = (e: VKB.KeyboardAttributeType) => {
     if (activeInputRef.current) {
       if (validateInputType(activeInputRef.current)) {
-        console.error('disabled type: ', [
-          ...invalidInputType,
-          ...needHandleInputType,
-        ]);
-        console.error(
-          'if you need type="number" please use data-vkb-type="number" replace',
-        );
+        reportInvalidInputType();
         return;
       }
 
-      const selectionStart = activeInputRef.current.selectionStart ?? 0;
-
-      const selectionEnd = activeInputRef.current.selectionEnd ?? 0;
-
+      const { selectionStart, selectionEnd, value } = getSelectionInfo(
+        activeInputRef.current,
+      );
       let index = 0;
-      const value = activeInputRef.current.value;
       const maxLength = value.length;
 
       // TODO: 待优化
@@ -548,17 +547,18 @@ const useInput = ({
   const onSelectChinese = (chinese: string) => {
     if (
       activeInputRef.current &&
-      !needHandleInputType.includes(inputType.current)
+      !NEED_HANDLE_INPUT_TYPES.includes(inputType.current)
     ) {
-      let value = activeInputRef.current.value;
-      const selectionEnd = activeInputRef.current.selectionEnd || 1;
+      let { value, selectionEnd } = getSelectionInfo(activeInputRef.current);
+      selectionEnd = selectionEnd || 1;
 
       value =
         value.slice(0, selectionEnd) + chinese + value.slice(selectionEnd);
 
       // 选择中文候选词后，同样通过原生 setter 回填输入框。
-      setNativeInputValue(activeInputRef.current, value);
-      activeInputRef.current.setSelectionRange(
+      applyInputValue(
+        activeInputRef.current,
+        value,
         chinese.length + selectionEnd,
         chinese.length + selectionEnd,
       );
@@ -575,23 +575,24 @@ const useInput = ({
   /** 拷贝 */
   const onCopy = async () => {
     if (activeInputRef.current) {
-      const selectionStart = activeInputRef.current.selectionStart ?? 0;
-      const selectionEnd = activeInputRef.current.selectionEnd ?? 0;
+      const { selectionStart, selectionEnd, value } = getSelectionInfo(
+        activeInputRef.current,
+      );
       if (selectionStart === selectionEnd) {
         console.warn('no have copy content');
         return;
       }
-      const value = activeInputRef.current.value.slice(
-        selectionStart,
-        selectionEnd,
-      );
+      const copiedValue = value.slice(selectionStart, selectionEnd);
       if (navigator.clipboard) {
-        await navigator.clipboard.writeText(value);
+        await navigator.clipboard.writeText(copiedValue);
         console.log('copy success');
       } else if (document.queryCommandSupported('copy')) {
         activeInputRef.current.select();
         document.execCommand('copy');
-        activeInputRef.current.setSelectionRange(value.length, value.length);
+        activeInputRef.current.setSelectionRange(
+          copiedValue.length,
+          copiedValue.length,
+        );
         console.log('copy success');
       } else {
         console.error('copy error');
@@ -602,16 +603,16 @@ const useInput = ({
   /** 粘贴 */
   const onPaste = async () => {
     if (activeInputRef.current) {
-      const selectionStart = activeInputRef.current.selectionStart ?? 0;
-      const selectionEnd = activeInputRef.current.selectionEnd ?? 0;
-      let value = activeInputRef.current.value;
+      let { selectionStart, selectionEnd, value } = getSelectionInfo(
+        activeInputRef.current,
+      );
 
       if (navigator.clipboard) {
         const text = await navigator.clipboard.readText();
         value =
           value.slice(0, selectionStart) + text + value.slice(selectionEnd);
         // 粘贴内容后走统一的原生赋值 + 事件派发逻辑。
-        setNativeInputValue(activeInputRef.current, value);
+        applyInputValue(activeInputRef.current, value);
         emitInputEvent();
         console.log('paste success');
       } else if (document.queryCommandSupported('paste')) {
