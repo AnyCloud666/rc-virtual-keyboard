@@ -19,6 +19,11 @@ const useContinuousTrigger = <T>({
 }) => {
   const delayTimerRef = useRef<number>();
   const intervalTimerRef = useRef<number>();
+  const onTriggerRef = useRef(onTrigger);
+
+  useEffect(() => {
+    onTriggerRef.current = onTrigger;
+  }, [onTrigger]);
 
   const stopContinuousTrigger = useCallback(() => {
     window.clearTimeout(delayTimerRef.current);
@@ -28,15 +33,15 @@ const useContinuousTrigger = <T>({
   const startContinuousTrigger = useCallback(
     (payload: T) => {
       stopContinuousTrigger();
-      onTrigger(payload);
+      onTriggerRef.current(payload);
 
       delayTimerRef.current = window.setTimeout(() => {
         intervalTimerRef.current = window.setInterval(() => {
-          onTrigger(payload);
+          onTriggerRef.current(payload);
         }, interval);
       }, delay);
     },
-    [delay, interval, onTrigger, stopContinuousTrigger],
+    [delay, interval, stopContinuousTrigger],
   );
 
   useEffect(() => {

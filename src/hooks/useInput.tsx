@@ -34,6 +34,7 @@ import {
   settingType,
 } from '../keys';
 import { VKB } from '../typing';
+import { english2WordsV1 } from '../utils/english';
 import { imgToWordV1 } from '../utils/imgToWord';
 import { pinyin2ChineseV2 } from '../utils/pinyin';
 import {
@@ -63,6 +64,7 @@ const useInput = ({
   onUseKeydownAudioChange,
   onKeydownAudioUrlChange,
   onPinyin2Chinese = pinyin2ChineseV2,
+  onEnglishWords = english2WordsV1,
   onImageToWord = imgToWordV1,
 }: {
   /** 主题模式 */
@@ -90,6 +92,8 @@ const useInput = ({
   onKeydownAudioUrlChange?: (url: string) => void;
   /** 拼音转汉字，自定义实现拼音转汉字，默认采用最简单的单字输入模式 */
   onPinyin2Chinese?: (value: string) => { pinyin: string; chinese: string[] };
+  /** 英文字母转单词候选 */
+  onEnglishWords?: (value: string) => string[];
   /** 图片转文字，自定义实现图片转文字，默认采用 tesseract.js 识别图片文字 */
   onImageToWord?: (url: string) => Promise<string[]>;
 }) => {
@@ -189,6 +193,11 @@ const useInput = ({
       blurTimer.current = window.setTimeout(() => {
         const nextActiveElement = document.activeElement;
         const currentInput = e.target as HTMLInputElement | null;
+
+        // 输入框一旦真正失焦，就清空当前中英文组合输入的待选区，
+        // 避免候选内容残留到下一次输入或切换到其他输入框时产生干扰。
+        setInputValue('');
+        setChinese([]);
 
         if (isSupportedInput(nextActiveElement)) {
           return;
@@ -294,6 +303,59 @@ const useInput = ({
   };
 
   /**
+   * 更新字母键候选
+   *
+   * @description
+   * 中文模式走拼音转汉字，英文模式走单词前缀匹配。
+   * 为了保持两种模式交互一致，候选首位始终保留原始输入值，用户可以直接回填原文。
+   */
+  const updateLetterCandidates = (value: string) => {
+    if (!value) {
+      setInputValue('');
+      setChinese([]);
+      return;
+    }
+
+    if (inputMode === ZH) {
+      updateChineseCandidates(value);
+      return;
+    }
+
+    const words = onEnglishWords?.(value) || [];
+    setInputValue(value);
+    setChinese([value, ...words.filter((word) => word !== value)]);
+  };
+
+  /**
+   * 当前是否处于字母组合输入模式
+   *
+   * @description
+   * 仅在字母键盘下对英文字母/拼音字母进入候选态，
+   * 其余键位仍然保持原来的直接输入行为。
+   */
+  const shouldUseLetterComposition = (key: string) => {
+    return activeKeyboard === letterType && /^[a-zA-Z]$/.test(key);
+  };
+
+  /**
+   * 提交当前候选值
+   *
+   * @param {string} [appendText]
+   * @return {boolean}
+   *
+   * @description
+   * 英文模式下支持按空格/回车直接提交当前组合串，
+   * 与中文候选点击确认保持一致，提交后可按需追加空格等字符。
+   */
+  const commitCurrentCandidate = (appendText = '') => {
+    if (!activeInputRef.current || !inputValue) return false;
+
+    const candidate = chinese[0] || inputValue;
+    onSelectChinese(candidate, appendText);
+    return true;
+  };
+
+  /**
    * 是否允许输入 数字 . + -
    * 且 + - 必须在最前面
    * true 允许 false 不允许
@@ -360,12 +422,18 @@ const useInput = ({
         return;
       }
       if (
-        inputMode === ZH &&
-        e.key !== Space.code &&
-        activeKeyboard === letterType
+        shouldUseLetterComposition(e.key) &&
+        ((inputMode === ZH && e.key !== Space.code) || inputMode === EN)
       ) {
-        updateChineseCandidates(inputValue + e.key);
+        updateLetterCandidates(inputValue + e.key.toLowerCase());
         jumpDelete.current = false;
+      } else if (
+        inputMode === EN &&
+        inputValue &&
+        activeKeyboard === letterType &&
+        e.code === Space.code
+      ) {
+        commitCurrentCandidate(' ');
       } else {
         // 处理 type = 'number' 时输入的其他字符
         if (isAllowInputNumber(inputType.current, value, e.key)) return;
@@ -404,9 +472,9 @@ const useInput = ({
         return;
       }
 
-      if (inputMode === ZH) {
+      if (inputMode === ZH || inputMode === EN) {
         const value = inputValue.slice(0, inputValue.length - 1);
-        updateChineseCandidates(value);
+        updateLetterCandidates(value);
 
         if (value) return;
 
@@ -541,10 +609,11 @@ const useInput = ({
   const onChangeInputMode = (mode: VKB.InputMode) => {
     setInputMode(mode);
     setInputValue('');
+    setChinese([]);
   };
 
   /** 选择输入的中文 */
-  const onSelectChinese = (chinese: string) => {
+  const onSelectChinese = (chinese: string, appendText = '') => {
     if (
       activeInputRef.current &&
       !NEED_HANDLE_INPUT_TYPES.includes(inputType.current)
@@ -553,14 +622,17 @@ const useInput = ({
       selectionEnd = selectionEnd || 1;
 
       value =
-        value.slice(0, selectionEnd) + chinese + value.slice(selectionEnd);
+        value.slice(0, selectionEnd) +
+        chinese +
+        appendText +
+        value.slice(selectionEnd);
 
       // 选择中文候选词后，同样通过原生 setter 回填输入框。
       applyInputValue(
         activeInputRef.current,
         value,
-        chinese.length + selectionEnd,
-        chinese.length + selectionEnd,
+        chinese.length + appendText.length + selectionEnd,
+        chinese.length + appendText.length + selectionEnd,
       );
 
       // 通知 React / 业务侧当前值已经变化。
@@ -630,7 +702,7 @@ const useInput = ({
 
   /** 清空临时输入区域 */
   const onClear = () => {
-    // setInputValue('');
+    setInputValue('');
     setChinese([]);
   };
 
@@ -647,8 +719,10 @@ const useInput = ({
         break;
       // 回车
       case Enter.code:
-        // onEnter && onEnter();
-        // TODO
+        if (!(inputMode === EN && commitCurrentCandidate())) {
+          // onEnter && onEnter();
+          // TODO
+        }
         break;
       // 复制
       case Copy.code:

@@ -133,7 +133,9 @@ const LetterKeyboard = ({
   /** 停止连续滚动 */
   const stopContinuousScroll = (shouldKeepSingleStep = true) => {
     window.clearTimeout(scrollDelayTimerRef.current);
-    window.cancelAnimationFrame(scrollFrameRef.current);
+    if (typeof scrollFrameRef.current === 'number') {
+      window.cancelAnimationFrame(scrollFrameRef.current);
+    }
 
     if (shouldKeepSingleStep && !isContinuousScrollingRef.current) {
       const direction = scrollDirectionRef.current;
@@ -178,6 +180,13 @@ const LetterKeyboard = ({
   };
 
   useEffect(() => {
+    const handleWindowMouseUp = () => {
+      stopContinuousScroll();
+    };
+    const handleWindowTouchEnd = () => {
+      stopContinuousScroll();
+    };
+
     if (inputMode === 'zh') {
       const tempKeys = letterKeys.map((item) => {
         const tempItem = { ...item };
@@ -188,19 +197,19 @@ const LetterKeyboard = ({
       });
       setKeys(tempKeys);
     }
-    window.addEventListener('mouseup', stopContinuousScroll);
-    window.addEventListener('touchend', stopContinuousScroll);
+    window.addEventListener('mouseup', handleWindowMouseUp);
+    window.addEventListener('touchend', handleWindowTouchEnd);
 
     return () => {
       stopContinuousScroll();
-      window.removeEventListener('mouseup', stopContinuousScroll);
-      window.removeEventListener('touchend', stopContinuousScroll);
+      window.removeEventListener('mouseup', handleWindowMouseUp);
+      window.removeEventListener('touchend', handleWindowTouchEnd);
     };
   }, []);
 
   return (
     <div className="letter-keyboard" onMouseDown={onMouseDown}>
-      {inputMode === ZH && inputValue && (
+      {inputValue && (
         <div className="letter-keyboard-temp">
           <div className="letter-keyboard-temp-pinyin">{inputValue}</div>
           <div

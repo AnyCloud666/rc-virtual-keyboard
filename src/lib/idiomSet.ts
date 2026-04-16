@@ -4,7 +4,7 @@
  * 用于在拼音自动组合候选中，把已命中的四字成语整体前置。
  * 这里以高频、常见、通用语境中的成语为主。
  */
-const idiomSet = [
+const idiomSet: string[] = [
   '哀兵必胜',
   '爱不释手',
   '爱屋及乌',
@@ -542,6 +542,6 @@ const idiomSet = [
   '履险如夷',
   '屡见不鲜',
   '屡试不爽',
-] as const;
+];
 
 export default idiomSet;

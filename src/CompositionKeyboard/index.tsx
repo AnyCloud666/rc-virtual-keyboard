@@ -11,7 +11,7 @@ import { FloatPosition, LightTheme, numberType } from '../keys';
 import './style.css';
 
 import useInput from '../hooks/useInput';
-import { pinyin2ChineseV1 } from '../utils/pinyin';
+import { pinyin2ChineseV2 } from '../utils/pinyin';
 import tabs from './KeyboardTabs';
 /**
  * 组合键盘
@@ -100,7 +100,7 @@ const CompositionKeyboard = ({
     onPositionModeChange,
     onUseKeydownAudioChange,
     onKeydownAudioUrlChange,
-    onPinyin2Chinese: pinyin2ChineseV1,
+    onPinyin2Chinese: pinyin2ChineseV2,
   });
 
   return (

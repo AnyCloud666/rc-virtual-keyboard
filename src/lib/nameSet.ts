@@ -4,7 +4,7 @@
  * 用于在拼音自动组合候选中，把已命中的常见姓名整体前置。
  * 这里包含高频姓氏 + 常见单名 / 双名 / 公众熟名的组合。
  */
-const nameSet = [
+const nameSet: string[] = [
   '张伟',
   '张敏',
   '张丽',
@@ -841,6 +841,6 @@ const nameSet = [
   '艳红',
   '翠萍',
   '淑芬',
-] as const;
+];
 
 export default nameSet;
