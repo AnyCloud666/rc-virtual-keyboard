@@ -5,6 +5,7 @@ import geographyPhrases from '../lib/geographyPhrases';
 import idiomPhrases from '../lib/idiomPhrases';
 import idiomSet from '../lib/idiomSet';
 import nameSet from '../lib/nameSet';
+import strokePhrases from '../lib/strokePhrases';
 
 /** 获取单个汉字 */
 export function getSingleChinese(pinyin: string) {
@@ -23,6 +24,8 @@ const IDIOM_PHRASES_DICTIONARY = idiomPhrases as Record<string, string[]>;
 const IDIOM_SET = new Set(idiomSet);
 /** 常用中文姓名集合 */
 const NAME_SET = new Set(nameSet);
+/** 笔画拼音词典 */
+const STROKE_PHRASES_DICTIONARY = strokePhrases as Record<string, string[]>;
 /** 地理位置词典 */
 const GEOGRAPHY_PHRASES_DICTIONARY = geographyPhrases as Record<
   string,
@@ -74,6 +77,13 @@ function getCommonPhrasePrefixCandidates(pinyin: string) {
     .filter((item) => item.startsWith(pinyin))
     .slice(0, MAX_RESULT_COUNT)
     .flatMap((item) => PRIORITY_PHRASES_DICTIONARY[item].slice(0, 2));
+}
+
+/** 拿到笔画拼音候选，例如 pie -> 丿 */
+function getStrokePhraseCandidates(pinyin: string) {
+  const normalized = normalizePinyinInput(pinyin).replace(/['\s]+/g, '');
+
+  return STROKE_PHRASES_DICTIONARY[normalized] || [];
 }
 
 /** 获取拼音切分后的简拼，例如 nihao => nh */
@@ -419,6 +429,7 @@ export function pinyin2ChineseV2(pinyin: string) {
   );
   const commonPhraseSimpleCandidates =
     getCommonPhraseSimpleCandidates(normalized);
+  const strokePhraseCandidates = getStrokePhraseCandidates(normalized);
 
   const chinese = getChineseCandidates(normalized);
 
@@ -426,7 +437,11 @@ export function pinyin2ChineseV2(pinyin: string) {
     return {
       pinyin: normalized,
       chinese: mergePrioritizedCandidates(
-        [...commonPhraseCandidates, ...commonPhraseSimpleCandidates],
+        [
+          ...strokePhraseCandidates,
+          ...commonPhraseCandidates,
+          ...commonPhraseSimpleCandidates,
+        ],
         chinese,
       ),
     };
@@ -440,7 +455,11 @@ export function pinyin2ChineseV2(pinyin: string) {
     return {
       pinyin: sortSegmentGroups(segmentGroups)[0]?.join("'") || normalized,
       chinese: mergePrioritizedCandidates(
-        [...commonPhraseCandidates, ...commonPhraseSimpleCandidates],
+        [
+          ...strokePhraseCandidates,
+          ...commonPhraseCandidates,
+          ...commonPhraseSimpleCandidates,
+        ],
         phrases,
       ),
     };
@@ -454,7 +473,11 @@ export function pinyin2ChineseV2(pinyin: string) {
   return {
     pinyin: partialResult.pinyin,
     chinese: mergePrioritizedCandidates(
-      [...commonPhraseSimpleCandidates, ...phrasePrefixCandidates],
+      [
+        ...strokePhraseCandidates,
+        ...commonPhraseSimpleCandidates,
+        ...phrasePrefixCandidates,
+      ],
       partialResult.chinese,
     ),
   };
