@@ -35,7 +35,7 @@ import {
 } from '../keys';
 import { VKB } from '../typing';
 import { imgToWordV1 } from '../utils/imgToWord';
-import { pinyin2ChineseV1 } from '../utils/pinyin';
+import { pinyin2ChineseV2 } from '../utils/pinyin';
 import {
   Simulate,
   SimulateEventData,
@@ -62,7 +62,7 @@ const useInput = ({
   onPositionModeChange,
   onUseKeydownAudioChange,
   onKeydownAudioUrlChange,
-  onPinyin2Chinese = pinyin2ChineseV1,
+  onPinyin2Chinese = pinyin2ChineseV2,
   onImageToWord = imgToWordV1,
 }: {
   /** 主题模式 */
