@@ -117,6 +117,8 @@ declare namespace VKB {
     zIndex?: string | number;
     /** 按键音效 url */
     keydownAudioUrl?: string;
+    /** 输入框 focus 时是否自动显示键盘 */
+    focusShow?: boolean;
     /** 自定义键盘内容 */
     virtualKeyboardTab?: KeyboardTabItem[];
     /** 自定义主题,当使用了主题变量时，主题变量的权重更高 */

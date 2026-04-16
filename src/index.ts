@@ -33,6 +33,9 @@ export { default as DragBlock } from './DragBlock';
 
 export { default as CompositionKeyboard } from './CompositionKeyboard';
 
-export { default as useVirtualKeyboard } from './VirtualKeyboard';
+export {
+  InitVirtualKeyBoardCtx,
+  default as useVirtualKeyboard,
+} from './VirtualKeyboard';
 
 export { default as useInput } from './hooks/useInput';

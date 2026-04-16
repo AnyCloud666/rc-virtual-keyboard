@@ -20,14 +20,15 @@
   "scripts": {
     "build": "father build",
     "build:watch": "father dev",
-    "dev": "dumi dev",
-    "docs:build": "dumi build",
-    "docs:preview": "dumi preview",
+    "dev": "node -r ./scripts/http-parser-shim.js ./node_modules/dumi/bin/dumi.js dev",
+    "docs:build": "node -r ./scripts/http-parser-shim.js ./node_modules/dumi/bin/dumi.js build",
+    "docs:preview": "node -r ./scripts/http-parser-shim.js ./node_modules/dumi/bin/dumi.js preview",
+    "docs:setup": "node -r ./scripts/http-parser-shim.js ./node_modules/dumi/bin/dumi.js setup",
     "doctor": "father doctor",
     "lint": "npm run lint:es && npm run lint:css",
     "lint:css": "stylelint \"{src,test}/**/*.{css,less}\"",
     "lint:es": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
-    "prepare": "husky install && dumi setup",
+    "prepare": "husky install",
     "prepublishOnly": "father doctor && npm run build",
     "start": "npm run dev"
   },
@@ -82,6 +83,9 @@
   "peerDependencies": {
     "react": ">=16.9.0",
     "react-dom": ">=16.9.0"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "publishConfig": {
     "access": "public"

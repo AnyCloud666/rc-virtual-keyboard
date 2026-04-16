@@ -56,6 +56,7 @@ export default () => {
 | theme              | 自定义主题,当使用了主题变量时，主题变量的权重更高 | Partial\<Theme\>  | 参考默认 token |
 | themeMode          | 主题模式                                          | string            | light          |
 | positionMode       | 位置模式                                          | string            | float          |
+| focusShow          | 输入框获得焦点时是否自动显示键盘                  | boolean           | true           |
 
 ## 方法
 

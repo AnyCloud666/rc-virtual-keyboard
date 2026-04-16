@@ -28,6 +28,7 @@ const CompositionKeyboard = ({
   hiddenLabel = <BottomSvg />,
   themeMode = LightTheme.code,
   positionMode = FloatPosition.code,
+  focusShow,
   useKeydownAudio = 'Y',
   keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
   onChangeShow,
@@ -54,6 +55,8 @@ const CompositionKeyboard = ({
   themeMode?: string;
   /** 位置 */
   positionMode?: string;
+  /** 输入框 focus 时是否自动显示键盘 */
+  focusShow?: boolean;
   /** 是否使用键盘按键声音 */
   useKeydownAudio?: 'Y' | 'N';
   /** 键盘按键声音地址 */
@@ -89,6 +92,7 @@ const CompositionKeyboard = ({
     themeMode,
     positionMode,
     defaultActiveKeyboard,
+    focusShow,
     useKeydownAudio,
     keydownAudioUrl,
     onChangeShow,

@@ -44,6 +44,7 @@ const useInput = ({
   themeMode = LightTheme.code,
   positionMode = FloatPosition.code,
   defaultActiveKeyboard = numberType,
+  focusShow,
   useKeydownAudio = 'Y',
   keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
   autoPopup = true,
@@ -61,11 +62,13 @@ const useInput = ({
   positionMode?: string;
   /** 默认活跃的键盘 */
   defaultActiveKeyboard?: string;
+  /** 输入框 focus 时是否自动显示键盘，全局关闭后可通过 data-vkb-show 单独开启 */
+  focusShow?: boolean;
   /** 使用按键音效 */
   useKeydownAudio?: 'Y' | 'N';
   /** 按键音效url */
   keydownAudioUrl?: string;
-  /** 自动弹出 */
+  /** 自动弹出，兼容旧参数 */
   autoPopup?: boolean;
   /** 显示/隐藏 */
   onChangeShow?: (s: boolean) => void;
@@ -124,6 +127,10 @@ const useInput = ({
   const jumpDelete = useRef(false);
   /** 焦点状态 */
   const cacheInputFocus = useRef(new WeakSet());
+  /** blur 延迟定时器，避免输入框切换时闪烁 */
+  const blurTimer = useRef<number>();
+  /** focus 弹出配置，autoPopup 作为兼容别名保留 */
+  const enableFocusShow = focusShow ?? autoPopup;
 
   /** 颜色主题 */
   const [vkbThemeMode, setVkbThemeMode] = useState(
@@ -136,46 +143,108 @@ const useInput = ({
   /** 按键音效 */
   const [vkbKeydownAudio, setVkbKeydownAudio] = useState(useKeydownAudio);
 
-  /** 失去焦点 */
-  const onBlur = useCallback(() => {
-    activeInputRef.current = null;
-    inputType.current = '';
-  }, []);
-  /** 获得焦点 */
-  const onFocus = useCallback((e: FocusEvent) => {
-    const activeElement = e.target as HTMLInputElement;
-    const vkbAutoPopup = activeElement?.dataset?.vkbAutoPopup ?? 'true';
-    if (autoPopup && vkbAutoPopup === 'true') {
-      onChangeShow && onChangeShow(true);
-    }
-  }, []);
+  const isSupportedInput = (
+    target: EventTarget | null,
+  ): target is HTMLInputElement => {
+    const activeElement = target as HTMLInputElement | null;
 
-  /** 寻找聚焦有效的input */
-  const findFocusElement = (e: MouseEvent) => {
-    const activeElement = e.target as HTMLInputElement;
-    const vkbDisabled = activeElement.dataset?.vkbDisabled;
-    const vkbType = activeElement.dataset?.vkbType ?? '';
-    const vkbAutoPopup = activeElement.dataset?.vkbAutoPopup ?? 'true';
-    if (
+    return !!(
       activeElement?.tagName === 'INPUT' &&
       [...effectiveInputType, ...needHandleInputType].includes(
         activeElement?.type ?? '',
       ) &&
-      vkbDisabled !== 'true'
-    ) {
-      inputType.current = vkbType;
-      activeInputRef.current = activeElement;
-      if (!cacheInputFocus.current.has(activeElement)) {
-        if (autoPopup && vkbAutoPopup === 'true') {
-          onChangeShow && onChangeShow(true);
+      activeElement.dataset?.vkbDisabled !== 'true'
+    );
+  };
+
+  const shouldShowOnFocus = (inputEl: HTMLInputElement) => {
+    const vkbShow = inputEl.dataset?.vkbShow;
+    const vkbAutoPopup = inputEl.dataset?.vkbAutoPopup;
+
+    if (vkbShow === 'true') return true;
+    if (vkbShow === 'false') return false;
+    if (vkbAutoPopup === 'true') return true;
+    if (vkbAutoPopup === 'false') return false;
+
+    return enableFocusShow;
+  };
+
+  const shouldHideOnBlur = (inputEl: HTMLInputElement | null) => {
+    if (!inputEl) return true;
+
+    return inputEl.dataset?.vkbBlurHidden !== 'false';
+  };
+
+  const bindInputListener = (inputEl: HTMLInputElement) => {
+    if (!cacheInputFocus.current.has(inputEl)) {
+      cacheInputFocus.current.add(inputEl);
+      inputEl.addEventListener('blur', onBlur);
+      inputEl.addEventListener('focus', onFocus);
+    }
+  };
+
+  const activateInput = (
+    inputEl: HTMLInputElement,
+    options?: { syncShow?: boolean },
+  ) => {
+    inputType.current = inputEl.dataset?.vkbType ?? '';
+    activeInputRef.current = inputEl;
+    bindInputListener(inputEl);
+
+    if (options?.syncShow) {
+      onChangeShow && onChangeShow(shouldShowOnFocus(inputEl));
+    }
+  };
+
+  /** 失去焦点 */
+  const onBlur = useCallback(
+    (e: FocusEvent) => {
+      window.clearTimeout(blurTimer.current);
+      blurTimer.current = window.setTimeout(() => {
+        const nextActiveElement = document.activeElement;
+        const currentInput = e.target as HTMLInputElement | null;
+
+        if (isSupportedInput(nextActiveElement)) {
+          return;
         }
-        cacheInputFocus.current.add(activeElement);
-        activeInputRef.current.addEventListener('blur', onBlur);
-        activeInputRef.current.addEventListener('focus', onFocus);
+
+        if (activeInputRef.current === currentInput) {
+          activeInputRef.current = null;
+          inputType.current = '';
+        }
+
+        if (shouldHideOnBlur(currentInput)) {
+          onChangeShow && onChangeShow(false);
+        }
+      }, 0);
+    },
+    [onChangeShow],
+  );
+  /** 获得焦点 */
+  const onFocus = useCallback(
+    (e: FocusEvent) => {
+      window.clearTimeout(blurTimer.current);
+      const activeElement = e.target as HTMLInputElement;
+
+      if (!isSupportedInput(activeElement)) {
+        return;
       }
+
+      activateInput(activeElement, { syncShow: true });
+    },
+    [onChangeShow, enableFocusShow],
+  );
+
+  /** 寻找聚焦有效的input */
+  const findFocusElement = (e: MouseEvent | FocusEvent) => {
+    const activeElement = e.target as HTMLInputElement;
+
+    if (isSupportedInput(activeElement)) {
+      activateInput(activeElement, { syncShow: true });
     }
   };
   useEventListener('click', findFocusElement, { target: document.body });
+  useEventListener('focusin', findFocusElement, { target: document.body });
 
   /**
    * 禁用类型

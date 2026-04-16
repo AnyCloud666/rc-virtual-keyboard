@@ -65,16 +65,17 @@ export default () => {
 
 ## 属性
 
-| 属性                  | 说明       | 类型          | 默认值          |
-| --------------------- | ---------- | ------------- | --------------- |
-| showDragHandle        | 显示拖拽   | boolean       | true            |
-| showHiddenHandle      | 显示隐藏   | boolean       | true            |
-| style                 | 样式       | CSSProperties | -               |
-| defaultActiveKeyboard | 默认键盘   | string        | number          |
-| moveLabel             | 移动 label | ReactNode     | \<MoveSvg \/>   |
-| hiddenLabel           | 隐藏 label | ReactNode     | \<BottomSvg \/> |
-| themeMode             | 主题模式   | string        | light           |
-| positionMode          | 位置模式   | string        | float           |
+| 属性                  | 说明                             | 类型          | 默认值          |
+| --------------------- | -------------------------------- | ------------- | --------------- |
+| showDragHandle        | 显示拖拽                         | boolean       | true            |
+| showHiddenHandle      | 显示隐藏                         | boolean       | true            |
+| style                 | 样式                             | CSSProperties | -               |
+| defaultActiveKeyboard | 默认键盘                         | string        | number          |
+| moveLabel             | 移动 label                       | ReactNode     | \<MoveSvg \/>   |
+| hiddenLabel           | 隐藏 label                       | ReactNode     | \<BottomSvg \/> |
+| themeMode             | 主题模式                         | string        | light           |
+| positionMode          | 位置模式                         | string        | float           |
+| focusShow             | 输入框获得焦点时是否自动显示键盘 | boolean       | true            |
 
 ## 方法
 

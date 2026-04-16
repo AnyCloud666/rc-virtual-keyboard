@@ -27,6 +27,12 @@ $ pnpm run docs:preview
 $ pnpm run doctor
 ```
 
+## Environment
+
+- Recommended Node.js version: `18.x`, `20.x`, or `24.x`
+- On Node.js `24.x`, this repo injects a local `http_parser` compatibility shim before running `dumi`
+- If you need to initialize dumi files manually, run `pnpm run docs:setup`
+
 ## use
 
 ```bash

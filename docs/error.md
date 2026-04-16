@@ -244,6 +244,22 @@ export default () => {
 };
 ```
 
+## 输入框失去焦点时不隐藏键盘
+
+- 默认情况下，输入框失去焦点后会隐藏键盘
+- 某个输入框失去焦点时不想隐藏键盘，可在 `input` 上加入 `data-vkb-blur-hidden={false}`
+
+```jsx
+export default () => {
+  return (
+    <>
+      <input placeholder="失去焦点时隐藏键盘" />
+      <input placeholder="失去焦点时不隐藏键盘" data-vkb-blur-hidden={false} />
+    </>
+  );
+};
+```
+
 ## Uncaught SyntaxError: The requested module '/node_modules/rc-virtual-keyboard/dist/svg/bottom.svg?import' does not provide an export named 'ReactComponent'
 
 - 在 vite 项目中配置 vite-plugin-svgr

@@ -102,6 +102,7 @@ export const VirtualKeyboard = () => {
           style={vkbStyles}
           themeMode={virtualKeyboardCtx.themeMode}
           positionMode={virtualKeyboardCtx.positionMode}
+          focusShow={virtualKeyboardCtx.focusShow}
           virtualKeyboardTab={virtualKeyboardCtx.virtualKeyboardTab}
           showDragHandle={virtualKeyboardCtx.showDragHandle}
           useKeydownAudio={virtualKeyboardCtx.useKeydownAudio}
