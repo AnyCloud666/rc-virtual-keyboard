@@ -1,6 +1,5 @@
 import { useEventListener } from 'ahooks';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Simulate, SyntheticEventData } from 'react-dom/test-utils';
 import {
   ArrowDown,
   ArrowLeft,
@@ -37,6 +36,11 @@ import {
 import { VKB } from '../typing';
 import { imgToWordV1 } from '../utils/imgToWord';
 import { pinyin2ChineseV1 } from '../utils/pinyin';
+import {
+  Simulate,
+  SimulateEventData,
+  setNativeInputValue,
+} from '../utils/simulate';
 
 let audio: HTMLAudioElement;
 
@@ -268,11 +272,17 @@ const useInput = ({
     return false;
   };
 
-  /** 触发 input 事件 */
+  /**
+   * 触发输入相关事件
+   *
+   * @description
+   * 这里不再依赖 react-dom/test-utils，而是派发自定义模拟事件。
+   * 顺序保持为先 input 再 change，尽量贴近 React / antd 对输入值变更的感知方式。
+   */
   const emitInputEvent = () => {
     if (!activeInputRef.current) return;
-    Simulate?.change?.(activeInputRef.current);
     Simulate?.input?.(activeInputRef.current);
+    Simulate?.change?.(activeInputRef.current);
   };
 
   /** 识别 */
@@ -352,8 +362,9 @@ const useInput = ({
             value.slice(0, selectionStart) + e.key + value.slice(selectionEnd);
         }
 
-        // 修改 value
-        activeInputRef.current.value = value;
+        // 通过原生 setter 更新 value，尽量保证 React 受控组件、
+        // antd InputNumber / Form 等场景能正确感知到值变化。
+        setNativeInputValue(activeInputRef.current, value);
 
         activeInputRef.current.setSelectionRange(
           selectionStart + 1,
@@ -406,12 +417,13 @@ const useInput = ({
           0,
           selectionStart - (selectionStart === selectionEnd ? 1 : 0),
         ) + value.slice(selectionEnd);
-      activeInputRef.current.value = tempValue;
+      setNativeInputValue(activeInputRef.current, tempValue);
       activeInputRef.current.setSelectionRange(
         selectionStart - (selectionStart === selectionEnd ? 1 : 0),
         selectionStart === selectionEnd ? selectionEnd - 1 : selectionStart,
       );
 
+      // 删除后补发输入事件，驱动上层受控状态同步。
       emitInputEvent();
     }
   };
@@ -544,13 +556,14 @@ const useInput = ({
       value =
         value.slice(0, selectionEnd) + chinese + value.slice(selectionEnd);
 
-      // 修改 value
-      activeInputRef.current.value = value;
+      // 选择中文候选词后，同样通过原生 setter 回填输入框。
+      setNativeInputValue(activeInputRef.current, value);
       activeInputRef.current.setSelectionRange(
         chinese.length + selectionEnd,
         chinese.length + selectionEnd,
       );
 
+      // 通知 React / 业务侧当前值已经变化。
       emitInputEvent();
     } else {
       console.error('input type = email or number not allow input chinese');
@@ -597,7 +610,8 @@ const useInput = ({
         const text = await navigator.clipboard.readText();
         value =
           value.slice(0, selectionStart) + text + value.slice(selectionEnd);
-        activeInputRef.current.value = value;
+        // 粘贴内容后走统一的原生赋值 + 事件派发逻辑。
+        setNativeInputValue(activeInputRef.current, value);
         emitInputEvent();
         console.log('paste success');
       } else if (document.queryCommandSupported('paste')) {
@@ -687,7 +701,13 @@ const useInput = ({
     }
   };
 
-  /** 点击事件分发 */
+  /**
+   * 点击事件分发
+   *
+   * @description
+   * 先执行当前键位对应的输入/控制逻辑，再补发键盘事件，
+   * 让外部组件有机会监听到更接近真实键盘输入的事件流。
+   */
   const onClick = (e: VKB.KeyboardAttributeType) => {
     if (e.keyType === controlsType) {
       onControl(e);
@@ -704,30 +724,45 @@ const useInput = ({
     if (!activeInputRef.current) return;
     Simulate?.keyPress?.(activeInputRef.current, {
       keyCode: e.keyCode,
+      which: e.keyCode,
       code: e.code,
       key: e.key,
-      target: activeInputRef.current,
-    } as SyntheticEventData);
+      charCode:
+        typeof e.key === 'string' && e.key.length === 1
+          ? e.key.charCodeAt(0)
+          : undefined,
+    } as SimulateEventData);
   };
-  /** 鼠标按下事件 模拟 键盘按下事件模式*/
+  /**
+   * 鼠标按下事件，模拟 keyDown
+   *
+   * @description
+   * 虚拟键盘本质是点击 DOM，不会天然触发输入框的 keydown。
+   * 这里补发一个模拟事件，兼容依赖键盘事件的上层组件。
+   */
   const onKeyDown = (e: VKB.KeyboardAttributeType) => {
     if (!activeInputRef.current) return;
     Simulate?.keyDown?.(activeInputRef.current, {
       keyCode: e.keyCode,
+      which: e.keyCode,
       code: e.code,
       key: e.key,
-      target: activeInputRef.current,
-    } as SyntheticEventData);
+    } as SimulateEventData);
   };
-  /** 鼠标抬起事件 模拟 键盘抬起事件模式 */
+  /**
+   * 鼠标抬起事件，模拟 keyUp
+   *
+   * @description
+   * 与 onKeyDown 配套使用，补齐完整的键盘事件链路。
+   */
   const onKeyUp = (e: VKB.KeyboardAttributeType) => {
     if (!activeInputRef.current) return;
     Simulate?.keyUp?.(activeInputRef.current, {
       keyCode: e.keyCode,
+      which: e.keyCode,
       code: e.code,
       key: e.key,
-      target: activeInputRef.current,
-    } as SyntheticEventData);
+    } as SimulateEventData);
   };
 
   /** 通过事件冒泡的形式递归向上寻找，没有找到则不阻止冒泡 */

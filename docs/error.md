@@ -296,56 +296,92 @@ defineConfig({
 - **_注意_**：onInput 事件不同于 onChange 事件，用 onInput 事件 + 受控组件无法更新状态，推荐使用 onChange 事件 + 受控组件更新状态
 
 ```js
-import { Simulate } from 'react-dom/test-utils';
-const emitInputEvent = () => {
-  if (!activeInputRef.current) return;
-  Simulate?.change?.(activeInputRef.current);
-  Simulate?.input?.(activeInputRef.current);
+const setNativeInputValue = (target, value) => {
+  const prototype = Object.getPrototypeOf(target);
+  const descriptor = Object.getOwnPropertyDescriptor(prototype, 'value');
+
+  if (descriptor?.set) {
+    descriptor.set.call(target, value);
+    return;
+  }
+
+  target.value = value;
 };
 
-  /** 点击事件分发 */
-  const onClick = (e: VKB.KeyboardAttributeType) => {
-    if (e.keyType === controlsType) {
-      onControl(e);
-    } else if (e.keyType === settingType) {
-      onSetting(e);
-    } else {
-      onInput(e);
-    }
-    if (audio && vkbKeydownAudio === 'Y') {
-      audio.pause();
-      audio.play();
-    }
+const dispatchInputEvent = (target, type) => {
+  target.dispatchEvent(
+    new Event(type, {
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
+};
 
-    if (!activeInputRef.current) return;
-    Simulate?.keyPress?.(activeInputRef.current, {
-      keyCode: e.keyCode,
-      code: e.code,
-      key: e.key,
-      target: activeInputRef.current,
-    } as SyntheticEventData);
-  };
-  /** 鼠标按下事件 模拟 键盘按下事件模式*/
-  const onKeyDown = (e: VKB.KeyboardAttributeType) => {
-    if (!activeInputRef.current) return;
-    Simulate?.keyDown?.(activeInputRef.current, {
-      keyCode: e.keyCode,
-      code: e.code,
-      key: e.key,
-      target: activeInputRef.current,
-    } as SyntheticEventData);
-  };
-  /** 鼠标抬起事件 模拟 键盘抬起事件模式 */
-  const onKeyUp = (e: VKB.KeyboardAttributeType) => {
-    if (!activeInputRef.current) return;
-    Simulate?.keyUp?.(activeInputRef.current, {
-      keyCode: e.keyCode,
-      code: e.code,
-      key: e.key,
-      target: activeInputRef.current,
-    } as SyntheticEventData);
-  };
+const dispatchKeyboardEvent = (target, type, payload) => {
+  const event = new KeyboardEvent(type, {
+    bubbles: true,
+    cancelable: true,
+    key: payload.key,
+    code: payload.code,
+  });
 
+  Object.defineProperty(event, 'keyCode', {
+    configurable: true,
+    get: () => payload.keyCode,
+  });
+  Object.defineProperty(event, 'which', {
+    configurable: true,
+    get: () => payload.keyCode,
+  });
+
+  target.dispatchEvent(event);
+};
+
+const emitInputEvent = () => {
+  if (!activeInputRef.current) return;
+  dispatchInputEvent(activeInputRef.current, 'input');
+  dispatchInputEvent(activeInputRef.current, 'change');
+};
+
+/** 点击事件分发 */
+const onClick = (e: VKB.KeyboardAttributeType) => {
+  if (e.keyType === controlsType) {
+    onControl(e);
+  } else if (e.keyType === settingType) {
+    onSetting(e);
+  } else {
+    onInput(e);
+  }
+  if (audio && vkbKeydownAudio === 'Y') {
+    audio.pause();
+    audio.play();
+  }
+
+  if (!activeInputRef.current) return;
+  dispatchKeyboardEvent(activeInputRef.current, 'keypress', {
+    keyCode: e.keyCode,
+    code: e.code,
+    key: e.key,
+  });
+};
+/** 鼠标按下事件 模拟 键盘按下事件模式*/
+const onKeyDown = (e: VKB.KeyboardAttributeType) => {
+  if (!activeInputRef.current) return;
+  dispatchKeyboardEvent(activeInputRef.current, 'keydown', {
+    keyCode: e.keyCode,
+    code: e.code,
+    key: e.key,
+  });
+};
+/** 鼠标抬起事件 模拟 键盘抬起事件模式 */
+const onKeyUp = (e: VKB.KeyboardAttributeType) => {
+  if (!activeInputRef.current) return;
+  dispatchKeyboardEvent(activeInputRef.current, 'keyup', {
+    keyCode: e.keyCode,
+    code: e.code,
+    key: e.key,
+  });
+};
 ```
 
 ```jsx
