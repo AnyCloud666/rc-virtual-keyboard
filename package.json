@@ -1,6 +1,6 @@
 {
   "name": "rc-virtual-keyboard",
-  "version": "0.0.15",
+  "version": "1.0.0",
   "description": "virtual keyboard",
   "keywords": [
     "react",
@@ -55,6 +55,7 @@
     ]
   },
   "dependencies": {
+    "@babel/runtime": "^7.27.0",
     "ahooks": "^3.8.0",
     "tesseract.js": "^5.1.1"
   },

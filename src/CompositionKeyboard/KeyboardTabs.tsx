@@ -15,8 +15,11 @@ import NumberKeyboard from '../NumberKeyboard';
 import SettingKeyBoard from '../SettingKeyboard';
 import SymbolKeyboard from '../SymbolKeyboard';
 import WriteKeyboard from '../WriteKeyboard';
+import { EN } from '../keys';
 import { VKB } from '../typing';
 import './style.css';
+
+const noop = () => {};
 /** 字母键tab */
 export const LetterKeyboardTab: VKB.KeyboardTabItem = {
   id: 'letter',
@@ -38,7 +41,7 @@ export const LetterKeyboardTab: VKB.KeyboardTabItem = {
     <LetterKeyboard
       inputValue={inputValue}
       chinese={chinese}
-      inputMode={inputMode}
+      inputMode={inputMode ?? EN}
       onClick={onClick}
       onMouseDown={onMouseDown}
       onChangeInputMode={onChangeInputMode}
@@ -97,7 +100,7 @@ export const WriteKeyboardTab: VKB.KeyboardTabItem = {
     isKeyActive,
   }) => (
     <WriteKeyboard
-      chinese={chinese}
+      chinese={chinese ?? []}
       onClick={onClick}
       onMouseDown={onMouseDown}
       onRecognition={onRecognition}
@@ -126,17 +129,17 @@ export const SettingKeyboardTab: VKB.KeyboardTabItem = {
     onClick,
   }) => (
     <SettingKeyBoard
-      vkbKeydownAudio={vkbKeydownAudio}
-      themeMode={themeMode}
-      positionMode={positionMode}
-      width={width}
-      height={height}
-      fontSize={fontSize}
-      fontFamily={fontFamily}
-      onWidthChange={onWidthChange}
-      onHeightChange={onHeightChange}
-      onFontSizeChange={onFontSizeChange}
-      onFontFamilyChange={onFontFamilyChange}
+      vkbKeydownAudio={vkbKeydownAudio ?? 'Y'}
+      themeMode={themeMode ?? ''}
+      positionMode={positionMode ?? ''}
+      width={width ?? ''}
+      height={height ?? ''}
+      fontSize={fontSize ?? ''}
+      fontFamily={fontFamily ?? ''}
+      onWidthChange={onWidthChange ?? noop}
+      onHeightChange={onHeightChange ?? noop}
+      onFontSizeChange={onFontSizeChange ?? noop}
+      onFontFamilyChange={onFontFamilyChange ?? noop}
       onClick={onClick}
     />
   ),
