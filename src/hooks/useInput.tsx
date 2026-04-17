@@ -272,6 +272,15 @@ const useInput = ({
     inputEl: HTMLInputElement,
     options?: { syncShow?: boolean },
   ) => {
+    const hasSwitchedInput =
+      !!activeInputRef.current && activeInputRef.current !== inputEl;
+
+    if (hasSwitchedInput) {
+      setInputValue('');
+      setChinese([]);
+      jumpDelete.current = false;
+    }
+
     inputType.current = inputEl.dataset?.vkbType ?? '';
     activeInputRef.current = inputEl;
     bindInputListener(inputEl);

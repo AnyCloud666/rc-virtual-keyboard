@@ -10,34 +10,45 @@
 
 .letter-keyboard-temp {
   position: absolute;
-  top: -52px;
+  top: calc((var(--vkb-keyboard-tab) + var(--vkb-key-gap) * 2) * -1);
   display: flex;
+  align-items: stretch;
   gap: var(--vkb-key-gap);
   width: 100%;
-  height: var(--vkb-keyboard-tab);
-  padding: var(--vkb-key-gap) 0;
+  height: calc(var(--vkb-keyboard-tab) + var(--vkb-key-gap) * 2);
   background-color: var(--vkb-background);
+  box-sizing: border-box;
+  padding: var(--vkb-key-gap) 0;
 }
 
 .letter-keyboard-temp-pinyin {
   position: absolute;
-  z-index: 1;
-  top: calc(var(--vkb-keyboard-tab) / -2);
+  top: calc((var(--vkb-keyboard-tab) - 8px) * -1);
   left: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 0 var(--vkb-key-gap);
-  height: calc(var(--vkb-keyboard-tab) / 2);
-  width: min-content;
+  height: calc(var(--vkb-keyboard-tab) - 8px);
+  min-width: max-content;
   background-color: var(--vkb-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 
 .letter-keyboard-temp-list {
   display: flex;
   gap: var(--vkb-key-gap);
-  width: 80%;
+  flex: 1;
+  min-width: 0;
   height: 100%;
   overflow: hidden;
   flex-wrap: nowrap;
   align-items: stretch;
+  box-sizing: border-box;
 }
 
 .letter-keyboard-temp-char {
@@ -61,10 +72,11 @@
 
 .letter-keyboard-temp-right,
 .letter-keyboard-temp-left {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(10% - var(--vkb-key-gap));
+  width: var(--vkb-keyboard-tab);
   height: 100%;
   color: var(--vkb-key-color);
   fill: var(--vkb-key-color);

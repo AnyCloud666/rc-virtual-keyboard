@@ -1,23 +1,29 @@
 .word-keyboard-temp {
   position: absolute;
-  top: -52px;
+  top: calc((var(--vkb-keyboard-tab) + var(--vkb-key-gap) * 2) * -1);
   display: flex;
   gap: var(--vkb-key-gap);
   width: 100%;
-  height: var(--vkb-keyboard-tab);
-  padding: var(--vkb-key-gap) 0;
+  height: calc(var(--vkb-keyboard-tab) + var(--vkb-key-gap) * 2);
   background-color: var(--vkb-background);
+  box-sizing: border-box;
+  padding: var(--vkb-key-gap) 0;
 }
 
 .word-keyboard-temp-value {
   position: absolute;
   z-index: 1;
-  top: calc(var(--vkb-keyboard-tab) / -2);
-  left: 0;
+  top: 0;
+  left: calc(10% + var(--vkb-key-gap));
   padding: 0 var(--vkb-key-gap);
-  height: calc(var(--vkb-keyboard-tab) / 2);
-  width: min-content;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  max-width: calc(80% - var(--vkb-key-gap) * 2);
   background-color: var(--vkb-background);
+  box-sizing: border-box;
+  pointer-events: none;
+  white-space: nowrap;
 }
 
 .word-keyboard-temp-list {
@@ -26,6 +32,7 @@
   width: 80%;
   height: 100%;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .word-keyboard-temp-char {
