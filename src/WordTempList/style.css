@@ -61,12 +61,29 @@
   border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
   box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
   box-sizing: border-box;
+  border-radius: var(--vkb-key-borer-radius);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease, color 0.2s ease;
 }
 
 .word-keyboard-temp-right svg,
 .word-keyboard-temp-left svg {
   width: var(--vkb-keyboard-svg-size);
   height: var(--vkb-keyboard-svg-size);
+  transition: fill 0.2s ease;
+}
+
+.word-keyboard-temp-right:hover,
+.word-keyboard-temp-left:hover {
+  background-color: var(--vkb-key-active-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+}
+
+.word-keyboard-temp-right:hover svg,
+.word-keyboard-temp-left:hover svg {
+  fill: var(--vkb-key-active-font-color);
 }
 
 .word-keyboard-temp-char:active,
