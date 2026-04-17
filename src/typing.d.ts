@@ -2,6 +2,9 @@ import { ReactNode } from 'react';
 
 declare namespace VKB {
   type InputMode = 'zh' | 'en';
+  type ImageRecognitionOptions = {
+    inputMode?: InputMode;
+  };
 
   type KeyboardTabComponentProps = {
     themeMode?: string;

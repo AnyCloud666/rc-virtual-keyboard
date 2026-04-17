@@ -97,7 +97,10 @@ const useInput = ({
   /** 英文字母转单词候选 */
   onEnglishWords?: (value: string) => string[];
   /** 图片转文字，自定义实现图片转文字，默认采用 tesseract.js 识别图片文字 */
-  onImageToWord?: (url: string) => Promise<string[]>;
+  onImageToWord?: (
+    url: string,
+    options?: VKB.ImageRecognitionOptions,
+  ) => Promise<string[]>;
 }) => {
   /** 光标选择模式 */
   const cursorMode = useRef('index');
@@ -523,7 +526,9 @@ const useInput = ({
   /** 识别 */
   const onRecognition = async (url: string) => {
     try {
-      const result = await onImageToWord(url);
+      const result = await onImageToWord(url, {
+        inputMode,
+      });
       setChinese([...new Set(result)]);
     } catch (error) {
       console.log('error: ', error);
