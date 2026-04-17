@@ -145,6 +145,8 @@ declare namespace VKB {
   type VirtualKeyboardProps = KeyBoardCtxTypBase & {
     /** 显示移动句柄 & 允许移动 */
     showDragHandle?: boolean;
+    /** 是否显示外部唤起 icon */
+    showIcon?: boolean;
     /** 是否显示 */
     show?: boolean;
     /** 主题模式 */

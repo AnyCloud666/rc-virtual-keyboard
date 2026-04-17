@@ -1,6 +1,6 @@
 ---
 nav:
-  title: 常见问题
+  title: 问题
   order: 3
 ---
 

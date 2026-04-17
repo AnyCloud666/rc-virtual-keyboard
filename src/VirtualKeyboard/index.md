@@ -78,6 +78,7 @@ export default () => {
 | height             | 高度                                              | string            | 320px          |
 | zIndex             | 层级                                              | string\| number   | 9999           |
 | showDragHandle     | 显示移动句柄 & 允许移动                           | boolean           | true           |
+| showIcon           | 是否显示外部唤起 icon                             | boolean           | true           |
 | show               | 是否显示                                          | boolean           | false          |
 | virtualKeyboardTab | 自定义键盘 tab 内容                               | KeyboardTabItem[] | all            |
 | theme              | 自定义主题,当使用了主题变量时，主题变量的权重更高 | Partial\<Theme\>  | 参考默认 token |

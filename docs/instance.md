@@ -1,6 +1,6 @@
 ---
 nav:
-  title: 实例说明
+  title: 实例
   order: 2
 ---
 

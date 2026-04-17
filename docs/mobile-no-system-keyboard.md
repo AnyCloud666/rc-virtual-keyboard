@@ -1,6 +1,6 @@
 ---
 nav:
-  title: 移动端禁系统键盘
+  title: 移动端
   order: 5
 ---
 

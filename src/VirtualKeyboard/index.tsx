@@ -46,6 +46,7 @@ const VirtualKeyboard = ({
   virtualKeyboardTab,
   theme,
   showDragHandle,
+  showIcon = true,
   show = false,
   themeMode = 'light',
   positionMode,
@@ -207,19 +208,21 @@ const VirtualKeyboard = ({
 
   return (
     <>
-      <DragBlock
-        resizeOverRight={true}
-        onClick={() => {
-          setVisible(true);
-        }}
-      >
-        <KeyBoardSvg
-          style={{
-            width: iconWidth,
-            height: iconHeight,
+      {showIcon && (
+        <DragBlock
+          resizeOverRight={true}
+          onClick={() => {
+            setVisible(true);
           }}
-        />
-      </DragBlock>
+        >
+          <KeyBoardSvg
+            style={{
+              width: iconWidth,
+              height: iconHeight,
+            }}
+          />
+        </DragBlock>
+      )}
       <DragBlock
         autoKeepRight={false}
         init={{

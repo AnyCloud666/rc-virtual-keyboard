@@ -1,6 +1,6 @@
 ---
 nav:
-  title: Focus 弹出测试
+  title: Focus
   order: 4
 ---
 
