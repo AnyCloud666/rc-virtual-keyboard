@@ -17,18 +17,15 @@ nav:
 常用的符号键盘
 
 ```jsx
-import { SymbolKeyboard, useInput, keys } from 'react-virtual-keyboard';
+import { SymbolKeyboard } from 'rc-virtual-keyboard';
 
 export default () => {
-  const { onClick } = useInput({
-    defaultActiveKeyboard: keys.symbolType,
-  });
+  const onClick = (e) => {
+    console.log('SymbolKeyboard e: ', e);
+  };
   return (
-    <div>
-      <input />
-      <div style={{ width: 500, height: 320, margin: '0 auto' }}>
-        <SymbolKeyboard onClick={onClick} />
-      </div>
+    <div style={{ width: 500, height: 320, margin: '0 auto' }}>
+      <SymbolKeyboard onClick={onClick} />
     </div>
   );
 };
@@ -36,15 +33,9 @@ export default () => {
 
 ## 属性
 
-| 属性                     | 说明                           | 类型                                                                                                                              | 默认值 |
-| ------------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| style                    | 外部传入的样式，作用于整个容器 | CSSProperties                                                                                                                     | -      |
-| styles                   | 外部传入的样式，作用于单个容器 | { symbolKeyTab?: CSSProperties;symbolKeyContent?: CSSProperties;symbolKeyItem?: CSSProperties;symbolKeyItemTips?: CSSProperties;} | -      |
-| styles.symbolKeyTab      | 左侧选中区域                   | CSSProperties                                                                                                                     | -      |
-| styles.symbolKeyTabItem  | 左侧选中区域单个 tab           | CSSProperties                                                                                                                     | -      |
-| styles.symbolKeyContent  | 符号内容                       | CSSProperties                                                                                                                     | -      |
-| styles.symbolKeyItem     | 单个符号按键                   | CSSProperties                                                                                                                     | -      |
-| styles.symbolKeyItemTips | 单个符号按键提示               | CSSProperties                                                                                                                     | -      |
+| 属性 | 说明 | 类型 | 默认值 |
+| ---- | ---- | ---- | ------ |
+| -    | -    | -    | -      |
 
 ## 方法
 

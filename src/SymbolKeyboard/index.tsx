@@ -1,36 +1,26 @@
-import React, { CSSProperties, useState } from 'react';
-import { Backspace, Enter, symbolKeys } from '../keys';
-import { ReactComponent as DeleteSvg } from '../svg/delete.svg';
-import { ReactComponent as EnterSvg } from '../svg/enter.svg';
+import React, { useState } from 'react';
+import useContinuousTrigger from '../hooks/useContinuousTrigger';
+import { symbolKeys } from '../keys';
 import { VKB } from '../typing';
 import './style.css';
 
 const SymbolKeyboard = ({
-  style,
-  styles,
   onClick,
-  onMouseDown = (e) => e.preventDefault(),
 }: {
-  style?: CSSProperties;
-  styles?: {
-    symbolKeyTab?: CSSProperties;
-    symbolKeyTabItem?: CSSProperties;
-    symbolKeyContent?: CSSProperties;
-    symbolKeyItem?: CSSProperties;
-    symbolKeyItemTips?: CSSProperties;
-  };
-  onClick?: (e: VKB.KeyboardAttributeType) => void;
-  onMouseDown?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  onClick: (e: VKB.KeyboardAttributeType) => void;
 }) => {
   const [activeSymbol, setActiveSymbol] = useState(symbolKeys[0]);
+  const { startContinuousTrigger, stopContinuousTrigger } =
+    useContinuousTrigger<VKB.KeyboardAttributeType>({
+      onTrigger: onClick,
+    });
 
   return (
-    <div style={style} className="symbol-keyboard" onMouseDown={onMouseDown}>
-      <div style={styles?.symbolKeyTab} className="symbol-key-tab">
+    <div className="symbol-keyboard">
+      <div className="symbol-key-tab">
         {symbolKeys.map((item) => {
           return (
             <div
-              style={styles?.symbolKeyTabItem}
               className={`symbol-key-tab-item ${
                 activeSymbol.id === item.id ? 'symbol-key-tab-item-active' : ''
               }`}
@@ -42,20 +32,28 @@ const SymbolKeyboard = ({
           );
         })}
       </div>
-      <div style={styles?.symbolKeyContent} className="symbol-key-content">
+      <div className="symbol-key-content">
         {activeSymbol.value.map((item) => {
           return (
             <div
-              key={item.keyCode}
-              style={styles?.symbolKeyItem}
               className="symbol-key-item"
-              onClick={() => onClick && onClick(item)}
+              key={item.keyCode}
+              onClick={(e) => e.preventDefault()}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                startContinuousTrigger(item);
+              }}
+              onMouseUp={stopContinuousTrigger}
+              onMouseLeave={stopContinuousTrigger}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                startContinuousTrigger(item);
+              }}
+              onTouchEnd={stopContinuousTrigger}
+              onTouchCancel={stopContinuousTrigger}
             >
               {item.key}
-              <span
-                style={styles?.symbolKeyItemTips}
-                className="symbol-key-item-tips"
-              >
+              <span className="symbol-key-item-tips">
                 {(typeof activeSymbol.label === 'string' &&
                   activeSymbol.label?.slice(0, 1)) ??
                   ''}
@@ -63,20 +61,6 @@ const SymbolKeyboard = ({
             </div>
           );
         })}
-      </div>
-      <div className="symbol-key-control">
-        <div
-          className="symbol-key-control-delete"
-          onClick={() => onClick && onClick(Backspace)}
-        >
-          <DeleteSvg />
-        </div>
-        <div
-          className="symbol-key-control-enter"
-          onClick={() => onClick && onClick(Enter)}
-        >
-          <EnterSvg />
-        </div>
       </div>
     </div>
   );

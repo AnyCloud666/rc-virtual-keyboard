@@ -18,64 +18,26 @@ nav:
 
 ```jsx
 import { useState } from 'react';
-import {
-  useVirtualKeyboard,
-  keys,
-  LetterKeyboardTab,
-  NumberKeyboardTab,
-  SymbolKeyboardTab,
-  EditKeyboardTab,
-  SettingKeyboardTab,
-  WriteKeyboardTab,
-} from 'react-virtual-keyboard';
+import { useVirtualKeyboard } from 'rc-virtual-keyboard';
 
 export default () => {
-  const [show, setShow] = useState(false);
-  const [themeMode, setThemeMode] = useState(
-    localStorage?.getItem(keys.VKB_THEME_MODE) ?? 'light',
-  );
-  const [positionMode, setPositionMode] = useState(
-    localStorage?.getItem(keys.VKB_POSITION_MODE) ?? 'float',
-  );
   const [value, setValue] = useState('');
-  const { VirtualKeyboard, InitVirtualKeyBoardCtx, VirtualKeyboardProvide } =
-    useVirtualKeyboard();
+  const { VirtualKeyboard, VirtualKeyboardProvider } = useVirtualKeyboard();
 
   return (
     <>
-      {/* <div>可使用左侧虚拟键盘</div> */}
+      {/* <div>可使用右侧虚拟键盘</div> */}
       <input
-        placeholder="可使用左侧虚拟键盘"
+        placeholder="可使用右侧虚拟键盘"
         onInput={(e) => {
           setValue(e.target.value);
           console.log('value', e.target.value);
         }}
       />
       <div>value：{value}</div>
-      <VirtualKeyboardProvide
-        value={{
-          ...InitVirtualKeyBoardCtx,
-          width: '500px',
-          height: '320px',
-          show,
-          setShow,
-          themeMode,
-          setThemeMode,
-          positionMode,
-          setPositionMode,
-          theme: {},
-          virtualKeyboardTab: [
-            LetterKeyboardTab,
-            NumberKeyboardTab,
-            SymbolKeyboardTab,
-            WriteKeyboardTab,
-            EditKeyboardTab,
-            SettingKeyboardTab,
-          ],
-        }}
-      >
+      <VirtualKeyboardProvider>
         <VirtualKeyboard />
-      </VirtualKeyboardProvide>
+      </VirtualKeyboardProvider>
     </>
   );
 };
@@ -87,13 +49,14 @@ export default () => {
 | ------------------ | ------------------------------------------------- | ----------------- | -------------- |
 | width              | 宽度                                              | string            | 500px          |
 | height             | 高度                                              | string            | 320px          |
-| zIndex             | 层级                                              | string \| number  | 9999           |
+| zIndex             | 层级                                              | string\| number   | 9999           |
 | showDragHandle     | 显示移动句柄 & 允许移动                           | boolean           | true           |
 | show               | 是否显示                                          | boolean           | false          |
 | virtualKeyboardTab | 自定义键盘 tab 内容                               | KeyboardTabItem[] | all            |
 | theme              | 自定义主题,当使用了主题变量时，主题变量的权重更高 | Partial\<Theme\>  | 参考默认 token |
 | themeMode          | 主题模式                                          | string            | light          |
 | positionMode       | 位置模式                                          | string            | float          |
+| focusShow          | 输入框获得焦点时是否自动显示键盘                  | boolean           | true           |
 
 ## 方法
 

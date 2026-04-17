@@ -11,7 +11,7 @@ import { FloatPosition, LightTheme, numberType } from '../keys';
 import './style.css';
 
 import useInput from '../hooks/useInput';
-import { pinyin2ChineseV1 } from '../utils/pinyin';
+import { pinyin2ChineseV2 } from '../utils/pinyin';
 import tabs from './KeyboardTabs';
 /**
  * 组合键盘
@@ -28,11 +28,14 @@ const CompositionKeyboard = ({
   hiddenLabel = <BottomSvg />,
   themeMode = LightTheme.code,
   positionMode = FloatPosition.code,
-  onEnter,
-  onChange,
+  focusShow,
+  useKeydownAudio = 'Y',
+  keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
   onChangeShow,
   onThemeModeChange,
   onPositionModeChange,
+  onUseKeydownAudioChange,
+  onKeydownAudioUrlChange,
 }: {
   /** 显示拖拽 */
   showDragHandle?: boolean;
@@ -52,40 +55,52 @@ const CompositionKeyboard = ({
   themeMode?: string;
   /** 位置 */
   positionMode?: string;
-  /** enter 方法回调 */
-  onEnter?: () => void;
-  /** 输入回调 */
-  onChange?: (e: VKB.KeyboardAttributeType) => void;
+  /** 输入框 focus 时是否自动显示键盘 */
+  focusShow?: boolean;
+  /** 是否使用键盘按键声音 */
+  useKeydownAudio?: 'Y' | 'N';
+  /** 键盘按键声音地址 */
+  keydownAudioUrl?: string;
   /** 显示/隐藏虚拟键盘 */
   onChangeShow?: (b: boolean) => void;
   /** 主题改变 */
   onThemeModeChange?: (mode: string) => void;
   /** 位置模式改变 */
   onPositionModeChange?: (mode: string) => void;
+  /** 使用改变 */
+  onUseKeydownAudioChange?: (mode: 'Y' | 'N') => void;
+  /** 地址改变 */
+  onKeydownAudioUrlChange?: (url: string) => void;
 }) => {
   const {
     inputMode,
     inputValue,
     vkbThemeMode,
     vkbPositionMode,
-    words,
+    vkbKeydownAudio,
+    chinese,
     activeKeyboard,
     setActiveKeyboard,
-    onDraw,
     onClick,
     onMouseDown,
-    onSelectWord,
+    onSelectChinese,
     onChangeInputMode,
+    onRecognition,
+    onKeyDown,
+    onKeyUp,
   } = useInput({
     themeMode,
     positionMode,
     defaultActiveKeyboard,
-    onChange,
-    onEnter,
+    focusShow,
+    useKeydownAudio,
+    keydownAudioUrl,
     onChangeShow,
     onThemeModeChange,
     onPositionModeChange,
-    onPinyin2Words: pinyin2ChineseV1,
+    onUseKeydownAudioChange,
+    onKeydownAudioUrlChange,
+    onPinyin2Chinese: pinyin2ChineseV2,
   });
 
   return (
@@ -139,15 +154,18 @@ const CompositionKeyboard = ({
               inputMode={inputMode}
               themeMode={vkbThemeMode}
               positionMode={vkbPositionMode}
-              words={words}
+              vkbKeydownAudio={vkbKeydownAudio}
+              chinese={chinese}
               onClick={onClick}
-              onDraw={onDraw}
               onChangeInputMode={onChangeInputMode}
               inputValue={inputValue}
-              onSelectWord={onSelectWord}
+              onSelectChinese={onSelectChinese}
               onMouseDown={(e) => {
                 e.preventDefault();
               }}
+              onRecognition={onRecognition}
+              onKeyDown={onKeyDown}
+              onKeyUp={onKeyUp}
             />
           ) : (
             ''

@@ -26,7 +26,7 @@ import {
   EditKeyboardTab,
   SettingKeyboardTab,
   WriteKeyboardTab,
-} from 'react-virtual-keyboard';
+} from 'rc-virtual-keyboard';
 
 export default () => {
   const [show, setShow] = useState(false);
@@ -37,14 +37,13 @@ export default () => {
     localStorage?.getItem(keys.VKB_POSITION_MODE) ?? 'float',
   );
   const [value, setValue] = useState('');
-  const { VirtualKeyboard, InitVirtualKeyBoardCtx, VirtualKeyboardProvide } =
-    useVirtualKeyboard();
+  const { VirtualKeyboard, VirtualKeyboardProvider } = useVirtualKeyboard();
 
   return (
     <>
-      {/* <div>可使用左侧虚拟键盘</div> */}
+      {/* <div>可使用右侧虚拟键盘</div> */}
       <input
-        placeholder="可使用左侧虚拟键盘"
+        placeholder="可使用右侧虚拟键盘"
         onInput={(e) => {
           setValue(e.target.value);
           console.log('value', e.target.value);
@@ -73,30 +72,9 @@ export default () => {
         <input type="datetime" />
       </div>
 
-      <VirtualKeyboardProvide
-        value={{
-          ...InitVirtualKeyBoardCtx,
-          width: '500px',
-          height: '320px',
-          show,
-          setShow,
-          themeMode,
-          setThemeMode,
-          positionMode,
-          setPositionMode,
-          theme: {},
-          virtualKeyboardTab: [
-            LetterKeyboardTab,
-            NumberKeyboardTab,
-            SymbolKeyboardTab,
-            WriteKeyboardTab,
-            EditKeyboardTab,
-            SettingKeyboardTab,
-          ],
-        }}
-      >
+      <VirtualKeyboardProvider>
         <VirtualKeyboard />
-      </VirtualKeyboardProvide>
+      </VirtualKeyboardProvider>
     </>
   );
 };
@@ -216,4 +194,347 @@ export default () => {
     </>
   );
 };
+```
+
+## 禁用空格输入
+
+- 存在需求，不想输入空格 上加入 `data-vkb-not-empty` 属性去禁用
+
+```jsx
+export default () => {
+  return (
+    <>
+      <input placeholder="禁止输入空格" data-vkb-not-empty />
+    </>
+  );
+};
+```
+
+## 禁用两端空格输入，中间输入空格不禁用
+
+- 存在需求，不想输入两端空格 上加入 `data-vkb-not-empty-trim` 属性去禁用
+
+```jsx
+export default () => {
+  return (
+    <>
+      <input placeholder="禁止输入两端空格" data-vkb-not-empty-trim />
+    </>
+  );
+};
+```
+
+## 单个输入框禁止弹出虚拟键盘
+
+- 存在需求，单个输入框禁止弹出虚拟键盘，在 `input` 上加入 `data-vkb-auto-popup` 属性设置为 `false`
+
+```jsx
+export default () => {
+  return (
+    <>
+      <input
+        placeholder="单个输入框禁止弹出虚拟键盘"
+        data-vkb-auto-popup={false}
+        onInput={(e) => {
+          console.log('e: ', e);
+        }}
+      />
+    </>
+  );
+};
+```
+
+## 输入框失去焦点时不隐藏键盘
+
+- 默认情况下，输入框失去焦点后会隐藏键盘
+- 某个输入框失去焦点时不想隐藏键盘，可在 `input` 上加入 `data-vkb-blur-hidden={false}`
+
+```jsx
+export default () => {
+  return (
+    <>
+      <input placeholder="失去焦点时隐藏键盘" />
+      <input placeholder="失去焦点时不隐藏键盘" data-vkb-blur-hidden={false} />
+    </>
+  );
+};
+```
+
+## Uncaught SyntaxError: The requested module '/node_modules/rc-virtual-keyboard/dist/svg/bottom.svg?import' does not provide an export named 'ReactComponent'
+
+- 在 vite 项目中配置 vite-plugin-svgr
+
+```js
+defineConfig({
+  plugins: [
+    // 支持 import BottomSvg from './Bottom.svg?react' 写法
+    svgr(),
+    // 支持 import { ReactComponent as BottomSvg } from './Bottom.svg' 写法
+    svgr({
+      svgrOptions: {
+        exportType: 'named',
+        ref: true,
+        svgo: false,
+        titleProp: true,
+      },
+      include: '**/*.svg',
+    }),
+  ],
+});
+```
+
+## 按键声音播放异常
+
+- 检查默认的音频文件是否存在 /public/audio/typing-sound-02-229861.mp3
+- 导入正确的 keydownAudioUrl
+
+## antd Input 组件如何使用虚拟键盘
+
+- 在虚拟键盘内部，触发了 input, change 事件，将触发 Input 组件的 onInput, onChange, onKeyDown, onKeyPress, onKeyUp 事件
+- **_注意_**：onKeyDown，onKeyPress，onKeyUp 事件对象是不完整的，对应的`key`, `keyCode`, `code`可能存在差异
+- **_注意_**：只在字母键和数字键触发 onInput，onChange，onKeyDown，onKeyPress，onKeyUp 事件
+- **_注意_**：onInput 事件不同于 onChange 事件，用 onInput 事件 + 受控组件无法更新状态，推荐使用 onChange 事件 + 受控组件更新状态
+
+```js
+const setNativeInputValue = (target, value) => {
+  const prototype = Object.getPrototypeOf(target);
+  const descriptor = Object.getOwnPropertyDescriptor(prototype, 'value');
+
+  if (descriptor?.set) {
+    descriptor.set.call(target, value);
+    return;
+  }
+
+  target.value = value;
+};
+
+const dispatchInputEvent = (target, type) => {
+  target.dispatchEvent(
+    new Event(type, {
+      bubbles: true,
+      cancelable: true,
+    }),
+  );
+};
+
+const dispatchKeyboardEvent = (target, type, payload) => {
+  const event = new KeyboardEvent(type, {
+    bubbles: true,
+    cancelable: true,
+    key: payload.key,
+    code: payload.code,
+  });
+
+  Object.defineProperty(event, 'keyCode', {
+    configurable: true,
+    get: () => payload.keyCode,
+  });
+  Object.defineProperty(event, 'which', {
+    configurable: true,
+    get: () => payload.keyCode,
+  });
+
+  target.dispatchEvent(event);
+};
+
+const emitInputEvent = () => {
+  if (!activeInputRef.current) return;
+  dispatchInputEvent(activeInputRef.current, 'input');
+  dispatchInputEvent(activeInputRef.current, 'change');
+};
+
+/** 点击事件分发 */
+const onClick = (e: VKB.KeyboardAttributeType) => {
+  if (e.keyType === controlsType) {
+    onControl(e);
+  } else if (e.keyType === settingType) {
+    onSetting(e);
+  } else {
+    onInput(e);
+  }
+  if (audio && vkbKeydownAudio === 'Y') {
+    audio.pause();
+    audio.play();
+  }
+
+  if (!activeInputRef.current) return;
+  dispatchKeyboardEvent(activeInputRef.current, 'keypress', {
+    keyCode: e.keyCode,
+    code: e.code,
+    key: e.key,
+  });
+};
+/** 鼠标按下事件 模拟 键盘按下事件模式*/
+const onKeyDown = (e: VKB.KeyboardAttributeType) => {
+  if (!activeInputRef.current) return;
+  dispatchKeyboardEvent(activeInputRef.current, 'keydown', {
+    keyCode: e.keyCode,
+    code: e.code,
+    key: e.key,
+  });
+};
+/** 鼠标抬起事件 模拟 键盘抬起事件模式 */
+const onKeyUp = (e: VKB.KeyboardAttributeType) => {
+  if (!activeInputRef.current) return;
+  dispatchKeyboardEvent(activeInputRef.current, 'keyup', {
+    keyCode: e.keyCode,
+    code: e.code,
+    key: e.key,
+  });
+};
+```
+
+```jsx
+import { useState } from 'react';
+import { Input } from 'antd';
+export default () => {
+  const [value, setValue] = useState();
+
+  return (
+    <Input
+      placeholder="antd Input 组件使用虚拟键盘"
+      value={value}
+      onInput={(e) => {
+        console.log('e: onInput', e);
+        setValue(e.target.value);
+      }}
+      onChange={(e) => {
+        console.log('e: onChange', e);
+      }}
+      onKeyDown={(e) => {
+        console.log('e: onKeyDown', e);
+      }}
+      onKeyUp={(e) => {
+        console.log('e: onKeyUp', e);
+      }}
+      onKeyPress={(e) => {
+        console.log('e: onKeyPress', e);
+      }}
+    />
+  );
+};
+```
+
+## antd InputNumber 组件如何使用虚拟键盘
+
+- 在虚拟键盘内部，触发了 input, change 事件，将触发 InputNumber 组件的 onInput, onChange 事件
+
+```jsx
+import { useState, useRef } from 'react';
+import { InputNumber } from 'antd';
+
+export default () => {
+  const [value, setValue] = useState();
+
+  return (
+    <InputNumber
+      placeholder="antd InputNumber 组件使用虚拟键盘"
+      value={value}
+      onInput={(e) => {
+        console.log('e: onInput', e);
+      }}
+      onChange={(e) => {
+        console.log('e: onChange', e);
+      }}
+    />
+  );
+};
+```
+
+## ProComponents ProFormText 组件如何使用虚拟键盘
+
+- 在虚拟键盘内部，触发了 input, change 事件，将触发 ProFormText 组件的 onInput, onChange 事件
+
+```jsx
+import { useState } from 'react';
+import { ProFormText } from '@ant-design/pro-components';
+export default () => {
+  const [value, setValue] = useState();
+
+  return (
+    <ProFormText
+      placeholder="ProComponents ProFormText 组件使用虚拟键盘"
+      value={value}
+      fieldProps={{
+        onInput: (e) => {
+          console.log('e: onInput', e);
+          setValue(e.target.value);
+        },
+        onChange: (e) => {
+          console.log('e: onChange', e);
+        },
+      }}
+    />
+  );
+};
+```
+
+## ProComponents ProFormDigit 组件如何使用虚拟键盘
+
+- 在虚拟键盘内部，触发了 input, change 事件，将触发 ProFormDigit 组件的 onInput, onChange 事件
+
+```jsx
+import { ProFormDigit } from '@ant-design/pro-components';
+export default () => {
+  return (
+    <ProFormDigit
+      placeholder="ProComponents ProFormDigit 组件使用虚拟键盘"
+      fieldProps={{
+        onInput: (e) => {
+          console.log('ProFormDigit: onInput', e);
+        },
+        onChange: (e) => {
+          console.log('ProFormDigit: onChange', e);
+        },
+      }}
+    />
+  );
+};
+```
+
+## antd form 表单中无需监听 onInput onChange 事件
+
+```jsx
+import { useState, useRef } from 'react';
+import { InputNumber, Form, Button } from 'antd';
+
+export default () => {
+  const [value, setValue] = useState();
+
+  return (
+    <Form
+      onFinish={(value) => {
+        console.log('value: ', value);
+      }}
+    >
+      <Form.Item name="number" label="数组">
+        <InputNumber
+          placeholder="antd InputNumber 组件使用虚拟键盘"
+          value={value}
+        />
+      </Form.Item>
+
+      <Form.Item>
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
+      </Form.Item>
+    </Form>
+  );
+};
+```
+
+## rc-virtual-keyboard 文档中可以复制，粘贴，但是本地运行就不可以了
+
+- 1. `navigator.clipboard`, `document.execCommand('paste')` 需要 https 才支持，安全策略
+- 2. 参考 [navigator.clipboard](https://developer.mozilla.org/zh-CN/docs/Web/API/Navigator/clipboard)
+- 3. 参考 [execCommand](https://developer.mozilla.org/zh-CN/docs/Web/API/Document/execCommand#paste)
+
+解决方法：
+
+- 将链接协议改为 https
+- 进行浏览器设置->站点权限->剪切板->允许
+
+```
+
 ```

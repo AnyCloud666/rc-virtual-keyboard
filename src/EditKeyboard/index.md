@@ -17,18 +17,15 @@ nav:
 常用的编辑键盘
 
 ```jsx
-import { EditKeyboard, useInput, keys } from 'react-virtual-keyboard';
+import { EditKeyboard } from 'rc-virtual-keyboard';
 
 export default () => {
-  const { onClick } = useInput({
-    defaultActiveKeyboard: keys.editType,
-  });
+  const onClick = (e) => {
+    console.log('EditKeyboard e: ', e);
+  };
   return (
-    <div>
-      <input value="123456789" />
-      <div style={{ width: 500, height: 320, margin: '0 auto' }}>
-        <EditKeyboard onClick={onClick} />
-      </div>
+    <div style={{ width: 500, height: 320, margin: '0 auto' }}>
+      <EditKeyboard onClick={onClick} />
     </div>
   );
 };
@@ -36,13 +33,9 @@ export default () => {
 
 ## 属性
 
-| 属性                  | 说明                           | 类型                                                                                   | 默认值 |
-| --------------------- | ------------------------------ | -------------------------------------------------------------------------------------- | ------ |
-| style                 | 外部传入的样式，作用于整个容器 | CSSProperties                                                                          | -      |
-| styles                | 外部传入的样式，作用于单个元素 | {keyCursor?: CSSProperties;cursorItem?: CSSProperties;editKeyControl?: CSSProperties;} | -      |
-| styles.keyCursor      | 编辑键容器样式                 | CSSProperties                                                                          | -      |
-| styles.cursorItem     | 单个编辑键                     | CSSProperties                                                                          | -      |
-| styles.editKeyControl | 控制键                         | CSSProperties                                                                          | -      |
+| 属性 | 说明 | 类型 | 默认值 |
+| ---- | ---- | ---- | ------ |
+| -    | -    | -    | -      |
 
 ## 方法
 

@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import { ReactComponent as BackgroundAudioSvg } from './svg/background-audio.svg';
 import { ReactComponent as BottomSvg } from './svg/bottom.svg';
 import { ReactComponent as DeleteSvg } from './svg/delete.svg';
 import { ReactComponent as EnterSvg } from './svg/enter.svg';
@@ -37,11 +38,14 @@ export const EN = 'en';
 export const VKB_THEME_MODE = 'VKB_THEME_MODE';
 /** 位置模式key */
 export const VKB_POSITION_MODE = 'VKB_POSITION_MODE';
+/** 按键音效key */
+export const VKB_KEYDOWN_MODE = 'VKB_KEYDOWN_MODE';
 
 /** ---------------------------功能控制类--------------------------- */
 /** 删除 */
 export const Backspace: VKB.KeyboardAttributeType = {
-  key: <DeleteSvg />,
+  key: 'Backspace',
+  renderKey: <DeleteSvg />,
   code: 'Backspace',
   keyCode: 8,
   keyType: controlsType,
@@ -49,7 +53,8 @@ export const Backspace: VKB.KeyboardAttributeType = {
 };
 /** 回车 */
 export const Enter: VKB.KeyboardAttributeType = {
-  key: <EnterSvg />,
+  key: 'Enter',
+  renderKey: <EnterSvg />,
   code: 'Enter',
   keyCode: 13,
   keyType: controlsType,
@@ -64,16 +69,25 @@ export const Tab: VKB.KeyboardAttributeType = {
 };
 /** 英文切换 */
 export const Shift: VKB.KeyboardAttributeType = {
-  key: '英',
+  key: 'Shift',
+  renderKey: '英',
   code: 'Shift',
   keyCode: 16,
   keyType: controlsType,
 };
 /** 切换大小写 */
 export const CapsLock: VKB.KeyboardAttributeType = {
-  key: '小',
+  key: 'CapsLock',
+  renderKey: '小',
   code: 'CapsLock',
   keyCode: 20,
+  keyType: controlsType,
+};
+/** 清除键 */
+export const Clear: VKB.KeyboardAttributeType = {
+  code: 'Clear',
+  key: 'Clear',
+  keyCode: -12,
   keyType: controlsType,
 };
 
@@ -869,7 +883,8 @@ export const Dollars: VKB.KeyboardAttributeType = {
 /** ---------------------------主题--------------------------- */
 /** 亮色 */
 export const LightTheme: VKB.KeyboardAttributeType = {
-  key: <SunSvg />,
+  key: 'light',
+  renderKey: <SunSvg />,
   code: 'light',
   keyCode: 9001,
   keyType: settingType,
@@ -877,7 +892,8 @@ export const LightTheme: VKB.KeyboardAttributeType = {
 };
 /** 暗色 */
 export const DarkTheme: VKB.KeyboardAttributeType = {
-  key: <MoonSvg />,
+  key: 'dark',
+  renderKey: <MoonSvg />,
   code: 'dark',
   keyCode: 9002,
   keyType: settingType,
@@ -887,7 +903,8 @@ export const DarkTheme: VKB.KeyboardAttributeType = {
 /** ---------------------------位置--------------------------- */
 /** 固定下方 */
 export const FixedBottomPosition: VKB.KeyboardAttributeType = {
-  key: <BottomSvg />,
+  key: 'fixedBottom',
+  renderKey: <BottomSvg />,
   code: 'fixedBottom',
   keyCode: 10001,
   keyType: settingType,
@@ -895,7 +912,8 @@ export const FixedBottomPosition: VKB.KeyboardAttributeType = {
 };
 /** 固定上方 */
 export const FixedTopPosition: VKB.KeyboardAttributeType = {
-  key: <TopSvg />,
+  key: 'fixedTop',
+  renderKey: <TopSvg />,
   code: 'fixedTop',
   keyCode: 10002,
   keyType: settingType,
@@ -903,7 +921,8 @@ export const FixedTopPosition: VKB.KeyboardAttributeType = {
 };
 /** 固定左侧 */
 export const FixedLeftPosition: VKB.KeyboardAttributeType = {
-  key: <LeftSvg />,
+  key: 'fixedLeft',
+  renderKey: <LeftSvg />,
   code: 'fixedLeft',
   keyCode: 10003,
   keyType: settingType,
@@ -911,7 +930,8 @@ export const FixedLeftPosition: VKB.KeyboardAttributeType = {
 };
 /** 固定右侧 */
 export const FixedRightPosition: VKB.KeyboardAttributeType = {
-  key: <RightSvg />,
+  key: 'fixedRight',
+  renderKey: <RightSvg />,
   code: 'fixedRight',
   keyCode: 10004,
   keyType: settingType,
@@ -919,11 +939,23 @@ export const FixedRightPosition: VKB.KeyboardAttributeType = {
 };
 /** 浮动 */
 export const FloatPosition: VKB.KeyboardAttributeType = {
-  key: <FloatSvg />,
+  key: 'float',
+  renderKey: <FloatSvg />,
   code: 'float',
   keyCode: 10005,
   keyType: settingType,
   description: '浮动',
+};
+
+/** ---------------------------位置--------------------------- */
+/** 开启 */
+export const BackgroundAudio: VKB.KeyboardAttributeType = {
+  key: 'backgroundAudio',
+  renderKey: <BackgroundAudioSvg />,
+  code: 'backgroundAudio',
+  keyCode: 11001,
+  keyType: settingType,
+  description: '开启按键音效',
 };
 
 /** 数字键 */
@@ -932,19 +964,23 @@ export const numberKeys: VKB.KeyboardAttributeType[] = [
   Numpad2,
   Numpad3,
   NumpadAdd,
+  Backspace,
+
   Numpad4,
   Numpad5,
   Numpad6,
   NumpadSubtract,
+
   Numpad7,
   Numpad8,
   Numpad9,
-  NumpadDecimal,
-  Numpad0,
   NumpadMultiply,
+  Enter,
+
+  Numpad0,
+  NumpadDecimal,
+  NumpadPercentage,
   NumpadDivide,
-  // Enter,
-  Backspace,
 ];
 
 /** 字母键 */
@@ -1120,4 +1156,8 @@ export const positionKeys: VKB.KeyboardAttributeType[] = [
   FixedTopPosition,
   FixedLeftPosition,
   FixedRightPosition,
+];
+/** 背景音乐键 */
+export const backgroundAudioKeys: VKB.KeyboardAttributeType[] = [
+  BackgroundAudio,
 ];

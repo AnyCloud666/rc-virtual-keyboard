@@ -1,6 +1,5 @@
 import { useEventListener } from 'ahooks';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { log } from 'react-virtual-keyboard/utils/log';
 import {
   ArrowDown,
   ArrowLeft,
@@ -8,7 +7,9 @@ import {
   ArrowRight,
   ArrowRightEnd,
   ArrowUp,
+  BackgroundAudio,
   Backspace,
+  Clear,
   Copy,
   DarkTheme,
   EN,
@@ -33,20 +34,38 @@ import {
   settingType,
 } from '../keys';
 import { VKB } from '../typing';
-import imgToWordV1 from '../utils/ocr';
-import { pinyin2ChineseV1 } from '../utils/pinyin';
+import { english2WordsV1 } from '../utils/english';
+import { imgToWordV1 } from '../utils/imgToWord';
+import { pinyin2ChineseV2 } from '../utils/pinyin';
+import {
+  Simulate,
+  SimulateEventData,
+  setNativeInputValue,
+} from '../utils/simulate';
+import {
+  EFFECTIVE_INPUT_TYPES,
+  INVALID_INPUT_TYPES,
+  NEED_HANDLE_INPUT_TYPES,
+} from './constants';
+
+let audio: HTMLAudioElement;
 
 const useInput = ({
   themeMode = LightTheme.code,
   positionMode = FloatPosition.code,
   defaultActiveKeyboard = numberType,
-  onChange,
-  onEnter,
+  focusShow,
+  useKeydownAudio = 'Y',
+  keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
+  autoPopup = true,
   onChangeShow,
   onThemeModeChange,
   onPositionModeChange,
-  onPinyin2Words = pinyin2ChineseV1,
-  onImg2Words = imgToWordV1,
+  onUseKeydownAudioChange,
+  onKeydownAudioUrlChange,
+  onPinyin2Chinese = pinyin2ChineseV2,
+  onEnglishWords = english2WordsV1,
+  onImageToWord = imgToWordV1,
 }: {
   /** 主题模式 */
   themeMode?: string;
@@ -54,46 +73,32 @@ const useInput = ({
   positionMode?: string;
   /** 默认活跃的键盘 */
   defaultActiveKeyboard?: string;
-  /** enter 方法回调 */
-  onEnter?: () => void;
-  /** 输入回调 */
-  onChange?: (e: VKB.KeyboardAttributeType) => void;
+  /** 输入框 focus 时是否自动显示键盘，全局关闭后可通过 data-vkb-show 单独开启 */
+  focusShow?: boolean;
+  /** 使用按键音效 */
+  useKeydownAudio?: 'Y' | 'N';
+  /** 按键音效url */
+  keydownAudioUrl?: string;
+  /** 自动弹出，兼容旧参数 */
+  autoPopup?: boolean;
   /** 显示/隐藏 */
   onChangeShow?: (s: boolean) => void;
   /** 主题改变 */
   onThemeModeChange?: (mode: string) => void;
   /** 位置模式改变 */
   onPositionModeChange?: (mode: string) => void;
+  /** 开启按键音效 */
+  onUseKeydownAudioChange?: (mode: 'Y' | 'N') => void;
+  onKeydownAudioUrlChange?: (url: string) => void;
   /** 拼音转汉字，自定义实现拼音转汉字，默认采用最简单的单字输入模式 */
-  onPinyin2Words?: (pinyin: string) => { pinyin: string; words: string[] };
-  /** 图片转字符 */
-  onImg2Words?: (imgUrl: string) => Promise<string[]>;
+  onPinyin2Chinese?: (value: string) => { pinyin: string; chinese: string[] };
+  /** 英文字母转单词候选 */
+  onEnglishWords?: (value: string) => string[];
+  /** 图片转文字，自定义实现图片转文字，默认采用 tesseract.js 识别图片文字 */
+  onImageToWord?: (url: string) => Promise<string[]>;
 }) => {
-  /** 光标选择模式 index 插入模式， select 选择模式 */
-  const cursorMode = useRef<'index' | 'select'>('index');
-  /** 无效 type */
-  const invalidInputType = [
-    'week',
-    'month',
-    'time',
-    'datetime-local',
-    'date',
-    'datetime',
-    'submit',
-    'reset',
-    'range',
-    'radio',
-    'image',
-    'hidden',
-    'file',
-    'color',
-    'checkbox',
-    'button',
-  ];
-  /** 有效 type */
-  const effectiveInputType = ['text', 'search', 'tel', 'password', 'url'];
-  /** 需处理 type */
-  const needHandleInputType = ['number', 'email'];
+  /** 光标选择模式 */
+  const cursorMode = useRef('index');
   /** input type 为 number，email 造成的一些异常 selection 相关属性无法使用 */
   const inputType = useRef('');
   /** 当前活动的input */
@@ -106,15 +111,18 @@ const useInput = ({
   const [inputMode, setInputMode] = useState<VKB.InputMode>(EN);
   /** 输入的值 */
   const [inputValue, setInputValue] = useState('');
-  /** 当前拼音转成的字符 */
-  const [words, setWords] = useState<string[]>([]);
+  /** 当前拼音转成的中文 */
+  const [chinese, setChinese] = useState<string[]>([]);
   /** 删除inputValue 不立马删除targetValue中的值 */
   const jumpDelete = useRef(false);
   /** 焦点状态 */
   const cacheInputFocus = useRef(new WeakSet());
+  /** blur 延迟定时器，避免输入框切换时闪烁 */
+  const blurTimer = useRef<number>();
+  /** focus 弹出配置，autoPopup 作为兼容别名保留 */
+  const enableFocusShow = focusShow ?? autoPopup;
 
   /** 颜色主题 */
-
   const [vkbThemeMode, setVkbThemeMode] = useState(
     themeMode ?? localStorage?.getItem(VKB_THEME_MODE) ?? 'float',
   );
@@ -122,56 +130,116 @@ const useInput = ({
   const [vkbPositionMode, setVkbPositionMode] = useState(
     positionMode ?? localStorage?.getItem(VKB_POSITION_MODE) ?? 'float',
   );
+  /** 按键音效 */
+  const [vkbKeydownAudio, setVkbKeydownAudio] = useState(useKeydownAudio);
 
-  /**
-   * 禁用 type 类型异常日志提示
-   *
-   */
-  const disabledTypeLog = () => {
-    log({
-      type: 'error',
-      message: `disabled type ${[...invalidInputType, ...needHandleInputType]}`,
-    });
-    log({
-      type: 'error',
-      message:
-        'if you need type="number" please use data-vkb-type="number" replace',
-    });
+  const isSupportedInput = (
+    target: EventTarget | null,
+  ): target is HTMLInputElement => {
+    const activeElement = target as HTMLInputElement | null;
+
+    return !!(
+      activeElement?.tagName === 'INPUT' &&
+      [...EFFECTIVE_INPUT_TYPES, ...NEED_HANDLE_INPUT_TYPES].includes(
+        activeElement?.type ?? '',
+      ) &&
+      activeElement.dataset?.vkbDisabled !== 'true'
+    );
+  };
+
+  const shouldShowOnFocus = (inputEl: HTMLInputElement) => {
+    const vkbShow = inputEl.dataset?.vkbShow;
+    const vkbAutoPopup = inputEl.dataset?.vkbAutoPopup;
+
+    if (vkbShow === 'true') return true;
+    if (vkbShow === 'false') return false;
+    if (vkbAutoPopup === 'true') return true;
+    if (vkbAutoPopup === 'false') return false;
+
+    return enableFocusShow;
+  };
+
+  const shouldHideOnBlur = (inputEl: HTMLInputElement | null) => {
+    if (!inputEl) return true;
+
+    return inputEl.dataset?.vkbBlurHidden !== 'false';
+  };
+
+  const bindInputListener = (inputEl: HTMLInputElement) => {
+    if (!cacheInputFocus.current.has(inputEl)) {
+      cacheInputFocus.current.add(inputEl);
+      inputEl.addEventListener('blur', onBlur);
+      inputEl.addEventListener('focus', onFocus);
+    }
+  };
+
+  const activateInput = (
+    inputEl: HTMLInputElement,
+    options?: { syncShow?: boolean },
+  ) => {
+    inputType.current = inputEl.dataset?.vkbType ?? '';
+    activeInputRef.current = inputEl;
+    bindInputListener(inputEl);
+
+    if (options?.syncShow) {
+      onChangeShow && onChangeShow(shouldShowOnFocus(inputEl));
+    }
   };
 
   /** 失去焦点 */
-  const onBlur = useCallback(() => {
-    activeInputRef.current = null;
-    inputType.current = '';
-  }, []);
+  const onBlur = useCallback(
+    (e: FocusEvent) => {
+      window.clearTimeout(blurTimer.current);
+      blurTimer.current = window.setTimeout(() => {
+        const nextActiveElement = document.activeElement;
+        const currentInput = e.target as HTMLInputElement | null;
+
+        // 输入框一旦真正失焦，就清空当前中英文组合输入的待选区，
+        // 避免候选内容残留到下一次输入或切换到其他输入框时产生干扰。
+        setInputValue('');
+        setChinese([]);
+
+        if (isSupportedInput(nextActiveElement)) {
+          return;
+        }
+
+        if (activeInputRef.current === currentInput) {
+          activeInputRef.current = null;
+          inputType.current = '';
+        }
+
+        if (shouldHideOnBlur(currentInput)) {
+          onChangeShow && onChangeShow(false);
+        }
+      }, 0);
+    },
+    [onChangeShow],
+  );
   /** 获得焦点 */
-  const onFocus = useCallback(() => {
-    onChangeShow && onChangeShow(true);
-  }, []);
+  const onFocus = useCallback(
+    (e: FocusEvent) => {
+      window.clearTimeout(blurTimer.current);
+      const activeElement = e.target as HTMLInputElement;
+
+      if (!isSupportedInput(activeElement)) {
+        return;
+      }
+
+      activateInput(activeElement, { syncShow: true });
+    },
+    [onChangeShow, enableFocusShow],
+  );
 
   /** 寻找聚焦有效的input */
-  const findFocusElement = (e: MouseEvent) => {
+  const findFocusElement = (e: MouseEvent | FocusEvent) => {
     const activeElement = e.target as HTMLInputElement;
-    const vkbDisabled = activeElement.dataset?.vkbDisabled;
-    const vkbType = activeElement.dataset?.vkbType ?? '';
-    if (
-      activeElement?.tagName === 'INPUT' &&
-      [...effectiveInputType, ...needHandleInputType].includes(
-        activeElement?.type ?? '',
-      ) &&
-      vkbDisabled !== 'true'
-    ) {
-      inputType.current = vkbType;
-      activeInputRef.current = activeElement;
-      if (!cacheInputFocus.current.has(activeElement)) {
-        onChangeShow && onChangeShow(true);
-        cacheInputFocus.current.add(activeElement);
-        activeInputRef.current.addEventListener('blur', onBlur);
-        activeInputRef.current.addEventListener('focus', onFocus);
-      }
+
+    if (isSupportedInput(activeElement)) {
+      activateInput(activeElement, { syncShow: true });
     }
   };
   useEventListener('click', findFocusElement, { target: document.body });
+  useEventListener('focusin', findFocusElement, { target: document.body });
 
   /**
    * 禁用类型
@@ -180,7 +248,111 @@ const useInput = ({
    * @return {*}
    */
   const validateInputType = (inputEl: HTMLInputElement) => {
-    return [...invalidInputType, ...needHandleInputType].includes(inputEl.type);
+    return [...INVALID_INPUT_TYPES, ...NEED_HANDLE_INPUT_TYPES].includes(
+      inputEl.type,
+    );
+  };
+
+  const reportInvalidInputType = () => {
+    console.error('disabled type', [
+      ...INVALID_INPUT_TYPES,
+      ...NEED_HANDLE_INPUT_TYPES,
+    ]);
+    console.error(
+      'if you need type="number" please use data-vkb-type="number" replace',
+    );
+  };
+
+  const getSelectionInfo = (inputEl: HTMLInputElement) => {
+    const selectionStart = inputEl.selectionStart ?? 0;
+    const selectionEnd = inputEl.selectionEnd ?? 0;
+
+    return {
+      value: inputEl.value,
+      selectionStart,
+      selectionEnd,
+      isCollapsed: selectionStart === selectionEnd,
+    };
+  };
+
+  const applyInputValue = (
+    inputEl: HTMLInputElement,
+    value: string,
+    selectionStart?: number,
+    selectionEnd?: number,
+  ) => {
+    setNativeInputValue(inputEl, value);
+
+    if (
+      typeof selectionStart === 'number' &&
+      typeof selectionEnd === 'number' &&
+      typeof inputEl.setSelectionRange === 'function'
+    ) {
+      inputEl.setSelectionRange(selectionStart, selectionEnd);
+    }
+  };
+
+  const updateChineseCandidates = (value: string) => {
+    const transformMsg = (onPinyin2Chinese && onPinyin2Chinese(value)) || {
+      pinyin: value,
+      chinese: [],
+    };
+
+    setInputValue(value);
+    setChinese([value, ...transformMsg.chinese]);
+  };
+
+  /**
+   * 更新字母键候选
+   *
+   * @description
+   * 中文模式走拼音转汉字，英文模式走单词前缀匹配。
+   * 为了保持两种模式交互一致，候选首位始终保留原始输入值，用户可以直接回填原文。
+   */
+  const updateLetterCandidates = (value: string) => {
+    if (!value) {
+      setInputValue('');
+      setChinese([]);
+      return;
+    }
+
+    if (inputMode === ZH) {
+      updateChineseCandidates(value);
+      return;
+    }
+
+    const words = onEnglishWords?.(value) || [];
+    setInputValue(value);
+    setChinese([value, ...words.filter((word) => word !== value)]);
+  };
+
+  /**
+   * 当前是否处于字母组合输入模式
+   *
+   * @description
+   * 仅在字母键盘下对英文字母/拼音字母进入候选态，
+   * 其余键位仍然保持原来的直接输入行为。
+   */
+  const shouldUseLetterComposition = (key: string) => {
+    return activeKeyboard === letterType && /^[a-zA-Z]$/.test(key);
+  };
+
+  /**
+   * 提交当前候选值
+   *
+   * @param {string} [appendText]
+   * @return {boolean}
+   *
+   * @description
+   * 英文模式下支持按空格/回车直接提交当前组合串，
+   * 与中文候选点击确认保持一致，提交后可按需追加空格等字符。
+   */
+  const commitCurrentCandidate = (appendText = '') => {
+    if (!activeInputRef.current || !inputValue) return false;
+
+    const candidate = chinese[0] || inputValue;
+    onSelectChinese(candidate, appendText);
+    return true;
   };
 
   /**
@@ -195,64 +367,97 @@ const useInput = ({
     return false;
   };
 
-  /** 触发 input 事件 */
+  /**
+   * 触发输入相关事件
+   *
+   * @description
+   * 这里不再依赖 react-dom/test-utils，而是派发自定义模拟事件。
+   * 顺序保持为先 input 再 change，尽量贴近 React / antd 对输入值变更的感知方式。
+   */
   const emitInputEvent = () => {
-    if (activeInputRef.current) {
-      const inputEvent = new Event('input', { bubbles: true });
-      // 标记 触发input事件
-      (inputEvent as any).simulated = true;
-      activeInputRef.current.dispatchEvent(inputEvent);
+    if (!activeInputRef.current) return;
+    Simulate?.input?.(activeInputRef.current);
+    Simulate?.change?.(activeInputRef.current);
+  };
+
+  /** 识别 */
+  const onRecognition = async (url: string) => {
+    try {
+      const result = await onImageToWord(url);
+      setChinese([...new Set(result)]);
+    } catch (error) {
+      console.log('error: ', error);
+      setChinese([]);
     }
   };
 
   /** 输入 */
-  const onInput = async (e: VKB.KeyboardAttributeType) => {
+  const onInput = (e: VKB.KeyboardAttributeType) => {
     if (activeInputRef.current && typeof e.key === 'string') {
+      let { value, selectionStart, selectionEnd, isCollapsed } =
+        getSelectionInfo(activeInputRef.current);
+      const vkbNotEmpty = activeInputRef.current.dataset?.vkbNotEmpty;
+      const vkbNotEmptyTrim = activeInputRef.current.dataset?.vkbNotEmptyTrim;
       const vkbNotInput =
         activeInputRef.current.dataset?.vkbNotInput?.split(',');
-
       // 处理类型
       // if (!(await handleInputType(activeInputRef.current))) return;
 
       if (validateInputType(activeInputRef.current)) {
-        disabledTypeLog();
+        reportInvalidInputType();
         return;
       }
 
       if (vkbNotInput?.includes(e.key)) {
         return;
       }
+      if (vkbNotEmpty === 'true' && e.code === Space.code) {
+        return;
+      }
       if (
-        inputMode === ZH &&
-        e.key !== Space.code &&
-        activeKeyboard === letterType
+        vkbNotEmptyTrim === 'true' &&
+        e.code === Space.code &&
+        (selectionStart === 0 || selectionEnd === value.length)
       ) {
-        const value = inputValue + e.key;
-
-        const transformMsg = (onPinyin2Words && onPinyin2Words(value)) || {
-          pinyin: value,
-          words: [],
-        };
-        setInputValue(value);
-        setWords([value, ...transformMsg.words]);
+        return;
+      }
+      if (
+        shouldUseLetterComposition(e.key) &&
+        ((inputMode === ZH && e.key !== Space.code) || inputMode === EN)
+      ) {
+        updateLetterCandidates(inputValue + e.key.toLowerCase());
         jumpDelete.current = false;
+      } else if (
+        inputMode === EN &&
+        inputValue &&
+        activeKeyboard === letterType &&
+        e.code === Space.code
+      ) {
+        commitCurrentCandidate(' ');
       } else {
-        let value = activeInputRef.current.value;
-
-        const selectionEnd = activeInputRef.current.selectionEnd || 0;
-
         // 处理 type = 'number' 时输入的其他字符
         if (isAllowInputNumber(inputType.current, value, e.key)) return;
 
-        value =
-          value.slice(0, selectionEnd) + e.key + value.slice(selectionEnd);
+        if (isCollapsed) {
+          // 相同进行插入
+          value =
+            value.slice(0, selectionStart) +
+            e.key +
+            value.slice(selectionStart);
+        } else {
+          // 不同的将选中的进行的进行替换为最新的
+          value =
+            value.slice(0, selectionStart) + e.key + value.slice(selectionEnd);
+        }
 
-        activeInputRef.current.setSelectionRange(
-          selectionEnd + 1,
-          selectionEnd + 1,
+        // 通过原生 setter 更新 value，尽量保证 React 受控组件、
+        // antd InputNumber / Form 等场景能正确感知到值变化。
+        applyInputValue(
+          activeInputRef.current,
+          value,
+          selectionStart + 1,
+          selectionStart + 1,
         );
-        // 修改 value
-        activeInputRef.current.value = value;
 
         emitInputEvent();
       }
@@ -261,45 +466,39 @@ const useInput = ({
 
   /** 删除 */
   const onBackspace = (e: VKB.KeyboardAttributeType) => {
-    if (inputMode === ZH) {
-      const value = inputValue.slice(0, inputValue.length - 1);
-      const transformMsg = (onPinyin2Words && onPinyin2Words(value)) || {
-        pinyin: value,
-        words: [],
-      };
-      setInputValue(value);
-      setWords([value, ...transformMsg.words]);
-
-      if (value) return;
-
-      if (!jumpDelete.current) {
-        jumpDelete.current = true;
-        return;
-      }
-    }
-
     if (activeInputRef.current) {
       if (validateInputType(activeInputRef.current)) {
-        disabledTypeLog;
+        reportInvalidInputType();
         return;
+      }
+
+      if (inputMode === ZH || inputMode === EN) {
+        const value = inputValue.slice(0, inputValue.length - 1);
+        updateLetterCandidates(value);
+
+        if (value) return;
+
+        if (!value && !jumpDelete.current) {
+          jumpDelete.current = true;
+          return;
+        }
       }
 
       // 获取光标位置
-      const selectionStart = activeInputRef.current.selectionStart ?? 0;
-      const selectionEnd = activeInputRef.current.selectionEnd ?? 0;
-      const value = activeInputRef.current.value;
+      const { selectionStart, selectionEnd, value, isCollapsed } =
+        getSelectionInfo(activeInputRef.current);
 
       const tempValue =
-        value.slice(
-          0,
-          selectionStart - (selectionStart === selectionEnd ? 1 : 0),
-        ) + value.slice(selectionEnd);
-      activeInputRef.current.value = tempValue;
-      activeInputRef.current.setSelectionRange(
-        selectionStart - (selectionStart === selectionEnd ? 1 : 0),
-        selectionStart === selectionEnd ? selectionEnd - 1 : selectionStart,
+        value.slice(0, selectionStart - (isCollapsed ? 1 : 0)) +
+        value.slice(selectionEnd);
+      applyInputValue(
+        activeInputRef.current,
+        tempValue,
+        selectionStart - (isCollapsed ? 1 : 0),
+        isCollapsed ? selectionEnd - 1 : selectionStart,
       );
 
+      // 删除后补发输入事件，驱动上层受控状态同步。
       emitInputEvent();
     }
   };
@@ -308,72 +507,52 @@ const useInput = ({
   const onCursor = (e: VKB.KeyboardAttributeType) => {
     if (activeInputRef.current) {
       if (validateInputType(activeInputRef.current)) {
-        disabledTypeLog();
+        reportInvalidInputType();
         return;
       }
 
-      const selectionStart = activeInputRef.current.selectionStart ?? 0;
-
-      const selectionEnd = activeInputRef.current.selectionEnd ?? 0;
-
+      const { selectionStart, selectionEnd, value } = getSelectionInfo(
+        activeInputRef.current,
+      );
       let index = 0;
-      const value = activeInputRef.current.value;
       const maxLength = value.length;
 
+      // TODO: 待优化
       if (cursorMode.current === 'index') {
-        // 插入模式
         switch (e.code) {
-          // 上 || 最左 光标位置放置到最前面
           case ArrowUp.code:
           case ArrowLeftFirst.code:
             activeInputRef.current.setSelectionRange(0, 0);
             break;
-          // 下 || 最右 光标位置放置到最后面
-          case ArrowDown.code:
-          case ArrowRightEnd.code:
-            activeInputRef.current.setSelectionRange(maxLength, maxLength);
-            break;
-          // 左 光标位置向前移动一位
           case ArrowLeft.code:
             index = selectionEnd - 1 > 0 ? selectionEnd - 1 : 0;
             activeInputRef.current.setSelectionRange(index, index);
             break;
-          // 右 光标位置向后移动一位
           case ArrowRight.code:
             index = selectionEnd + 1 > maxLength ? maxLength : selectionEnd + 1;
             activeInputRef.current.setSelectionRange(index, index);
             break;
-          // 选择全部 光标范围设置为 0-最后
+          case ArrowDown.code:
+          case ArrowRightEnd.code:
+            activeInputRef.current.setSelectionRange(maxLength, maxLength);
+            break;
           case SelectAll.code:
             activeInputRef.current.setSelectionRange(0, maxLength);
             break;
-          // 开始选择 标记为选择模式
           case StartSelect.code:
             cursorMode.current = 'select';
             break;
         }
       } else {
-        // 选择模式
         switch (e.code) {
-          // 上 || 最左 选择 0   如果开始位置和结束位置一样，到 光标开始位置 ，否则 到 光标结束位置
           case ArrowUp.code:
           case ArrowLeftFirst.code:
-            activeInputRef.current.setSelectionRange(
-              0,
-              selectionEnd === selectionStart ? selectionStart : selectionEnd,
-            );
+            activeInputRef.current.setSelectionRange(0, selectionEnd);
             break;
-          // 下 || 最右 选择 光标开始位置 到 最后
-          case ArrowDown.code:
-          case ArrowRightEnd.code:
-            activeInputRef.current.setSelectionRange(selectionStart, maxLength);
-            break;
-          // 左 光标位置向前移动一位
           case ArrowLeft.code:
             index = selectionStart - 1 > 0 ? selectionStart - 1 : 0;
             activeInputRef.current.setSelectionRange(index, selectionEnd);
             break;
-          // 右 光标位置向后移动一位
           case ArrowRight.code:
             if (selectionEnd < maxLength) {
               index =
@@ -386,7 +565,13 @@ const useInput = ({
             }
 
             break;
-
+          case ArrowDown.code:
+          case ArrowRightEnd.code:
+            activeInputRef.current.setSelectionRange(
+              selectionEnd,
+              value.length,
+            );
+            break;
           case SelectAll.code:
             activeInputRef.current.setSelectionRange(0, maxLength);
             break;
@@ -416,10 +601,7 @@ const useInput = ({
         } else inputList[0]?.focus();
       }
     } catch (error) {
-      log({
-        type: 'error',
-        message: error,
-      });
+      console.log('error: ', error);
     }
   };
 
@@ -427,70 +609,65 @@ const useInput = ({
   const onChangeInputMode = (mode: VKB.InputMode) => {
     setInputMode(mode);
     setInputValue('');
+    setChinese([]);
   };
 
   /** 选择输入的中文 */
-  const onSelectWord = (chinese: string) => {
+  const onSelectChinese = (chinese: string, appendText = '') => {
     if (
       activeInputRef.current &&
-      !needHandleInputType.includes(inputType.current)
+      !NEED_HANDLE_INPUT_TYPES.includes(inputType.current)
     ) {
-      let value = activeInputRef.current.value;
-      const selectionEnd = activeInputRef.current.selectionEnd || 1;
+      let { value, selectionEnd } = getSelectionInfo(activeInputRef.current);
+      selectionEnd = selectionEnd || 1;
 
       value =
-        value.slice(0, selectionEnd) + chinese + value.slice(selectionEnd);
+        value.slice(0, selectionEnd) +
+        chinese +
+        appendText +
+        value.slice(selectionEnd);
 
-      // 修改 value
-      activeInputRef.current.value = value;
-      activeInputRef.current.setSelectionRange(
-        chinese.length + selectionEnd,
-        chinese.length + selectionEnd,
+      // 选择中文候选词后，同样通过原生 setter 回填输入框。
+      applyInputValue(
+        activeInputRef.current,
+        value,
+        chinese.length + appendText.length + selectionEnd,
+        chinese.length + appendText.length + selectionEnd,
       );
 
-      const inputEvent = new Event('input', { bubbles: true });
-      // 标记 触发input事件
-      (inputEvent as any).simulated = true;
-      activeInputRef.current.dispatchEvent(inputEvent);
-
-      onChange &&
-        onChange({
-          code: '-1',
-          key: value,
-          keyCode: -1,
-          keyType: 'word',
-        });
-
-      setInputValue('');
-      setWords([]);
+      // 通知 React / 业务侧当前值已经变化。
+      emitInputEvent();
     } else {
-      setInputValue('');
-      setWords([]);
+      console.error('input type = email or number not allow input chinese');
     }
+    setInputValue('');
+    setChinese([]);
   };
 
   /** 拷贝 */
   const onCopy = async () => {
     if (activeInputRef.current) {
-      const selectionStart = activeInputRef.current.selectionStart ?? 0;
-      const selectionEnd = activeInputRef.current.selectionEnd ?? 0;
+      const { selectionStart, selectionEnd, value } = getSelectionInfo(
+        activeInputRef.current,
+      );
       if (selectionStart === selectionEnd) {
-        log({ type: 'warning', message: 'vkb: no have copy content' });
+        console.warn('no have copy content');
         return;
       }
-      const value = activeInputRef.current.value.slice(
-        selectionStart,
-        selectionEnd,
-      );
+      const copiedValue = value.slice(selectionStart, selectionEnd);
       if (navigator.clipboard) {
-        await navigator.clipboard.writeText(value);
-        log({ type: 'success', message: 'vkb: copy success' });
-      } else if (document.execCommand) {
+        await navigator.clipboard.writeText(copiedValue);
+        console.log('copy success');
+      } else if (document.queryCommandSupported('copy')) {
         activeInputRef.current.select();
         document.execCommand('copy');
-        log({ type: 'success', message: 'vkb: copy success' });
+        activeInputRef.current.setSelectionRange(
+          copiedValue.length,
+          copiedValue.length,
+        );
+        console.log('copy success');
       } else {
-        log({ type: 'error', message: 'vkb: copy error' });
+        console.error('copy error');
       }
     }
   };
@@ -498,30 +675,35 @@ const useInput = ({
   /** 粘贴 */
   const onPaste = async () => {
     if (activeInputRef.current) {
-      const selectionStart = activeInputRef.current.selectionStart ?? 0;
-      const selectionEnd = activeInputRef.current.selectionEnd ?? 0;
-      let value = activeInputRef.current.value;
+      let { selectionStart, selectionEnd, value } = getSelectionInfo(
+        activeInputRef.current,
+      );
 
       if (navigator.clipboard) {
         const text = await navigator.clipboard.readText();
         value =
           value.slice(0, selectionStart) + text + value.slice(selectionEnd);
-        activeInputRef.current.value = value;
+        // 粘贴内容后走统一的原生赋值 + 事件派发逻辑。
+        applyInputValue(activeInputRef.current, value);
         emitInputEvent();
-
-        log({ type: 'success', message: 'vkb: paste success' });
-      } else if (document.execCommand) {
+        console.log('paste success');
+      } else if (document.queryCommandSupported('paste')) {
         activeInputRef.current.focus();
-        const r = document.execCommand('paste', true);
+        const r = document.execCommand('paste');
         emitInputEvent();
-        log({
-          type: r ? 'success' : 'error',
-          message: `vkb: paste ${r ? 'success' : 'error'}`,
-        });
+        console.log(`paste ${r ? 'success' : 'error'}`);
       } else {
-        log({ type: 'error', message: 'vkb: paste error' });
+        console.error(
+          'paste error navigator.clipboard and document.execCommand not support,You may need https',
+        );
       }
     }
+  };
+
+  /** 清空临时输入区域 */
+  const onClear = () => {
+    setInputValue('');
+    setChinese([]);
   };
 
   /** 控制类 */
@@ -537,7 +719,10 @@ const useInput = ({
         break;
       // 回车
       case Enter.code:
-        onEnter && onEnter();
+        if (!(inputMode === EN && commitCurrentCandidate())) {
+          // onEnter && onEnter();
+          // TODO
+        }
         break;
       // 复制
       case Copy.code:
@@ -561,6 +746,9 @@ const useInput = ({
       case SelectAll.code:
         onCursor(e);
         break;
+      case Clear.code:
+        onClear();
+        break;
     }
   };
 
@@ -571,7 +759,6 @@ const useInput = ({
       case DarkTheme.code:
         setVkbThemeMode(e.code);
         onThemeModeChange && onThemeModeChange(e.code);
-        localStorage?.setItem(VKB_THEME_MODE, e.code);
         break;
       case FixedBottomPosition.code:
       case FixedTopPosition.code:
@@ -580,14 +767,23 @@ const useInput = ({
       case FloatPosition.code:
         setVkbPositionMode(e.code);
         onPositionModeChange && onPositionModeChange(e.code);
-        localStorage?.setItem(VKB_THEME_MODE, e.code);
+        break;
+      case BackgroundAudio.code:
+        setVkbKeydownAudio(vkbKeydownAudio === 'Y' ? 'N' : 'Y');
+        onUseKeydownAudioChange &&
+          onUseKeydownAudioChange(vkbKeydownAudio === 'Y' ? 'N' : 'Y');
         break;
     }
   };
 
-  /** 点击事件分发 */
+  /**
+   * 点击事件分发
+   *
+   * @description
+   * 先执行当前键位对应的输入/控制逻辑，再补发键盘事件，
+   * 让外部组件有机会监听到更接近真实键盘输入的事件流。
+   */
   const onClick = (e: VKB.KeyboardAttributeType) => {
-    onChange && onChange(e);
     if (e.keyType === controlsType) {
       onControl(e);
     } else if (e.keyType === settingType) {
@@ -595,6 +791,53 @@ const useInput = ({
     } else {
       onInput(e);
     }
+    if (audio && vkbKeydownAudio === 'Y') {
+      audio.pause();
+      audio.play();
+    }
+
+    if (!activeInputRef.current) return;
+    Simulate?.keyPress?.(activeInputRef.current, {
+      keyCode: e.keyCode,
+      which: e.keyCode,
+      code: e.code,
+      key: e.key,
+      charCode:
+        typeof e.key === 'string' && e.key.length === 1
+          ? e.key.charCodeAt(0)
+          : undefined,
+    } as SimulateEventData);
+  };
+  /**
+   * 鼠标按下事件，模拟 keyDown
+   *
+   * @description
+   * 虚拟键盘本质是点击 DOM，不会天然触发输入框的 keydown。
+   * 这里补发一个模拟事件，兼容依赖键盘事件的上层组件。
+   */
+  const onKeyDown = (e: VKB.KeyboardAttributeType) => {
+    if (!activeInputRef.current) return;
+    Simulate?.keyDown?.(activeInputRef.current, {
+      keyCode: e.keyCode,
+      which: e.keyCode,
+      code: e.code,
+      key: e.key,
+    } as SimulateEventData);
+  };
+  /**
+   * 鼠标抬起事件，模拟 keyUp
+   *
+   * @description
+   * 与 onKeyDown 配套使用，补齐完整的键盘事件链路。
+   */
+  const onKeyUp = (e: VKB.KeyboardAttributeType) => {
+    if (!activeInputRef.current) return;
+    Simulate?.keyUp?.(activeInputRef.current, {
+      keyCode: e.keyCode,
+      which: e.keyCode,
+      code: e.code,
+      key: e.key,
+    } as SimulateEventData);
   };
 
   /** 通过事件冒泡的形式递归向上寻找，没有找到则不阻止冒泡 */
@@ -613,12 +856,7 @@ const useInput = ({
     return checkStopPropagation(target.parentNode, targetId, outId);
   };
 
-  /**
-   * 整个键盘的鼠标按下事件，整个键盘的触摸事件，用来对虚拟键盘进行移动
-   *
-   * @param {(React.MouseEvent<HTMLDivElement, MouseEvent>
-   *       | React.TouchEvent<HTMLDivElement>)} e
-   */
+  /** 整个键盘的鼠标按下事件，整个键盘的触摸事件，用来对虚拟键盘进行移动 */
   const onMouseDown = (
     e:
       | React.MouseEvent<HTMLDivElement, MouseEvent>
@@ -635,18 +873,18 @@ const useInput = ({
     }
   };
 
-  /**
-   * canvas 绘制的图片
-   *
-   * @param {string} imgUrl
-   */
-  const onDraw = async (imgUrl: string) => {
-    if (imgUrl) {
-      const res = await onImg2Words(imgUrl);
-      setWords(res);
-    } else {
-      setWords([]);
+  /** 创建按键背景音乐 */
+  const createBackgroundAudio = () => {
+    if (!keydownAudioUrl) return;
+    audio = document.body.querySelector(
+      '#keyboard-bg-audio',
+    ) as HTMLAudioElement;
+    if (!audio) {
+      audio = document.createElement('audio');
+      document.body.appendChild(audio);
+      audio.id = 'keyboard-bg-audio';
     }
+    audio.src = keydownAudioUrl;
   };
 
   useEffect(() => {
@@ -657,19 +895,30 @@ const useInput = ({
     setVkbPositionMode(positionMode);
   }, [positionMode]);
 
+  useEffect(() => {
+    setVkbKeydownAudio(useKeydownAudio);
+  }, [useKeydownAudio]);
+
+  useEffect(() => {
+    createBackgroundAudio();
+  }, []);
+
   return {
     inputMode,
     inputValue,
     vkbThemeMode,
     vkbPositionMode,
-    words,
+    vkbKeydownAudio,
+    chinese,
     activeKeyboard,
-    onDraw,
     onClick,
     onMouseDown,
-    onSelectWord,
+    onSelectChinese,
     onChangeInputMode,
     setActiveKeyboard,
+    onRecognition,
+    onKeyDown,
+    onKeyUp,
   };
 };
 

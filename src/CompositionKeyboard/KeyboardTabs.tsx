@@ -25,20 +25,24 @@ export const LetterKeyboardTab: VKB.KeyboardTabItem = {
   Component: ({
     inputMode,
     inputValue,
-    words,
+    chinese,
     onClick,
     onMouseDown,
     onChangeInputMode,
-    onSelectWord,
+    onSelectChinese,
+    onKeyDown,
+    onKeyUp,
   }) => (
     <LetterKeyboard
       inputValue={inputValue}
-      words={words}
+      chinese={chinese}
       inputMode={inputMode}
       onClick={onClick}
       onMouseDown={onMouseDown}
       onChangeInputMode={onChangeInputMode}
-      onSelectWord={onSelectWord}
+      onSelectChinese={onSelectChinese}
+      onKeyDown={onKeyDown}
+      onKeyUp={onKeyUp}
     />
   ),
 };
@@ -48,7 +52,9 @@ export const NumberKeyboardTab: VKB.KeyboardTabItem = {
   id: 'number',
   label: <NumberSvg />,
   name: '数字键',
-  Component: ({ onClick }) => <NumberKeyboard onClick={onClick} />,
+  Component: ({ onClick, onKeyUp, onKeyDown }) => (
+    <NumberKeyboard onClick={onClick} onKeyDown={onKeyDown} onKeyUp={onKeyUp} />
+  ),
 };
 /** 符号键tab */
 export const SymbolKeyboardTab: VKB.KeyboardTabItem = {
@@ -69,12 +75,19 @@ export const WriteKeyboardTab: VKB.KeyboardTabItem = {
   id: 'write',
   label: <WriteSvg />,
   name: '手写板',
-  Component: ({ words, onClick, onDraw, onSelectWord }) => (
+  Component: ({
+    chinese,
+    onMouseDown,
+    onSelectChinese,
+    onRecognition,
+    onClick,
+  }) => (
     <WriteKeyboard
-      words={words}
-      onDraw={onDraw}
+      chinese={chinese}
       onClick={onClick}
-      onSelectWord={onSelectWord}
+      onMouseDown={onMouseDown}
+      onRecognition={onRecognition}
+      onSelectChinese={onSelectChinese}
     />
   ),
 };
@@ -83,8 +96,9 @@ export const SettingKeyboardTab: VKB.KeyboardTabItem = {
   id: 'setting',
   label: <SettingSvg />,
   name: '设置',
-  Component: ({ themeMode, positionMode, onClick }) => (
+  Component: ({ themeMode, positionMode, vkbKeydownAudio, onClick }) => (
     <SettingKeyBoard
+      vkbKeydownAudio={vkbKeydownAudio}
       themeMode={themeMode}
       positionMode={positionMode}
       onClick={onClick}

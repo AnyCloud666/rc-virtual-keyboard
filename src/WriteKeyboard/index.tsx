@@ -1,88 +1,89 @@
 import { useDebounceFn, useEventListener } from 'ahooks';
-import React, { CSSProperties, useEffect, useRef, useState } from 'react';
-import { Backspace, Enter } from '../keys';
+import React, { useEffect, useRef, useState } from 'react';
+import useContinuousTrigger from '../hooks/useContinuousTrigger';
 import { ReactComponent as DeleteSvg } from '../svg/delete.svg';
 import { ReactComponent as EnterSvg } from '../svg/enter.svg';
+import { ReactComponent as LeftSvg } from '../svg/left.svg';
+import { ReactComponent as RightSvg } from '../svg/right.svg';
 
-import WordTempList from '../WordTempList';
+import { Backspace, Clear, Enter } from '../keys';
 import { VKB } from '../typing';
 import './style.css';
 const WriteKeyboard = ({
-  words,
-  style,
-  styles,
+  chinese,
   onClick,
-  onDraw,
-  onSelectWord,
-  onMouseDown = (e) => e.preventDefault(),
+  onSelectChinese,
+  onRecognition,
+  onMouseDown,
 }: {
-  words?: string[];
-  style?: CSSProperties;
-  styles?: {
-    /** 书写区域 */
-    writeContent?: CSSProperties;
-    /** 书写区域内部canvas */
-    writeContentCanvas?: CSSProperties;
-    /** 内容提示 */
-    writeContentTips?: CSSProperties;
-    /** 书写控制区 */
-    writeControl?: CSSProperties;
-    /** 删除键 */
-    writeControlBackspace?: CSSProperties;
-    /** 回车键 */
-    writeControlEnter?: CSSProperties;
-    /** 手写识别到的临时区域 */
-    writeKeyboardTemp?: CSSProperties;
-    /** 左侧翻页 */
-    writeKeyboardTempLeft?: CSSProperties;
-    /** 识别到的字符列表 */
-    writeKeyboardTempList?: CSSProperties;
-    /** 识别到的字符 */
-    writeKeyboardTempChar?: CSSProperties;
-    /** 右侧翻页 */
-    writeKeyboardTempRight?: CSSProperties;
-  };
+  chinese: string[];
   onClick?: (e: VKB.KeyboardAttributeType) => void;
-  onDraw?: (img: string) => void;
-  onSelectWord?: (word: string) => void;
+  onSelectChinese?: (chinese: string) => void;
+  /** 识别图片 */
+  onRecognition?: (url: string) => void;
   onMouseDown?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 }) => {
+  /** 临时输入区引用 */
+  const tempInputAreaRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const canvasCTX = useRef<CanvasRenderingContext2D | null>(null);
   const writeContentRef = useRef<HTMLDivElement | null>(null);
   const allowMove = useRef(false);
-  const imgUrl = useRef('');
-
   const [canvasRect, setCanvasRect] = useState({
     width: '200px',
     height: '200px',
   });
 
+  function downloadCanvas(str: string) {
+    let link = document.createElement('a');
+
+    link.download = 'canvas_image.png';
+
+    link.href = str;
+
+    link.click();
+
+    link.remove();
+  }
+
   const onDelete = () => {
-    if (canvasCTX.current) {
+    if (canvasCTX.current && chinese.length > 0) {
       canvasCTX.current.clearRect(0, 0, 10000, 10000);
-      if (imgUrl.current) {
-        imgUrl.current = '';
-        onDraw && onDraw('');
-      } else {
-        onClick && onClick(Backspace);
-      }
+      onClick && onClick(Clear);
+    } else {
+      onClick && onClick(Backspace);
     }
   };
+
+  const { startContinuousTrigger, stopContinuousTrigger } =
+    useContinuousTrigger<void>({
+      onTrigger: onDelete,
+    });
   const generateImage = useDebounceFn(
     () => {
       if (canvasRef.current) {
         const tempUrl = canvasRef.current?.toDataURL();
 
-        imgUrl.current = tempUrl;
-        onDraw && onDraw(tempUrl);
+        onRecognition && onRecognition(tempUrl);
+
+        // downloadCanvas(tempUrl);
+        // let writeImgEl = document.body.querySelector("#write-img") as HTMLImageElement;
+        // console.log("writeImgEl: ", writeImgEl);
+        // if (!writeImgEl) {
+        //   writeImgEl = document.createElement("img");
+        //   writeImgEl.id = "write-img";
+        //   writeImgEl.style.position = "fixed";
+        //   writeImgEl.style.top = "0px";
+        //   writeImgEl.style.left = "0px";
+        //   document.body.appendChild(writeImgEl);
+        // }
+        // writeImgEl.src = tempUrl;
       }
     },
     {
-      wait: 1000,
+      wait: 300,
     },
   );
-
   useEventListener(
     'mousedown',
     (e: MouseEvent) => {
@@ -105,12 +106,11 @@ const WriteKeyboard = ({
     () => {
       allowMove.current = false;
       const ctx = canvasCTX.current;
-
       ctx && ctx.closePath();
       generateImage.run();
     },
     {
-      target: window,
+      target: writeContentRef.current,
     },
   );
   useEventListener(
@@ -144,42 +144,92 @@ const WriteKeyboard = ({
     }
   }, []);
 
+  /** 翻页 */
+  const onMore = (type: string) => {
+    if (tempInputAreaRef.current) {
+      const width = tempInputAreaRef.current.offsetWidth;
+      tempInputAreaRef.current.scrollTo({
+        left:
+          tempInputAreaRef.current.scrollLeft +
+          (type === 'add' ? width : -width) / 10,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   return (
-    <div style={style} className="write-keyboard" onMouseDown={onMouseDown}>
-      {words && words.length > 0 && (
-        <WordTempList words={words} onSelectWord={onSelectWord} />
+    <div className="write-keyboard" onMouseDown={onMouseDown}>
+      {chinese && chinese.length > 0 && (
+        <div className="write-keyboard-temp">
+          <div
+            className="write-keyboard-temp-left"
+            onClick={() => onMore('minus')}
+          >
+            <LeftSvg />
+          </div>
+          <div className="write-keyboard-temp-list" ref={tempInputAreaRef}>
+            {chinese?.map((item, index) => {
+              return (
+                <div
+                  key={index}
+                  className="letter-keyboard-temp-char"
+                  onClick={() => {
+                    onDelete();
+                    onSelectChinese && onSelectChinese(item);
+                  }}
+                >
+                  {item}
+                </div>
+              );
+            })}
+          </div>
+          <div
+            className="write-keyboard-temp-right"
+            onClick={() => onMore('add')}
+          >
+            <RightSvg />
+          </div>
+        </div>
       )}
-      <div
-        style={styles?.writeContent}
-        className="write-content"
-        ref={writeContentRef}
-      >
-        <canvas
-          style={styles?.writeContentCanvas}
-          className="write-content-canvas"
-          ref={canvasRef}
-          {...canvasRect}
-        />
-        <div style={styles?.writeContentTips} className="write-content-tips">
-          单字
+
+      <div className="write-keyboard-area">
+        <div className="write-content" ref={writeContentRef}>
+          <canvas
+            className="write-content-canvas"
+            ref={canvasRef}
+            {...canvasRect}
+          />
+          <div className="write-content-tips">单字</div>
         </div>
-      </div>
-      <div style={styles?.writeControl} className="write-control">
-        <div
-          style={styles?.writeControlBackspace}
-          className="write-control-backspace"
-          onClick={onDelete}
-        >
-          {/* Del */}
-          <DeleteSvg />
-        </div>
-        <div
-          style={styles?.writeControlEnter}
-          className="write-control-enter"
-          onClick={() => onClick && onClick(Enter)}
-        >
-          {/* Enter */}
-          <EnterSvg />
+        <div className="write-control">
+          <div
+            className="write-control-backspace"
+            onClick={(e) => e.preventDefault()}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              startContinuousTrigger();
+            }}
+            onMouseUp={stopContinuousTrigger}
+            onMouseLeave={stopContinuousTrigger}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              startContinuousTrigger();
+            }}
+            onTouchEnd={stopContinuousTrigger}
+            onTouchCancel={stopContinuousTrigger}
+          >
+            {/* Del */}
+            <DeleteSvg />
+          </div>
+          <div
+            className="write-control-enter"
+            onClick={() => {
+              onClick && onClick(Enter);
+            }}
+          >
+            {/* Enter */}
+            <EnterSvg />
+          </div>
         </div>
       </div>
     </div>

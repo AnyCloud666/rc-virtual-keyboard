@@ -18,7 +18,7 @@ nav:
 
 ```jsx
 import { useState } from 'react';
-import { LetterKeyboard, useInput, keys } from 'react-virtual-keyboard';
+import { LetterKeyboard, useInput, keys } from 'rc-virtual-keyboard';
 
 export default () => {
   const [value, setValue] = useState('');
@@ -26,9 +26,9 @@ export default () => {
     onClick,
     inputMode,
     inputValue,
-    words,
+    chinese,
     onChangeInputMode,
-    onSelectWord,
+    onSelectChinese,
   } = useInput({
     defaultActiveKeyboard: keys.letterType,
     onEnter: () => {
@@ -40,7 +40,6 @@ export default () => {
       <div style={{ margin: '0 auto', textAlign: 'center' }}>
         <input
           placeholder="可使用虚拟键盘"
-          style={{ marginBottom: 60 }}
           value={value}
           onInput={(e) => {
             {
@@ -54,11 +53,11 @@ export default () => {
       <div style={{ width: 500, height: 320, margin: '0 auto' }}>
         <LetterKeyboard
           inputValue={inputValue}
-          words={words}
+          chinese={chinese}
           inputMode={inputMode}
           onClick={onClick}
           onChangeInputMode={onChangeInputMode}
-          onSelectWord={onSelectWord}
+          onSelectChinese={onSelectChinese}
           onMouseDown={(e) => {
             // 防止失去焦点
             e?.preventDefault?.();
@@ -72,34 +71,18 @@ export default () => {
 
 ## 属性
 
-| 属性                            | 说明                           | 类型                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | 默认值 |
-| ------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| inputMode                       | 输入模式                       | zh \| en                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | en     |
-| inputValue                      | 输入的值                       | string                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | ''     |
-| chinese                         | 中文输入状态获得的结果         | string\[\]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | \[\]   |
-| style                           | 外部传入的样式，作用于整个容器 | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -      |
-| styles                          | 外部传入的样式，作用域单个容器 | { letterKeyboardArea?: CSSProperties; letterKeyItem?: CSSProperties;letterCapsLockLock?: CSSProperties; letterCapsLockLockBig?: CSSProperties; letterCapsLockLockSmall?: CSSProperties; letterShift?: CSSProperties;letterShiftBig?: CSSProperties;letterShiftSmall?: CSSProperties;letterKeyboardTemp?: CSSProperties;letterKeyboardTempPinyin?: CSSProperties; letterKeyboardTempLeft?: CSSProperties; letterKeyboardTempRight?: CSSProperties; letterKeyboardTempList?: CSSProperties;letterKeyboardTempChar?: CSSProperties;} | -      |
-| styles.letterKeyboardArea       | 按键区域                       | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -      |
-| styles.letterKeyItem            | 单个按键                       | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -      |
-| styles.letterCapsLockLock       | 大小写切换                     | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -      |
-| styles.letterCapsLockLockBig    | 选中模式                       | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -      |
-| styles.letterCapsLockLockSmall  | 非选中模式                     | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -      |
-| styles.letterShift              | 中英文切换                     | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -      |
-| styles.letterShiftBig           | 选中模式                       | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -      |
-| styles.letterShiftSmall         | 非选中模式                     | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -      |
-| styles.letterKeyboardTemp       | 输入法区域                     | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -      |
-| styles.letterKeyboardTempPinyin | 当前输入的拼音                 | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -      |
-| styles.letterKeyboardTempLeft   | 向左选择                       | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -      |
-| styles.letterKeyboardTempRight  | 向右选择                       | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -      |
-| styles.letterKeyboardTempList   | 拼音转中文的列表               | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -      |
-| styles.letterKeyboardTempChar   | 拼音转中文的单个汉字           | CSSProperties                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | -      |
+| 属性       | 说明                   | 类型       | 默认值 |
+| ---------- | ---------------------- | ---------- | ------ |
+| inputMode  | 输入模式               | zh\| en    | en     |
+| inputValue | 输入的值               | string     | ''     |
+| chinese    | 中文输入状态获得的结果 | string\[\] | \[\]   |
 
 ## 方法
 
 | 方法              | 说明                                                                  | 类型                                                        | 默认值 |
 | ----------------- | --------------------------------------------------------------------- | ----------------------------------------------------------- | ------ |
 | onClick           | 点击事件                                                              | (e: VKB.KeyboardAttributeType) => void                      | -      |
-| onChangeInputMode | 改变输入模式                                                          | (mode:'zh' \| 'en')=>void                                   | -      |
+| onChangeInputMode | 改变输入模式                                                          | (mode:'zh'\| 'en')=>void                                    | -      |
 | onMouseDown       | 鼠标按下事件,如果不想失去输入框的焦点，应该实现该方法，并阻止默认事件 | (e: React.MouseEvent\<HTMLDivElement, MouseEvent\>) => void | -      |
 | onChangeInputMode | 改变输入模式                                                          | (mode:'zh'\|'en')=>void                                     | -      |
 | onSelectChinese   | 选择的中文                                                            | (chinese:string)=>void                                      | -      |

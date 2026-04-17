@@ -17,18 +17,15 @@ nav:
 常用的数字键盘
 
 ```jsx
-import { NumberKeyboard, keys, useInput } from 'react-virtual-keyboard';
+import { NumberKeyboard } from 'rc-virtual-keyboard';
 
 export default () => {
-  const { onClick } = useInput({
-    defaultActiveKeyboard: keys.numberType,
-  });
+  const onClick = (e) => {
+    console.log('NumberKeyboard e: ', e);
+  };
   return (
-    <div>
-      <input />
-      <div style={{ width: 500, height: 320, margin: '0 auto' }}>
-        <NumberKeyboard onClick={onClick} />
-      </div>
+    <div style={{ width: 500, height: 320, margin: '0 auto' }}>
+      <NumberKeyboard onClick={onClick} />
     </div>
   );
 };
@@ -36,10 +33,9 @@ export default () => {
 
 ## 属性
 
-| 属性   | 说明                           | 类型                               | 默认值 |
-| ------ | ------------------------------ | ---------------------------------- | ------ |
-| style  | 外部传入的样式，作用于整个容器 | CSSProperties                      | -      |
-| styles | 外部传入的样式，作用于单个容器 | { numberKeyItem?: CSSProperties; } | -      |
+| 属性 | 说明 | 类型 | 默认值 |
+| ---- | ---- | ---- | ------ |
+| -    | -    | -    | -      |
 
 ## 方法
 
