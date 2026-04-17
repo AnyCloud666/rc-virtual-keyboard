@@ -69,6 +69,25 @@
   font-weight: 600;
 }
 
+.setting-keyboard-number-layout-mini {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  width: 100%;
+  max-width: 34px;
+}
+
+.setting-keyboard-number-layout-mini > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  aspect-ratio: 1;
+  border-radius: 3px;
+  font-size: 10px;
+  line-height: 1;
+}
+
 .setting-keyboard-box-item > svg {
   width: var(--vkb-keyboard-svg-size);
   height: var(--vkb-keyboard-svg-size);
@@ -149,7 +168,7 @@
 }
 
 .setting-keyboard-size-tips {
-  color: var(--vkb-key-tips-color);
+  /* color: var(--vkb-key-tips-color); */
   font-size: inherit;
   line-height: 1.5;
   opacity: 0.72;

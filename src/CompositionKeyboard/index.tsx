@@ -34,6 +34,7 @@ const CompositionKeyboard = ({
   height = '320px',
   fontSize = '14px',
   fontFamily = "'Microsoft YaHei', 'PingFang SC', sans-serif",
+  numberKeyboardLayoutMode = 'asc',
   focusShow,
   useKeydownAudio = 'Y',
   keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
@@ -44,6 +45,7 @@ const CompositionKeyboard = ({
   onHeightChange,
   onFontSizeChange,
   onFontFamilyChange,
+  onNumberKeyboardLayoutModeChange,
   onUseKeydownAudioChange,
   onKeydownAudioUrlChange,
 }: {
@@ -73,6 +75,8 @@ const CompositionKeyboard = ({
   fontSize?: string;
   /** 按键字体 */
   fontFamily?: string;
+  /** 数字键盘排列 */
+  numberKeyboardLayoutMode?: VKB.NumberKeyboardLayoutMode;
   /** 输入框 focus 时是否自动显示键盘 */
   focusShow?: boolean;
   /** 是否使用键盘按键声音 */
@@ -93,6 +97,10 @@ const CompositionKeyboard = ({
   onFontSizeChange?: (fontSize: string) => void;
   /** 按键字体改变 */
   onFontFamilyChange?: (fontFamily: string) => void;
+  /** 数字键盘排列改变 */
+  onNumberKeyboardLayoutModeChange?: (
+    mode: VKB.NumberKeyboardLayoutMode,
+  ) => void;
   /** 使用改变 */
   onUseKeydownAudioChange?: (mode: 'Y' | 'N') => void;
   /** 地址改变 */
@@ -236,6 +244,7 @@ const CompositionKeyboard = ({
               height={height}
               fontSize={fontSize}
               fontFamily={fontFamily}
+              numberKeyboardLayoutMode={numberKeyboardLayoutMode}
               capsLockActive={capsLockActive}
               chinese={chinese}
               onClick={onClick}
@@ -244,6 +253,9 @@ const CompositionKeyboard = ({
               onHeightChange={onHeightChange ?? (() => {})}
               onFontSizeChange={onFontSizeChange ?? (() => {})}
               onFontFamilyChange={onFontFamilyChange ?? (() => {})}
+              onNumberKeyboardLayoutModeChange={
+                onNumberKeyboardLayoutModeChange ?? (() => {})
+              }
               onChangeInputMode={onChangeInputMode}
               inputValue={inputValue}
               onSelectChinese={onSelectChinese}

@@ -35,7 +35,7 @@ export default () => {
         }}
       />
       <div>value：{value}</div>
-      <VirtualKeyboard />
+      <VirtualKeyboard numberKeyboardLayoutMode="desc" />
     </>
   );
 };
@@ -72,19 +72,27 @@ export default () => {
 
 ## 属性
 
-| 属性               | 说明                                              | 类型              | 默认值         |
-| ------------------ | ------------------------------------------------- | ----------------- | -------------- |
-| width              | 宽度                                              | string            | 500px          |
-| height             | 高度                                              | string            | 320px          |
-| zIndex             | 层级                                              | string\| number   | 9999           |
-| showDragHandle     | 显示移动句柄 & 允许移动                           | boolean           | true           |
-| showIcon           | 是否显示外部唤起 icon                             | boolean           | true           |
-| show               | 是否显示                                          | boolean           | false          |
-| virtualKeyboardTab | 自定义键盘 tab 内容                               | KeyboardTabItem[] | all            |
-| theme              | 自定义主题,当使用了主题变量时，主题变量的权重更高 | Partial\<Theme\>  | 参考默认 token |
-| themeMode          | 主题模式                                          | string            | light          |
-| positionMode       | 位置模式                                          | string            | float          |
-| focusShow          | 输入框获得焦点时是否自动显示键盘                  | boolean           | true           |
+| 属性                     | 说明                                              | 类型              | 默认值         |
+| ------------------------ | ------------------------------------------------- | ----------------- | -------------- |
+| width                    | 宽度                                              | string            | 500px          |
+| height                   | 高度                                              | string            | 320px          |
+| zIndex                   | 层级                                              | string\| number   | 9999           |
+| showDragHandle           | 显示移动句柄 & 允许移动                           | boolean           | true           |
+| showIcon                 | 是否显示外部唤起 icon                             | boolean           | true           |
+| show                     | 是否显示                                          | boolean           | false          |
+| virtualKeyboardTab       | 自定义键盘 tab 内容                               | KeyboardTabItem[] | all            |
+| theme                    | 自定义主题,当使用了主题变量时，主题变量的权重更高 | Partial\<Theme\>  | 参考默认 token |
+| themeMode                | 主题模式                                          | string            | light          |
+| positionMode             | 位置模式                                          | string            | float          |
+| focusShow                | 输入框获得焦点时是否自动显示键盘                  | boolean           | true           |
+| numberKeyboardLayoutMode | 数字键盘排列                                      | `'asc' \| 'desc'` | asc            |
+
+其中：
+
+- `asc`
+  - `123 / 456 / 789`
+- `desc`
+  - `789 / 456 / 123`
 
 ## 方法
 
@@ -132,4 +140,10 @@ const tabs: VKB.KeyboardTabItem[] = [
   SettingKeyboardTab,
   WriteKeyboardTab,
 ];
+```
+
+## 数字键盘排列测试
+
+```tsx
+<code src="../../docs/number-keyboard-layout-demo.tsx"></code>
 ```

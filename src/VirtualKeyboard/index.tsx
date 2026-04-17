@@ -15,6 +15,7 @@ import {
   VKB_KEYBOARD_HEIGHT,
   VKB_KEYBOARD_WIDTH,
   VKB_KEYDOWN_MODE,
+  VKB_NUMBER_KEYBOARD_LAYOUT_MODE,
   VKB_POSITION_MODE,
   VKB_THEME_MODE,
 } from '../keys';
@@ -38,6 +39,7 @@ const VirtualKeyboard = ({
   height = InitVirtualKeyBoardCtx.height,
   fontSize = InitVirtualKeyBoardCtx.fontSize,
   fontFamily = InitVirtualKeyBoardCtx.fontFamily,
+  numberKeyboardLayoutMode = 'asc',
   iconWidth = InitVirtualKeyBoardCtx.iconWidth,
   iconHeight = InitVirtualKeyBoardCtx.iconHeight,
   zIndex = InitVirtualKeyBoardCtx.zIndex,
@@ -110,6 +112,13 @@ const VirtualKeyboard = ({
     useLocalStorageState<'Y' | 'N' | undefined>(VKB_KEYDOWN_MODE, {
       defaultValue: useKeydownAudio,
     });
+  const [currentNumberKeyboardLayoutMode, setCurrentNumberKeyboardLayoutMode] =
+    useLocalStorageState<VKB.NumberKeyboardLayoutMode | undefined>(
+      VKB_NUMBER_KEYBOARD_LAYOUT_MODE,
+      {
+        defaultValue: numberKeyboardLayoutMode,
+      },
+    );
 
   useEffect(() => {
     setVisible(show);
@@ -159,6 +168,12 @@ const VirtualKeyboard = ({
       setCurrentUseKeydownAudio(useKeydownAudio);
     }
   }, [setCurrentUseKeydownAudio, useKeydownAudio]);
+
+  useEffect(() => {
+    if (numberKeyboardLayoutMode) {
+      setCurrentNumberKeyboardLayoutMode(numberKeyboardLayoutMode);
+    }
+  }, [numberKeyboardLayoutMode, setCurrentNumberKeyboardLayoutMode]);
 
   const vkbStyles = useMemo(() => {
     const styles: VirtualKeyboardStyles = {
@@ -246,6 +261,7 @@ const VirtualKeyboard = ({
             InitVirtualKeyBoardCtx.fontFamily ??
             "'Microsoft YaHei', 'PingFang SC', sans-serif"
           }
+          numberKeyboardLayoutMode={currentNumberKeyboardLayoutMode ?? 'asc'}
           focusShow={focusShow}
           virtualKeyboardTab={virtualKeyboardTab}
           showDragHandle={showDragHandle}
@@ -258,6 +274,7 @@ const VirtualKeyboard = ({
           onHeightChange={setCurrentHeight}
           onFontSizeChange={setCurrentFontSize}
           onFontFamilyChange={setCurrentFontFamily}
+          onNumberKeyboardLayoutModeChange={setCurrentNumberKeyboardLayoutMode}
           onKeydownAudioUrlChange={() => undefined}
           onUseKeydownAudioChange={setCurrentUseKeydownAudio}
         />

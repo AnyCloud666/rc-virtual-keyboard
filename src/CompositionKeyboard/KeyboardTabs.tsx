@@ -59,8 +59,15 @@ export const NumberKeyboardTab: VKB.KeyboardTabItem = {
   id: 'number',
   label: <NumberSvg />,
   name: '数字键',
-  Component: ({ onClick, onKeyUp, onKeyDown, isKeyActive }) => (
+  Component: ({
+    onClick,
+    onKeyUp,
+    onKeyDown,
+    isKeyActive,
+    numberKeyboardLayoutMode,
+  }) => (
     <NumberKeyboard
+      numberKeyboardLayoutMode={numberKeyboardLayoutMode}
       onClick={onClick}
       onKeyDown={onKeyDown}
       onKeyUp={onKeyUp}
@@ -122,10 +129,12 @@ export const SettingKeyboardTab: VKB.KeyboardTabItem = {
     height,
     fontSize,
     fontFamily,
+    numberKeyboardLayoutMode,
     onWidthChange,
     onHeightChange,
     onFontSizeChange,
     onFontFamilyChange,
+    onNumberKeyboardLayoutModeChange,
     onClick,
   }) => (
     <SettingKeyBoard
@@ -136,10 +145,14 @@ export const SettingKeyboardTab: VKB.KeyboardTabItem = {
       height={height ?? ''}
       fontSize={fontSize ?? ''}
       fontFamily={fontFamily ?? ''}
+      numberKeyboardLayoutMode={numberKeyboardLayoutMode ?? 'asc'}
       onWidthChange={onWidthChange ?? noop}
       onHeightChange={onHeightChange ?? noop}
       onFontSizeChange={onFontSizeChange ?? noop}
       onFontFamilyChange={onFontFamilyChange ?? noop}
+      onNumberKeyboardLayoutModeChange={
+        onNumberKeyboardLayoutModeChange ?? noop
+      }
       onClick={onClick}
     />
   ),

@@ -25,17 +25,25 @@ export default () => {
   };
   return (
     <div style={{ width: 500, height: 320, margin: '0 auto' }}>
-      <NumberKeyboard onClick={onClick} />
+      <NumberKeyboard numberKeyboardLayoutMode="desc" onClick={onClick} />
     </div>
   );
 };
 ```
 
+支持两种数字排列：
+
+- `asc`
+  - `123 / 456 / 789`
+- `desc`
+  - `789 / 456 / 123`
+
 ## 属性
 
-| 属性 | 说明 | 类型 | 默认值 |
-| ---- | ---- | ---- | ------ |
-| -    | -    | -    | -      |
+| 属性                     | 说明         | 类型                               | 默认值 |
+| ------------------------ | ------------ | ---------------------------------- | ------ |
+| numberKeyboardLayoutMode | 数字键盘排列 | `'asc' \| 'desc'`                  | `asc`  |
+| onClick                  | 点击事件     | `(e: KeyboardAttributeType)=>void` | -      |
 
 ## 方法
 

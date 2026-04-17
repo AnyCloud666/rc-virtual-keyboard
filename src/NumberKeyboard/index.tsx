@@ -1,23 +1,26 @@
 import React from 'react';
 import useContinuousTrigger from '../hooks/useContinuousTrigger';
 import useTouchClickGuard from '../hooks/useTouchClickGuard';
-import { Enter, numberKeys } from '../keys';
+import { Enter, getNumberKeys } from '../keys';
 import { VKB } from '../typing';
 import './style.css';
 
 /** 数字键盘 */
 const NumberKeyboard = ({
+  numberKeyboardLayoutMode = 'asc',
   onClick,
   onKeyDown,
   onKeyUp,
   isKeyActive,
 }: {
+  numberKeyboardLayoutMode?: VKB.NumberKeyboardLayoutMode;
   onClick?: (e: VKB.KeyboardAttributeType) => void;
   onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
   onKeyUp?: (e: VKB.KeyboardAttributeType) => void;
   isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
 }) => {
   const { markTouchInteraction, shouldIgnoreClick } = useTouchClickGuard();
+  const numberKeys = getNumberKeys(numberKeyboardLayoutMode);
   const triggerKey = (item: VKB.KeyboardAttributeType) => {
     onKeyDown?.(item);
     onClick?.(item);

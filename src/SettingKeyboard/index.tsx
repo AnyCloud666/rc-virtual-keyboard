@@ -98,6 +98,31 @@ const FONT_FAMILY_OPTIONS = [
   },
 ] as const;
 
+const NUMBER_KEYBOARD_LAYOUT_OPTIONS = [
+  {
+    label: (
+      <div className="setting-keyboard-number-layout-mini">
+        {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((item) => (
+          <span key={item}>{item}</span>
+        ))}
+      </div>
+    ),
+    value: 'asc',
+    preview: 'asc',
+  },
+  {
+    label: (
+      <div className="setting-keyboard-number-layout-mini">
+        {['7', '8', '9', '4', '5', '6', '1', '2', '3'].map((item) => (
+          <span key={item}>{item}</span>
+        ))}
+      </div>
+    ),
+    value: 'desc',
+    preview: 'desc',
+  },
+] as const;
+
 const clampValue = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
 
@@ -109,6 +134,13 @@ const stopDragBubble = (
     | React.TouchEvent<HTMLElement>
     | React.PointerEvent<HTMLElement>,
 ) => {
+  e.stopPropagation();
+};
+
+const keepFocusAndBubble = (
+  e: React.MouseEvent<HTMLElement> | React.PointerEvent<HTMLElement>,
+) => {
+  e.preventDefault();
   e.stopPropagation();
 };
 
@@ -129,10 +161,12 @@ const SettingKeyboard = ({
   height,
   fontSize,
   fontFamily,
+  numberKeyboardLayoutMode,
   onWidthChange,
   onHeightChange,
   onFontSizeChange,
   onFontFamilyChange,
+  onNumberKeyboardLayoutModeChange,
   onClick,
 }: {
   themeMode: string;
@@ -142,10 +176,14 @@ const SettingKeyboard = ({
   height: string;
   fontSize: string;
   fontFamily: string;
+  numberKeyboardLayoutMode: VKB.NumberKeyboardLayoutMode;
   onWidthChange: (width: string) => void;
   onHeightChange: (height: string) => void;
   onFontSizeChange: (fontSize: string) => void;
   onFontFamilyChange: (fontFamily: string) => void;
+  onNumberKeyboardLayoutModeChange: (
+    mode: VKB.NumberKeyboardLayoutMode,
+  ) => void;
   onClick: (e: VKB.KeyboardAttributeType) => void;
 }) => {
   const currentWidth = clampValue(
@@ -317,6 +355,37 @@ const SettingKeyboard = ({
                 >
                   {item.renderKey || item.key}
                 </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="setting-keyboard-item">
+        <div>数字排列：</div>
+        <div className="setting-keyboard-box">
+          {NUMBER_KEYBOARD_LAYOUT_OPTIONS.map((item) => {
+            const isActive = numberKeyboardLayoutMode === item.value;
+
+            return (
+              <div className="setting-keyboard-wrapper" key={item.value}>
+                <button
+                  type="button"
+                  className={`setting-keyboard-box-item ${
+                    isActive ? 'setting-keyboard-box-item-active' : ''
+                  }`}
+                  onMouseDown={keepFocusAndBubble}
+                  onTouchStart={(e) =>
+                    stopTouchAndRun(e, () =>
+                      onNumberKeyboardLayoutModeChange(item.value),
+                    )
+                  }
+                  onPointerDown={keepFocusAndBubble}
+                  onClick={() => onNumberKeyboardLayoutModeChange(item.value)}
+                  title={item.preview}
+                >
+                  {item.label}
+                </button>
+                <div>{item.preview}</div>
               </div>
             );
           })}

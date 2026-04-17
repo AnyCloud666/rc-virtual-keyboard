@@ -12,6 +12,11 @@ import idiomPhrases from '../lib/idiomPhrases';
 import nameSet from '../lib/nameSet';
 import strokePhrases from '../lib/strokePhrases';
 
+type InputMode = 'zh' | 'en';
+type ImageRecognitionOptions = {
+  inputMode?: InputMode;
+};
+
 type WorkerMap = {
   eng: Worker;
   chi: Worker;
@@ -23,7 +28,9 @@ type Candidate = {
   language: 'eng' | 'chi';
 };
 
-type RankedCandidate = Candidate & {
+type RankedCandidate = {
+  text: string;
+  confidence: number;
   score: number;
 };
 
@@ -40,7 +47,7 @@ const CHINESE_CORRECTION_MAX_DISTANCE = 1;
 let englishLexiconCache: string[] | null = null;
 let chineseLexiconCache: string[] | null = null;
 
-const resolveRecognitionMode = (options?: VKB.ImageRecognitionOptions) => {
+const resolveRecognitionMode = (options?: ImageRecognitionOptions) => {
   if (options?.inputMode === 'en') {
     return 'en';
   }
@@ -410,7 +417,7 @@ const getClosestLexiconWord = (
   lexicon: string[],
   maxDistance: number,
   shouldMatch: (candidate: string) => boolean,
-) => {
+): { word: string; distance: number } | null => {
   let bestMatch: { word: string; distance: number } | null = null;
 
   lexicon.forEach((word) => {
@@ -596,7 +603,7 @@ const rankCandidates = (
  */
 export async function imgToWordV1(
   img: string,
-  options?: VKB.ImageRecognitionOptions,
+  options?: ImageRecognitionOptions,
 ): Promise<string[]> {
   const workers = await initWorkers();
   const variants = await createPreprocessedVariants(img);
@@ -635,7 +642,7 @@ export async function imgToWordV1(
 
 export function imgToWordV2(
   img: string,
-  options?: VKB.ImageRecognitionOptions,
+  options?: ImageRecognitionOptions,
 ): Promise<string[]> {
   return imgToWordV1(img, options);
 }

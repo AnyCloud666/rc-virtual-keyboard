@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 
 declare namespace VKB {
   type InputMode = 'zh' | 'en';
+  type NumberKeyboardLayoutMode = 'asc' | 'desc';
   type ImageRecognitionOptions = {
     inputMode?: InputMode;
   };
@@ -15,6 +16,7 @@ declare namespace VKB {
     height?: string;
     fontSize?: string;
     fontFamily?: string;
+    numberKeyboardLayoutMode?: NumberKeyboardLayoutMode;
     capsLockActive?: boolean;
     inputValue?: string;
     chinese?: string[];
@@ -25,6 +27,7 @@ declare namespace VKB {
     onHeightChange?: (height: string) => void;
     onFontSizeChange?: (fontSize: string) => void;
     onFontFamilyChange?: (fontFamily: string) => void;
+    onNumberKeyboardLayoutModeChange?: (mode: NumberKeyboardLayoutMode) => void;
     onChangeInputMode?: (mode: VKB.InputMode) => void;
     onSelectChinese?: (chinese: string) => void;
     onRecognition?: (url: string) => void;
@@ -139,6 +142,8 @@ declare namespace VKB {
     keydownAudioUrl?: string;
     /** 输入框 focus 时是否自动显示键盘 */
     focusShow?: boolean;
+    /** 数字键盘排列 */
+    numberKeyboardLayoutMode?: NumberKeyboardLayoutMode;
     /** 自定义键盘内容 */
     virtualKeyboardTab?: KeyboardTabItem[];
     /** 自定义主题,当使用了主题变量时，主题变量的权重更高 */
@@ -179,6 +184,8 @@ declare namespace VKB {
     setFontSize?: (fontSize: string) => void;
     /** 设置按键字体 */
     setFontFamily?: (fontFamily: string) => void;
+    /** 设置数字键盘排列 */
+    setNumberKeyboardLayoutMode?: (mode: NumberKeyboardLayoutMode) => void;
     /** 设置是否使用按键音效 */
     setUseKeydownAudio?: (use: 'Y' | 'N') => void;
     /** 设置按键音效 url */

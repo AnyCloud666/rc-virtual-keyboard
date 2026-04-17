@@ -48,6 +48,9 @@ export const VKB_KEYBOARD_HEIGHT = 'VKB_KEYBOARD_HEIGHT';
 export const VKB_KEY_FONT_SIZE = 'VKB_KEY_FONT_SIZE';
 /** 按键字体 */
 export const VKB_KEY_FONT_FAMILY = 'VKB_KEY_FONT_FAMILY';
+/** 数字键盘排列 */
+export const VKB_NUMBER_KEYBOARD_LAYOUT_MODE =
+  'VKB_NUMBER_KEYBOARD_LAYOUT_MODE';
 
 /** ---------------------------功能控制类--------------------------- */
 /** 删除 */
@@ -967,7 +970,7 @@ export const BackgroundAudio: VKB.KeyboardAttributeType = {
 };
 
 /** 数字键 */
-export const numberKeys: VKB.KeyboardAttributeType[] = [
+export const numberKeysAsc: VKB.KeyboardAttributeType[] = [
   Numpad1,
   Numpad2,
   Numpad3,
@@ -990,6 +993,37 @@ export const numberKeys: VKB.KeyboardAttributeType[] = [
   NumpadPercentage,
   NumpadDivide,
 ];
+
+/** 数字键 - 倒序排列 */
+export const numberKeysDesc: VKB.KeyboardAttributeType[] = [
+  Numpad7,
+  Numpad8,
+  Numpad9,
+  NumpadAdd,
+  Backspace,
+
+  Numpad4,
+  Numpad5,
+  Numpad6,
+  NumpadSubtract,
+
+  Numpad1,
+  Numpad2,
+  Numpad3,
+  NumpadMultiply,
+  Enter,
+
+  Numpad0,
+  NumpadDecimal,
+  NumpadPercentage,
+  NumpadDivide,
+];
+
+export const getNumberKeys = (
+  layoutMode: VKB.NumberKeyboardLayoutMode = 'asc',
+) => {
+  return layoutMode === 'desc' ? numberKeysDesc : numberKeysAsc;
+};
 
 /** 字母键 */
 export const letterKeys: VKB.KeyboardAttributeType[] = [
