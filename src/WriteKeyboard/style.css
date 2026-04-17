@@ -108,10 +108,13 @@
   background-color: var(--vkb-key-background);
 }
 
-.write-content-canvas:hover {
-  /* width: 100%; */
+.write-content-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 
-  /* height: 100%; */
+.write-content-canvas:hover {
   cursor: crosshair;
 }
 

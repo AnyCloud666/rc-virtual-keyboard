@@ -11,6 +11,37 @@ import { ReactComponent as RightSvg } from '../svg/right.svg';
 import { Backspace, Clear, Enter } from '../keys';
 import { VKB } from '../typing';
 import './style.css';
+
+type DrawPoint = {
+  x: number;
+  y: number;
+};
+
+type StrokeSamplePoint = DrawPoint & {
+  time: number;
+};
+
+type CanvasSize = {
+  cssWidth: number;
+  cssHeight: number;
+  displayWidth: number;
+  displayHeight: number;
+  drawWidth: number;
+  drawHeight: number;
+};
+
+const OFFSCREEN_SUPERSAMPLE = 2;
+const MAX_DISPLAY_SCALE = 3;
+const MAX_DRAW_SCALE = 6;
+const MIN_POINT_DISTANCE = 0.8;
+const BASE_STROKE_WIDTH = 5.2;
+const MIN_STROKE_WIDTH = 2.8;
+const MAX_STROKE_WIDTH = 6.2;
+const STROKE_SAMPLE_STEP = 0.6;
+const STROKE_SMOOTHING = 0.22;
+const EDGE_TAPER_RATIO = 0.92;
+const STROKE_COLOR = 'rgba(38, 38, 38, 0.94)';
+
 const WriteKeyboard = ({
   chinese,
   onClick,
@@ -31,13 +62,22 @@ const WriteKeyboard = ({
   const tempInputAreaRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const canvasCTX = useRef<CanvasRenderingContext2D | null>(null);
+  const drawCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const drawCanvasCTX = useRef<CanvasRenderingContext2D | null>(null);
   const writeContentRef = useRef<HTMLDivElement | null>(null);
   const allowMove = useRef(false);
+  const lastPointRef = useRef<StrokeSamplePoint | null>(null);
+  const lastMidPointRef = useRef<StrokeSamplePoint | null>(null);
+  const lastRadiusRef = useRef(BASE_STROKE_WIDTH / 2);
   const { markTouchInteraction, shouldIgnoreClick } = useTouchClickGuard();
   const dragScroll = useHorizontalDragScroll(tempInputAreaRef);
-  const [canvasRect, setCanvasRect] = useState({
-    width: '200px',
-    height: '200px',
+  const [canvasSize, setCanvasSize] = useState<CanvasSize>({
+    cssWidth: 200,
+    cssHeight: 200,
+    displayWidth: 200,
+    displayHeight: 200,
+    drawWidth: 200,
+    drawHeight: 200,
   });
 
   const getTouchPoint = (touch: Touch) => {
@@ -53,6 +93,194 @@ const WriteKeyboard = ({
     };
   };
 
+  const setupStrokeContext = (ctx: CanvasRenderingContext2D) => {
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = BASE_STROKE_WIDTH;
+    ctx.strokeStyle = STROKE_COLOR;
+    ctx.fillStyle = STROKE_COLOR;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.globalAlpha = 0.98;
+    // 让细线条在高 DPI 画布上边缘更柔和一些。
+    ctx.shadowBlur = 0.45;
+    ctx.shadowColor = ctx.strokeStyle;
+  };
+
+  const syncDisplayCanvas = () => {
+    const displayCanvas = canvasRef.current;
+    const displayCtx = canvasCTX.current;
+    const drawCanvas = drawCanvasRef.current;
+
+    if (!displayCanvas || !displayCtx || !drawCanvas) return;
+
+    displayCtx.setTransform(1, 0, 0, 1, 0, 0);
+    displayCtx.clearRect(0, 0, displayCanvas.width, displayCanvas.height);
+    displayCtx.imageSmoothingEnabled = true;
+    displayCtx.imageSmoothingQuality = 'high';
+    displayCtx.drawImage(
+      drawCanvas,
+      0,
+      0,
+      drawCanvas.width,
+      drawCanvas.height,
+      0,
+      0,
+      displayCanvas.width,
+      displayCanvas.height,
+    );
+  };
+
+  const createSamplePoint = (point: DrawPoint): StrokeSamplePoint => ({
+    ...point,
+    time: performance.now(),
+  });
+
+  const getStrokeRadius = (
+    previousPoint: StrokeSamplePoint,
+    point: StrokeSamplePoint,
+  ) => {
+    const distance = Math.hypot(
+      point.x - previousPoint.x,
+      point.y - previousPoint.y,
+    );
+    const deltaTime = Math.max(point.time - previousPoint.time, 1);
+    const velocity = distance / deltaTime;
+    const rawWidth = BASE_STROKE_WIDTH - velocity * 0.9;
+    const nextWidth = Math.min(
+      MAX_STROKE_WIDTH,
+      Math.max(MIN_STROKE_WIDTH, rawWidth),
+    );
+    const smoothedWidth =
+      lastRadiusRef.current * 2 * (1 - STROKE_SMOOTHING) +
+      nextWidth * STROKE_SMOOTHING;
+
+    return smoothedWidth / 2;
+  };
+
+  /**
+   * 按二次贝塞尔曲线进行采样铺点，避免只依赖浏览器默认 stroke 抗锯齿，
+   * 在高 DPI 下进一步减少边缘锯齿和断续感。
+   */
+  const fillCurveSegment = (
+    ctx: CanvasRenderingContext2D,
+    start: StrokeSamplePoint,
+    control: StrokeSamplePoint,
+    end: StrokeSamplePoint,
+    startRadius: number,
+    endRadius: number,
+  ) => {
+    const approximateLength =
+      Math.hypot(control.x - start.x, control.y - start.y) +
+      Math.hypot(end.x - control.x, end.y - control.y);
+    const steps = Math.max(
+      12,
+      Math.ceil(approximateLength / STROKE_SAMPLE_STEP),
+    );
+
+    for (let index = 0; index <= steps; index += 1) {
+      const t = index / steps;
+      const invT = 1 - t;
+      const easedT = t * t * (3 - 2 * t);
+      const edgeTaper =
+        EDGE_TAPER_RATIO + (1 - EDGE_TAPER_RATIO) * Math.sin(Math.PI * t);
+      const radius =
+        (startRadius + (endRadius - startRadius) * easedT) * edgeTaper;
+      const x =
+        invT * invT * start.x + 2 * invT * t * control.x + t * t * end.x;
+      const y =
+        invT * invT * start.y + 2 * invT * t * control.y + t * t * end.y;
+
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  };
+
+  const beginStroke = (point: DrawPoint) => {
+    const ctx = drawCanvasCTX.current;
+
+    if (!ctx) return;
+
+    setupStrokeContext(ctx);
+    const samplePoint = createSamplePoint(point);
+    lastPointRef.current = samplePoint;
+    lastMidPointRef.current = samplePoint;
+    lastRadiusRef.current = BASE_STROKE_WIDTH / 2;
+
+    ctx.beginPath();
+    ctx.arc(point.x, point.y, lastRadiusRef.current, 0, Math.PI * 2);
+    ctx.fill();
+    syncDisplayCanvas();
+  };
+
+  const drawStroke = (point: DrawPoint) => {
+    const ctx = drawCanvasCTX.current;
+    const previousPoint = lastPointRef.current;
+    const previousMidPoint = lastMidPointRef.current;
+
+    if (!ctx || !previousPoint || !previousMidPoint) return;
+
+    const samplePoint = createSamplePoint(point);
+
+    const deltaX = samplePoint.x - previousPoint.x;
+    const deltaY = samplePoint.y - previousPoint.y;
+    if (Math.hypot(deltaX, deltaY) < MIN_POINT_DISTANCE) {
+      return;
+    }
+
+    setupStrokeContext(ctx);
+
+    const nextMidPoint: StrokeSamplePoint = {
+      x: (previousPoint.x + samplePoint.x) / 2,
+      y: (previousPoint.y + samplePoint.y) / 2,
+      time: samplePoint.time,
+    };
+    const nextRadius = getStrokeRadius(previousPoint, samplePoint);
+    const segmentStartRadius = Math.max(
+      MIN_STROKE_WIDTH / 2,
+      lastRadiusRef.current,
+    );
+    const segmentEndRadius = Math.max(MIN_STROKE_WIDTH / 2, nextRadius);
+
+    fillCurveSegment(
+      ctx,
+      previousMidPoint,
+      previousPoint,
+      nextMidPoint,
+      segmentStartRadius,
+      segmentEndRadius,
+    );
+
+    lastPointRef.current = samplePoint;
+    lastMidPointRef.current = nextMidPoint;
+    lastRadiusRef.current = nextRadius;
+    syncDisplayCanvas();
+  };
+
+  const endStroke = () => {
+    const ctx = drawCanvasCTX.current;
+    const previousPoint = lastPointRef.current;
+    const previousMidPoint = lastMidPointRef.current;
+
+    if (ctx && previousPoint && previousMidPoint) {
+      setupStrokeContext(ctx);
+      fillCurveSegment(
+        ctx,
+        previousMidPoint,
+        previousPoint,
+        previousPoint,
+        lastRadiusRef.current,
+        Math.max(MIN_STROKE_WIDTH / 2, lastRadiusRef.current * 0.72),
+      );
+      syncDisplayCanvas();
+    }
+
+    lastPointRef.current = null;
+    lastMidPointRef.current = null;
+    lastRadiusRef.current = BASE_STROKE_WIDTH / 2;
+  };
+
   function downloadCanvas(str: string) {
     let link = document.createElement('a');
 
@@ -66,8 +294,14 @@ const WriteKeyboard = ({
   }
 
   const onDelete = () => {
-    if (canvasCTX.current && chinese.length > 0) {
-      canvasCTX.current.clearRect(0, 0, 10000, 10000);
+    if (drawCanvasCTX.current && chinese.length > 0) {
+      drawCanvasCTX.current.clearRect(
+        0,
+        0,
+        canvasSize.cssWidth,
+        canvasSize.cssHeight,
+      );
+      syncDisplayCanvas();
       onClick && onClick(Clear);
     } else {
       onClick && onClick(Backspace);
@@ -92,8 +326,8 @@ const WriteKeyboard = ({
     });
   const generateImage = useDebounceFn(
     () => {
-      if (canvasRef.current) {
-        const tempUrl = canvasRef.current?.toDataURL();
+      if (drawCanvasRef.current) {
+        const tempUrl = drawCanvasRef.current.toDataURL();
 
         onRecognition && onRecognition(tempUrl);
 
@@ -119,14 +353,7 @@ const WriteKeyboard = ({
     'mousedown',
     (e: MouseEvent) => {
       allowMove.current = true;
-      const ctx = canvasCTX.current;
-      if (ctx) {
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.lineWidth = 6;
-        ctx.beginPath(); // 开始路径
-        ctx.moveTo(e.offsetX, e.offsetY);
-      }
+      beginStroke({ x: e.offsetX, y: e.offsetY });
     },
     {
       target: canvasRef,
@@ -136,8 +363,7 @@ const WriteKeyboard = ({
     'mouseup',
     () => {
       allowMove.current = false;
-      const ctx = canvasCTX.current;
-      ctx && ctx.closePath();
+      endStroke();
       generateImage.run();
     },
     {
@@ -147,14 +373,8 @@ const WriteKeyboard = ({
   useEventListener(
     'mousemove',
     (e: MouseEvent) => {
-      if (allowMove.current && canvasCTX.current) {
-        const ctx = canvasCTX.current;
-        ctx.lineWidth = 6;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
-      }
+      if (!allowMove.current) return;
+      drawStroke({ x: e.offsetX, y: e.offsetY });
     },
     {
       target: canvasRef,
@@ -170,11 +390,7 @@ const WriteKeyboard = ({
 
       const point = getTouchPoint(touch);
       allowMove.current = true;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.moveTo(point.x, point.y);
+      beginStroke(point);
     },
     {
       target: canvasRef,
@@ -188,12 +404,7 @@ const WriteKeyboard = ({
       if (!touch || !allowMove.current || !canvasCTX.current) return;
 
       const point = getTouchPoint(touch);
-      const ctx = canvasCTX.current;
-      ctx.lineWidth = 6;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.lineTo(point.x, point.y);
-      ctx.stroke();
+      drawStroke(point);
     },
     {
       target: canvasRef,
@@ -203,8 +414,7 @@ const WriteKeyboard = ({
     'touchend',
     () => {
       allowMove.current = false;
-      const ctx = canvasCTX.current;
-      ctx && ctx.closePath();
+      endStroke();
       generateImage.run();
     },
     {
@@ -212,19 +422,101 @@ const WriteKeyboard = ({
     },
   );
   useEffect(() => {
-    if (canvasRef.current) {
-      canvasCTX.current = canvasRef.current.getContext(
-        '2d',
-      ) as CanvasRenderingContext2D;
-    }
-    if (writeContentRef.current) {
+    const updateCanvasSize = () => {
+      if (!writeContentRef.current) return;
+
       const { width, height } = writeContentRef.current.getBoundingClientRect();
-      setCanvasRect({
-        width: width + 'px',
-        height: height + 'px',
+      const displayScale = Math.min(
+        Math.max(window.devicePixelRatio || 1, 1),
+        MAX_DISPLAY_SCALE,
+      );
+      const drawScale = Math.min(
+        displayScale * OFFSCREEN_SUPERSAMPLE,
+        MAX_DRAW_SCALE,
+      );
+      const cssWidth = Math.max(1, Math.round(width));
+      const cssHeight = Math.max(1, Math.round(height));
+      const displayWidth = Math.max(1, Math.round(width * displayScale));
+      const displayHeight = Math.max(1, Math.round(height * displayScale));
+      const drawWidth = Math.max(1, Math.round(width * drawScale));
+      const drawHeight = Math.max(1, Math.round(height * drawScale));
+
+      setCanvasSize((prev) => {
+        if (
+          prev.cssWidth === cssWidth &&
+          prev.cssHeight === cssHeight &&
+          prev.displayWidth === displayWidth &&
+          prev.displayHeight === displayHeight &&
+          prev.drawWidth === drawWidth &&
+          prev.drawHeight === drawHeight
+        ) {
+          return prev;
+        }
+
+        return {
+          cssWidth,
+          cssHeight,
+          displayWidth,
+          displayHeight,
+          drawWidth,
+          drawHeight,
+        };
       });
+    };
+
+    updateCanvasSize();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateCanvasSize();
+    });
+
+    if (writeContentRef.current) {
+      resizeObserver.observe(writeContentRef.current);
     }
+
+    window.addEventListener('resize', updateCanvasSize);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateCanvasSize);
+    };
   }, []);
+
+  useEffect(() => {
+    const displayCanvas = canvasRef.current;
+
+    if (!displayCanvas) return;
+
+    const displayContext = displayCanvas.getContext('2d');
+
+    if (!displayContext) return;
+
+    let drawCanvas = drawCanvasRef.current;
+    if (!drawCanvas) {
+      drawCanvas = document.createElement('canvas');
+      drawCanvasRef.current = drawCanvas;
+    }
+
+    const drawContext = drawCanvas.getContext('2d');
+
+    if (!drawContext) return;
+
+    displayCanvas.width = canvasSize.displayWidth;
+    displayCanvas.height = canvasSize.displayHeight;
+    drawCanvas.width = canvasSize.drawWidth;
+    drawCanvas.height = canvasSize.drawHeight;
+
+    const drawScaleX = canvasSize.drawWidth / canvasSize.cssWidth;
+    const drawScaleY = canvasSize.drawHeight / canvasSize.cssHeight;
+
+    canvasCTX.current = displayContext;
+    drawCanvasCTX.current = drawContext;
+    drawContext.setTransform(drawScaleX, 0, 0, drawScaleY, 0, 0);
+    drawContext.imageSmoothingEnabled = true;
+    drawContext.imageSmoothingQuality = 'high';
+    setupStrokeContext(drawContext);
+    syncDisplayCanvas();
+  }, [canvasSize]);
 
   /** 翻页 */
   const onMore = (type: string) => {
@@ -310,7 +602,12 @@ const WriteKeyboard = ({
           <canvas
             className="write-content-canvas"
             ref={canvasRef}
-            {...canvasRect}
+            width={canvasSize.displayWidth}
+            height={canvasSize.displayHeight}
+            style={{
+              width: `${canvasSize.cssWidth}px`,
+              height: `${canvasSize.cssHeight}px`,
+            }}
           />
           <div className="write-content-tips">单字</div>
         </div>
