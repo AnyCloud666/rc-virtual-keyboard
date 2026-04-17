@@ -115,6 +115,8 @@ declare namespace VKB {
     width?: string;
     /** 高度 */
     height?: string;
+    /** 按键文字大小 */
+    fontSize?: string;
     /** icon 宽度 */
     iconWidth?: string;
     /** icon 高度 */
@@ -142,6 +144,8 @@ declare namespace VKB {
     themeMode?: string;
     /** 位置模式 */
     positionMode?: string;
+    /** 按键文字大小 */
+    fontSize?: string;
     /** 按键音效 */
     useKeydownAudio?: 'Y' | 'N';
     /** 显示 ,传入的必须是 setStatus 重新 render */

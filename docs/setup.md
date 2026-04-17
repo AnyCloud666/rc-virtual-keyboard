@@ -17,11 +17,10 @@ pnpm install rc-vitrual-keyboard
 
 ```jsx
 import { useState } from 'react';
-import { useVirtualKeyboard, keys } from 'rc-virtual-keyboard';
+import { VirtualKeyboard, keys } from 'rc-virtual-keyboard';
 
 export default () => {
   const [value, setValue] = useState('');
-  const { VirtualKeyboard, VirtualKeyboardProvider } = useVirtualKeyboard();
 
   return (
     <>
@@ -34,9 +33,7 @@ export default () => {
         }}
       />
       <div>value：{value}</div>
-      <VirtualKeyboardProvider>
-        <VirtualKeyboard />
-      </VirtualKeyboardProvider>
+      <VirtualKeyboard />
     </>
   );
 };

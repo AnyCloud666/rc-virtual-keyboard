@@ -14,9 +14,38 @@ nav:
 
 # 组合虚拟键盘
 
-## 简单案例
+## 当前版本用法
+
+当前版本开始，支持直接使用 `VirtualKeyboard` 组件，不再需要额外包一层 `useVirtualKeyboard` 和 `VirtualKeyboardProvider`。
 
 ```jsx
+import { useState } from 'react';
+import { VirtualKeyboard } from 'rc-virtual-keyboard';
+
+export default () => {
+  const [value, setValue] = useState('');
+
+  return (
+    <>
+      <input
+        placeholder="可使用右侧虚拟键盘"
+        onInput={(e) => {
+          setValue(e.target.value);
+          console.log('value', e.target.value);
+        }}
+      />
+      <div>value：{value}</div>
+      <VirtualKeyboard />
+    </>
+  );
+};
+```
+
+## 历史版本用法
+
+如果你使用的是旧版本，仍然可以参考下面这种写法：
+
+```js
 import { useState } from 'react';
 import { useVirtualKeyboard } from 'rc-virtual-keyboard';
 
@@ -26,12 +55,10 @@ export default () => {
 
   return (
     <>
-      {/* <div>可使用右侧虚拟键盘</div> */}
       <input
         placeholder="可使用右侧虚拟键盘"
         onInput={(e) => {
           setValue(e.target.value);
-          console.log('value', e.target.value);
         }}
       />
       <div>value：{value}</div>

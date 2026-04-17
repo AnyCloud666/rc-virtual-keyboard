@@ -128,8 +128,8 @@ const tabs: VKB.KeyboardTabItem[] = [
   NumberKeyboardTab,
   SymbolKeyboardTab,
   EditKeyboardTab,
-  SettingKeyboardTab,
   WriteKeyboardTab,
+  SettingKeyboardTab,
 ];
 
 export default tabs;

@@ -1,15 +1,8 @@
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useMemo,
-  useState,
-} from 'react';
-import CompositionKeyboard from '../CompositionKeyboard';
-
-import DragBlock from '../DragBlock';
-
 import { useLocalStorageState } from 'ahooks';
+import React, { useEffect, useMemo, useState } from 'react';
+
+import CompositionKeyboard from '../CompositionKeyboard';
+import DragBlock from '../DragBlock';
 import {
   FixedBottomPosition,
   FixedLeftPosition,
@@ -30,34 +23,128 @@ import { VKB } from '../typing';
 export const InitVirtualKeyBoardCtx: VKB.KeyBoardCtxTypBase = {
   width: '500px',
   height: '320px',
+  fontSize: '14px',
   iconWidth: '100px',
   iconHeight: '100px',
   zIndex: 9999,
   keydownAudioUrl: '/audio/typing-sound-02-229861.mp3',
 };
 
-export const VirtualKeyboardContext = createContext<VKB.KeyBoardCtxType>(
-  InitVirtualKeyBoardCtx,
-);
+const VirtualKeyboard = ({
+  width = InitVirtualKeyBoardCtx.width,
+  height = InitVirtualKeyBoardCtx.height,
+  fontSize = InitVirtualKeyBoardCtx.fontSize,
+  iconWidth = InitVirtualKeyBoardCtx.iconWidth,
+  iconHeight = InitVirtualKeyBoardCtx.iconHeight,
+  zIndex = InitVirtualKeyBoardCtx.zIndex,
+  keydownAudioUrl = InitVirtualKeyBoardCtx.keydownAudioUrl,
+  focusShow,
+  virtualKeyboardTab,
+  theme,
+  showDragHandle,
+  show = false,
+  themeMode = 'light',
+  positionMode = 'float',
+  useKeydownAudio = 'Y',
+}: VKB.KeyBoardCtxType) => {
+  const [visible, setVisible] = useState(show);
 
-export const VirtualKeyboard = () => {
-  const virtualKeyboardCtx = useContext(VirtualKeyboardContext);
+  const [currentThemeMode, setCurrentThemeMode] = useLocalStorageState(
+    VKB_THEME_MODE,
+    {
+      defaultValue: themeMode,
+    },
+  );
+
+  const [currentPositionMode, setCurrentPositionMode] = useLocalStorageState(
+    VKB_POSITION_MODE,
+    {
+      defaultValue: positionMode,
+    },
+  );
+
+  const [currentWidth, setCurrentWidth] = useLocalStorageState(
+    VKB_KEYBOARD_WIDTH,
+    {
+      defaultValue: width,
+    },
+  );
+
+  const [currentHeight, setCurrentHeight] = useLocalStorageState(
+    VKB_KEYBOARD_HEIGHT,
+    {
+      defaultValue: height,
+    },
+  );
+
+  const [currentFontSize, setCurrentFontSize] = useLocalStorageState(
+    VKB_KEY_FONT_SIZE,
+    {
+      defaultValue: fontSize,
+    },
+  );
+
+  const [currentUseKeydownAudio, setCurrentUseKeydownAudio] =
+    useLocalStorageState<'Y' | 'N' | undefined>(VKB_KEYDOWN_MODE, {
+      defaultValue: useKeydownAudio,
+    });
+
+  useEffect(() => {
+    setVisible(show);
+  }, [show]);
+
+  useEffect(() => {
+    if (themeMode) {
+      setCurrentThemeMode(themeMode);
+    }
+  }, [setCurrentThemeMode, themeMode]);
+
+  useEffect(() => {
+    if (positionMode) {
+      setCurrentPositionMode(positionMode);
+    }
+  }, [positionMode, setCurrentPositionMode]);
+
+  useEffect(() => {
+    if (width) {
+      setCurrentWidth(width);
+    }
+  }, [setCurrentWidth, width]);
+
+  useEffect(() => {
+    if (height) {
+      setCurrentHeight(height);
+    }
+  }, [height, setCurrentHeight]);
+
+  useEffect(() => {
+    if (fontSize) {
+      setCurrentFontSize(fontSize);
+    }
+  }, [fontSize, setCurrentFontSize]);
+
+  useEffect(() => {
+    if (useKeydownAudio) {
+      setCurrentUseKeydownAudio(useKeydownAudio);
+    }
+  }, [setCurrentUseKeydownAudio, useKeydownAudio]);
 
   const vkbStyles = useMemo(() => {
     const styles = {
-      height: virtualKeyboardCtx.height,
-      width: virtualKeyboardCtx.width,
-      fontSize: virtualKeyboardCtx.fontSize ?? '14px',
-      transform: virtualKeyboardCtx.show ? 'scale(1)' : 'scale(0)',
-      '--vkb-key-font-size': virtualKeyboardCtx.fontSize ?? '14px',
-      ...virtualKeyboardCtx.theme,
+      height: currentHeight,
+      width: currentWidth,
+      fontSize: currentFontSize ?? InitVirtualKeyBoardCtx.fontSize,
+      transform: visible ? 'scale(1)' : 'scale(0)',
+      '--vkb-key-font-size':
+        currentFontSize ?? InitVirtualKeyBoardCtx.fontSize ?? '14px',
+      ...theme,
     };
-    switch (virtualKeyboardCtx.positionMode) {
+    switch (currentPositionMode) {
       case FloatPosition.code:
         styles.width =
-          parseFloat(virtualKeyboardCtx.width ?? '0') > window.innerWidth
+          parseFloat(currentWidth ?? '0') > window.innerWidth
             ? '100vw'
-            : virtualKeyboardCtx.width;
+            : currentWidth;
         break;
       case FixedBottomPosition.code:
       case FixedTopPosition.code:
@@ -67,19 +154,19 @@ export const VirtualKeyboard = () => {
       case FixedRightPosition.code:
         styles.height = '100vh';
         styles.width =
-          parseFloat(virtualKeyboardCtx.width ?? '0') > window.innerWidth
+          parseFloat(currentWidth ?? '0') > window.innerWidth
             ? '100vw'
-            : virtualKeyboardCtx.width;
+            : currentWidth;
         break;
     }
     return styles;
   }, [
-    virtualKeyboardCtx.fontSize,
-    virtualKeyboardCtx.height,
-    virtualKeyboardCtx.positionMode,
-    virtualKeyboardCtx.show,
-    virtualKeyboardCtx.theme,
-    virtualKeyboardCtx.width,
+    currentFontSize,
+    currentHeight,
+    currentPositionMode,
+    currentWidth,
+    theme,
+    visible,
   ]);
 
   return (
@@ -87,128 +174,51 @@ export const VirtualKeyboard = () => {
       <DragBlock
         resizeOverRight={true}
         onClick={() => {
-          virtualKeyboardCtx?.setShow?.(true);
+          setVisible(true);
         }}
       >
         <KeyBoardSvg
           style={{
-            width: virtualKeyboardCtx.iconWidth,
-            height: virtualKeyboardCtx.iconHeight,
+            width: iconWidth,
+            height: iconHeight,
           }}
         />
       </DragBlock>
       <DragBlock
         autoKeepRight={false}
         init={{
-          width: virtualKeyboardCtx.width ?? '0px',
-          height: virtualKeyboardCtx.height ?? '0px',
+          width: currentWidth ?? '0px',
+          height: currentHeight ?? '0px',
         }}
-        zIndex={virtualKeyboardCtx.show ? virtualKeyboardCtx.zIndex : -1}
-        positionMode={virtualKeyboardCtx.positionMode}
+        zIndex={visible ? zIndex : -1}
+        positionMode={currentPositionMode}
       >
         <CompositionKeyboard
           style={vkbStyles}
-          themeMode={virtualKeyboardCtx.themeMode}
-          positionMode={virtualKeyboardCtx.positionMode}
-          width={
-            virtualKeyboardCtx.width ?? InitVirtualKeyBoardCtx.width ?? '500px'
+          themeMode={currentThemeMode}
+          positionMode={currentPositionMode}
+          width={currentWidth ?? InitVirtualKeyBoardCtx.width ?? '500px'}
+          height={currentHeight ?? InitVirtualKeyBoardCtx.height ?? '320px'}
+          fontSize={
+            currentFontSize ?? InitVirtualKeyBoardCtx.fontSize ?? '14px'
           }
-          height={
-            virtualKeyboardCtx.height ??
-            InitVirtualKeyBoardCtx.height ??
-            '320px'
-          }
-          fontSize={virtualKeyboardCtx.fontSize ?? '14px'}
-          focusShow={virtualKeyboardCtx.focusShow}
-          virtualKeyboardTab={virtualKeyboardCtx.virtualKeyboardTab}
-          showDragHandle={virtualKeyboardCtx.showDragHandle}
-          useKeydownAudio={virtualKeyboardCtx.useKeydownAudio}
-          keydownAudioUrl={virtualKeyboardCtx.keydownAudioUrl}
-          onChangeShow={virtualKeyboardCtx.setShow}
-          onThemeModeChange={virtualKeyboardCtx.setThemeMode}
-          onPositionModeChange={virtualKeyboardCtx.setPositionMode}
-          onWidthChange={virtualKeyboardCtx.setWidth}
-          onHeightChange={virtualKeyboardCtx.setHeight}
-          onFontSizeChange={virtualKeyboardCtx.setFontSize}
-          onKeydownAudioUrlChange={virtualKeyboardCtx.setKeydownAudioUrl}
-          onUseKeydownAudioChange={virtualKeyboardCtx.setUseKeydownAudio}
+          focusShow={focusShow}
+          virtualKeyboardTab={virtualKeyboardTab}
+          showDragHandle={showDragHandle}
+          useKeydownAudio={currentUseKeydownAudio}
+          keydownAudioUrl={keydownAudioUrl}
+          onChangeShow={setVisible}
+          onThemeModeChange={setCurrentThemeMode}
+          onPositionModeChange={setCurrentPositionMode}
+          onWidthChange={setCurrentWidth}
+          onHeightChange={setCurrentHeight}
+          onFontSizeChange={setCurrentFontSize}
+          onKeydownAudioUrlChange={() => undefined}
+          onUseKeydownAudioChange={setCurrentUseKeydownAudio}
         />
       </DragBlock>
     </>
   );
 };
 
-const VirtualKeyboardProvider = ({
-  children,
-  value = InitVirtualKeyBoardCtx,
-}: {
-  children?: ReactNode;
-  value?: VKB.KeyBoardCtxTypBase;
-}) => {
-  const [show, setShow] = useState(false);
-
-  const [themeMode, setThemeMode] = useLocalStorageState(VKB_THEME_MODE, {
-    defaultValue: 'light',
-  });
-
-  const [positionMode, setPositionMode] = useLocalStorageState(
-    VKB_POSITION_MODE,
-    {
-      defaultValue: 'float',
-    },
-  );
-
-  const [width, setWidth] = useLocalStorageState(VKB_KEYBOARD_WIDTH, {
-    defaultValue: value.width ?? InitVirtualKeyBoardCtx.width,
-  });
-
-  const [height, setHeight] = useLocalStorageState(VKB_KEYBOARD_HEIGHT, {
-    defaultValue: value.height ?? InitVirtualKeyBoardCtx.height,
-  });
-
-  const [fontSize, setFontSize] = useLocalStorageState(VKB_KEY_FONT_SIZE, {
-    defaultValue: value.theme?.['--vkb-key-font-size'] ?? '14px',
-  });
-
-  const [useKeydownAudio, setUseKeydownAudio] = useLocalStorageState<
-    'Y' | 'N' | undefined
-  >(VKB_KEYDOWN_MODE, {
-    defaultValue: 'Y',
-  });
-
-  return (
-    <VirtualKeyboardContext.Provider
-      value={{
-        show,
-        setShow,
-        positionMode,
-        setPositionMode,
-        useKeydownAudio,
-        setUseKeydownAudio,
-        themeMode,
-        setThemeMode,
-        ...value,
-        width,
-        setWidth,
-        height,
-        setHeight,
-        fontSize,
-        setFontSize,
-      }}
-    >
-      {children}
-    </VirtualKeyboardContext.Provider>
-  );
-};
-
-const useVirtualKeyboard = () => {
-  const virtualKeyboardCtx = useContext(VirtualKeyboardContext);
-
-  return {
-    virtualKeyboardCtx,
-    VirtualKeyboardProvider,
-    VirtualKeyboard,
-  };
-};
-
-export default useVirtualKeyboard;
+export default VirtualKeyboard;

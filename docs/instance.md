@@ -15,7 +15,7 @@ nav:
 ## 实际使用推荐
 
 - 实际业务中，推荐全局只保留一个虚拟键盘实例
-- 通常做法是在应用根节点挂一个 `VirtualKeyboardProvider` 和一个 `VirtualKeyboard`
+- 通常做法是在应用根节点直接挂一个 `VirtualKeyboard`
 - 页面里的输入框统一共用这一套虚拟键盘，通过不同的 `data-vkb-*` 属性控制行为
 - 如果你要单独验证某个规则，建议像文档中的 [Focus 弹出测试](/focus-show) 一样拆成单独页面，避免示例之间互相影响
 
@@ -23,15 +23,14 @@ nav:
 
 ```jsx
 import { useState } from 'react';
-import { useVirtualKeyboard } from 'rc-virtual-keyboard';
+import { VirtualKeyboard } from 'rc-virtual-keyboard';
 
 export default () => {
   const [name, setName] = useState('');
   const [code, setCode] = useState('');
-  const { VirtualKeyboard, VirtualKeyboardProvider } = useVirtualKeyboard();
 
   return (
-    <VirtualKeyboardProvider>
+    <>
       <div>
         <input
           placeholder="默认跟随全局规则"
@@ -52,7 +51,7 @@ export default () => {
       </div>
 
       <VirtualKeyboard />
-    </VirtualKeyboardProvider>
+    </>
   );
 };
 ```

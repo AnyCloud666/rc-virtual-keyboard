@@ -18,7 +18,7 @@ type = `number` | `email` 造成的 `selection` 异常
 ```jsx
 import { useState } from 'react';
 import {
-  useVirtualKeyboard,
+  VirtualKeyboard,
   keys,
   LetterKeyboardTab,
   NumberKeyboardTab,
@@ -37,7 +37,6 @@ export default () => {
     localStorage?.getItem(keys.VKB_POSITION_MODE) ?? 'float',
   );
   const [value, setValue] = useState('');
-  const { VirtualKeyboard, VirtualKeyboardProvider } = useVirtualKeyboard();
 
   return (
     <>
@@ -72,9 +71,7 @@ export default () => {
         <input type="datetime" />
       </div>
 
-      <VirtualKeyboardProvider>
-        <VirtualKeyboard />
-      </VirtualKeyboardProvider>
+      <VirtualKeyboard />
     </>
   );
 };

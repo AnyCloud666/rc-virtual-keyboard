@@ -35,7 +35,7 @@ export { default as CompositionKeyboard } from './CompositionKeyboard';
 
 export {
   InitVirtualKeyBoardCtx,
-  default as useVirtualKeyboard,
+  default as VirtualKeyboard,
 } from './VirtualKeyboard';
 
 export { default as useInput } from './hooks/useInput';

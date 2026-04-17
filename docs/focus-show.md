@@ -18,17 +18,11 @@ nav:
 
 ```jsx
 import { useState } from 'react';
-import {
-  useVirtualKeyboard,
-  InitVirtualKeyBoardCtx,
-} from 'rc-virtual-keyboard';
+import { VirtualKeyboard } from 'rc-virtual-keyboard';
 
 export default () => {
   const [normalValue, setNormalValue] = useState('');
   const [forcedValue, setForcedValue] = useState('');
-  const { VirtualKeyboard, VirtualKeyboardProvider } = useVirtualKeyboard({
-    focusShow: false,
-  });
 
   return (
     <>
@@ -51,11 +45,7 @@ export default () => {
         />
       </div>
 
-      <VirtualKeyboardProvider
-        value={{ ...InitVirtualKeyBoardCtx, focusShow: false }}
-      >
-        <VirtualKeyboard />
-      </VirtualKeyboardProvider>
+      <VirtualKeyboard focusShow={false} />
     </>
   );
 };

@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { useVirtualKeyboard } from '../src';
+import { VirtualKeyboard } from '../src';
 
 export default () => {
   const [normalValue, setNormalValue] = useState('');
   const [forcedValue, setForcedValue] = useState('');
-  const { VirtualKeyboard, VirtualKeyboardProvider } = useVirtualKeyboard();
 
   return (
     <>
@@ -27,9 +26,7 @@ export default () => {
         />
       </div>
 
-      <VirtualKeyboardProvider value={{ focusShow: false }}>
-        <VirtualKeyboard />
-      </VirtualKeyboardProvider>
+      <VirtualKeyboard focusShow={false} />
     </>
   );
 };
