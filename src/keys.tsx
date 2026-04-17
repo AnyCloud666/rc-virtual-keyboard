@@ -46,6 +46,8 @@ export const VKB_KEYBOARD_WIDTH = 'VKB_KEYBOARD_WIDTH';
 export const VKB_KEYBOARD_HEIGHT = 'VKB_KEYBOARD_HEIGHT';
 /** 按键文字大小 */
 export const VKB_KEY_FONT_SIZE = 'VKB_KEY_FONT_SIZE';
+/** 按键字体 */
+export const VKB_KEY_FONT_FAMILY = 'VKB_KEY_FONT_FAMILY';
 
 /** ---------------------------功能控制类--------------------------- */
 /** 删除 */

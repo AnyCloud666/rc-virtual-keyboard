@@ -20,6 +20,84 @@ const FONT_SIZE_MIN = 12;
 const FONT_SIZE_MAX = 28;
 const SIZE_STEP = 10;
 
+const FONT_FAMILY_OPTIONS = [
+  {
+    label: '默认',
+    value: "'Microsoft YaHei', 'PingFang SC', sans-serif",
+    preview: '文Aa',
+  },
+  {
+    label: '苹方',
+    value: "'PingFang SC', 'Microsoft YaHei', sans-serif",
+    preview: '苹Aa',
+  },
+  {
+    label: '微软雅黑',
+    value: "'Microsoft YaHei', 'PingFang SC', sans-serif",
+    preview: '雅黑',
+  },
+  {
+    label: '宋体',
+    value: "'SimSun', 'Songti SC', serif",
+    preview: '宋Aa',
+  },
+  {
+    label: '仿宋',
+    value: "'FangSong', 'STFangsong', serif",
+    preview: '仿Aa',
+  },
+  {
+    label: '楷体',
+    value: "'KaiTi', 'STKaiti', serif",
+    preview: '楷Aa',
+  },
+  {
+    label: '黑体',
+    value: "'SimHei', 'Heiti SC', sans-serif",
+    preview: '黑Aa',
+  },
+  {
+    label: '圆体',
+    value: "'YouYuan', 'Hiragino Sans GB', sans-serif",
+    preview: '圆Aa',
+  },
+  {
+    label: 'Arial',
+    value: "'Arial', 'Helvetica Neue', sans-serif",
+    preview: 'Arial',
+  },
+  {
+    label: 'Georgia',
+    value: "'Georgia', 'Times New Roman', serif",
+    preview: 'Geo',
+  },
+  {
+    label: 'Trebuchet',
+    value: "'Trebuchet MS', 'Arial', sans-serif",
+    preview: 'Treb',
+  },
+  {
+    label: 'Verdana',
+    value: "'Verdana', 'Geneva', sans-serif",
+    preview: 'VdAa',
+  },
+  {
+    label: '等宽',
+    value: "'Consolas', 'Courier New', monospace",
+    preview: 'Mono',
+  },
+  {
+    label: 'Courier',
+    value: "'Courier New', 'Consolas', monospace",
+    preview: 'Code',
+  },
+  {
+    label: 'Times',
+    value: "'Times New Roman', 'Georgia', serif",
+    preview: 'Time',
+  },
+] as const;
+
 const clampValue = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
 
@@ -41,9 +119,11 @@ const SettingKeyboard = ({
   width,
   height,
   fontSize,
+  fontFamily,
   onWidthChange,
   onHeightChange,
   onFontSizeChange,
+  onFontFamilyChange,
   onClick,
 }: {
   themeMode: string;
@@ -52,9 +132,11 @@ const SettingKeyboard = ({
   width: string;
   height: string;
   fontSize: string;
+  fontFamily: string;
   onWidthChange: (width: string) => void;
   onHeightChange: (height: string) => void;
   onFontSizeChange: (fontSize: string) => void;
+  onFontFamilyChange: (fontFamily: string) => void;
   onClick: (e: VKB.KeyboardAttributeType) => void;
 }) => {
   const currentWidth = clampValue(
@@ -75,6 +157,7 @@ const SettingKeyboard = ({
   const [draftWidth, setDraftWidth] = useState(currentWidth);
   const [draftHeight, setDraftHeight] = useState(currentHeight);
   const [draftFontSize, setDraftFontSize] = useState(currentFontSize);
+  const [draftFontFamily, setDraftFontFamily] = useState(fontFamily);
 
   const canResizeWidth =
     positionMode === 'float' ||
@@ -98,6 +181,10 @@ const SettingKeyboard = ({
     setDraftFontSize(currentFontSize);
   }, [currentFontSize]);
 
+  useEffect(() => {
+    setDraftFontFamily(fontFamily);
+  }, [fontFamily]);
+
   const { run: commitWidth } = useDebounceFn(
     (nextValue: number) => {
       onWidthChange(formatPx(nextValue));
@@ -115,6 +202,13 @@ const SettingKeyboard = ({
   const { run: commitFontSize } = useDebounceFn(
     (nextValue: number) => {
       onFontSizeChange(formatPx(nextValue));
+    },
+    { wait: 120 },
+  );
+
+  const { run: commitFontFamily } = useDebounceFn(
+    (nextValue: string) => {
+      onFontFamilyChange(nextValue);
     },
     { wait: 120 },
   );
@@ -138,6 +232,11 @@ const SettingKeyboard = ({
 
     setDraftFontSize(normalizedValue);
     commitFontSize(normalizedValue);
+  };
+
+  const changeFontFamily = (nextValue: string) => {
+    setDraftFontFamily(nextValue);
+    commitFontFamily(nextValue);
   };
 
   return (
@@ -359,6 +458,34 @@ const SettingKeyboard = ({
               </button>
             </div>
           </div>
+        </div>
+      </div>
+      <div className="setting-keyboard-item">
+        <div>按键字体：</div>
+        <div className="setting-keyboard-box">
+          {FONT_FAMILY_OPTIONS.map((item) => {
+            const isActive = draftFontFamily === item.value;
+
+            return (
+              <div className="setting-keyboard-wrapper" key={item.label}>
+                <button
+                  type="button"
+                  className={`setting-keyboard-box-item setting-keyboard-font-item ${
+                    isActive ? 'setting-keyboard-box-item-active' : ''
+                  }`}
+                  style={{ fontFamily: item.value }}
+                  onMouseDown={stopDragBubble}
+                  onTouchStart={stopDragBubble}
+                  onPointerDown={stopDragBubble}
+                  onClick={() => changeFontFamily(item.value)}
+                  title={item.label}
+                >
+                  {item.preview}
+                </button>
+                <div>{item.label}</div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

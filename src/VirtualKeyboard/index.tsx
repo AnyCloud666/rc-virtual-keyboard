@@ -9,6 +9,7 @@ import {
   FixedRightPosition,
   FixedTopPosition,
   FloatPosition,
+  VKB_KEY_FONT_FAMILY,
   VKB_KEY_FONT_SIZE,
   VKB_KEYBOARD_HEIGHT,
   VKB_KEYBOARD_WIDTH,
@@ -24,6 +25,7 @@ export const InitVirtualKeyBoardCtx: VKB.KeyBoardCtxTypBase = {
   width: '500px',
   height: '320px',
   fontSize: '14px',
+  fontFamily: "'Microsoft YaHei', 'PingFang SC', sans-serif",
   iconWidth: '100px',
   iconHeight: '100px',
   zIndex: 9999,
@@ -34,6 +36,7 @@ const VirtualKeyboard = ({
   width = InitVirtualKeyBoardCtx.width,
   height = InitVirtualKeyBoardCtx.height,
   fontSize = InitVirtualKeyBoardCtx.fontSize,
+  fontFamily = InitVirtualKeyBoardCtx.fontFamily,
   iconWidth = InitVirtualKeyBoardCtx.iconWidth,
   iconHeight = InitVirtualKeyBoardCtx.iconHeight,
   zIndex = InitVirtualKeyBoardCtx.zIndex,
@@ -84,6 +87,13 @@ const VirtualKeyboard = ({
     },
   );
 
+  const [currentFontFamily, setCurrentFontFamily] = useLocalStorageState(
+    VKB_KEY_FONT_FAMILY,
+    {
+      defaultValue: fontFamily,
+    },
+  );
+
   const [currentUseKeydownAudio, setCurrentUseKeydownAudio] =
     useLocalStorageState<'Y' | 'N' | undefined>(VKB_KEYDOWN_MODE, {
       defaultValue: useKeydownAudio,
@@ -124,6 +134,12 @@ const VirtualKeyboard = ({
   }, [fontSize, setCurrentFontSize]);
 
   useEffect(() => {
+    if (fontFamily) {
+      setCurrentFontFamily(fontFamily);
+    }
+  }, [fontFamily, setCurrentFontFamily]);
+
+  useEffect(() => {
     if (useKeydownAudio) {
       setCurrentUseKeydownAudio(useKeydownAudio);
     }
@@ -134,9 +150,14 @@ const VirtualKeyboard = ({
       height: currentHeight,
       width: currentWidth,
       fontSize: currentFontSize ?? InitVirtualKeyBoardCtx.fontSize,
+      fontFamily: currentFontFamily ?? InitVirtualKeyBoardCtx.fontFamily,
       transform: visible ? 'scale(1)' : 'scale(0)',
       '--vkb-key-font-size':
         currentFontSize ?? InitVirtualKeyBoardCtx.fontSize ?? '14px',
+      '--vkb-key-font-family':
+        currentFontFamily ??
+        InitVirtualKeyBoardCtx.fontFamily ??
+        "'Microsoft YaHei', 'PingFang SC', sans-serif",
       ...theme,
     };
     switch (currentPositionMode) {
@@ -162,6 +183,7 @@ const VirtualKeyboard = ({
     return styles;
   }, [
     currentFontSize,
+    currentFontFamily,
     currentHeight,
     currentPositionMode,
     currentWidth,
@@ -202,6 +224,11 @@ const VirtualKeyboard = ({
           fontSize={
             currentFontSize ?? InitVirtualKeyBoardCtx.fontSize ?? '14px'
           }
+          fontFamily={
+            currentFontFamily ??
+            InitVirtualKeyBoardCtx.fontFamily ??
+            "'Microsoft YaHei', 'PingFang SC', sans-serif"
+          }
           focusShow={focusShow}
           virtualKeyboardTab={virtualKeyboardTab}
           showDragHandle={showDragHandle}
@@ -213,6 +240,7 @@ const VirtualKeyboard = ({
           onWidthChange={setCurrentWidth}
           onHeightChange={setCurrentHeight}
           onFontSizeChange={setCurrentFontSize}
+          onFontFamilyChange={setCurrentFontFamily}
           onKeydownAudioUrlChange={() => undefined}
           onUseKeydownAudioChange={setCurrentUseKeydownAudio}
         />

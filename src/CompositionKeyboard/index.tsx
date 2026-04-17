@@ -31,6 +31,7 @@ const CompositionKeyboard = ({
   width = '500px',
   height = '320px',
   fontSize = '14px',
+  fontFamily = "'Microsoft YaHei', 'PingFang SC', sans-serif",
   focusShow,
   useKeydownAudio = 'Y',
   keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
@@ -40,6 +41,7 @@ const CompositionKeyboard = ({
   onWidthChange,
   onHeightChange,
   onFontSizeChange,
+  onFontFamilyChange,
   onUseKeydownAudioChange,
   onKeydownAudioUrlChange,
 }: {
@@ -67,6 +69,8 @@ const CompositionKeyboard = ({
   height?: string;
   /** 按键文字大小 */
   fontSize?: string;
+  /** 按键字体 */
+  fontFamily?: string;
   /** 输入框 focus 时是否自动显示键盘 */
   focusShow?: boolean;
   /** 是否使用键盘按键声音 */
@@ -85,6 +89,8 @@ const CompositionKeyboard = ({
   onHeightChange?: (height: string) => void;
   /** 按键文字大小改变 */
   onFontSizeChange?: (fontSize: string) => void;
+  /** 按键字体改变 */
+  onFontFamilyChange?: (fontFamily: string) => void;
   /** 使用改变 */
   onUseKeydownAudioChange?: (mode: 'Y' | 'N') => void;
   /** 地址改变 */
@@ -176,11 +182,13 @@ const CompositionKeyboard = ({
               width={width}
               height={height}
               fontSize={fontSize}
+              fontFamily={fontFamily}
               chinese={chinese}
               onClick={onClick}
               onWidthChange={onWidthChange ?? (() => {})}
               onHeightChange={onHeightChange ?? (() => {})}
               onFontSizeChange={onFontSizeChange ?? (() => {})}
+              onFontFamilyChange={onFontFamilyChange ?? (() => {})}
               onChangeInputMode={onChangeInputMode}
               inputValue={inputValue}
               onSelectChinese={onSelectChinese}

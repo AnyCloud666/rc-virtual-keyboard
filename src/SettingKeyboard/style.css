@@ -65,6 +65,10 @@
   cursor: pointer;
 }
 
+.setting-keyboard-font-item {
+  font-weight: 600;
+}
+
 .setting-keyboard-box-item > svg {
   width: var(--vkb-keyboard-svg-size);
   height: var(--vkb-keyboard-svg-size);

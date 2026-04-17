@@ -35,6 +35,7 @@ declare namespace VKB {
       width: string;
       height: string;
       fontSize: string;
+      fontFamily: string;
       inputValue: string;
       chinese: string[];
       onMouseDown: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
@@ -42,6 +43,7 @@ declare namespace VKB {
       onWidthChange: (width: string) => void;
       onHeightChange: (height: string) => void;
       onFontSizeChange: (fontSize: string) => void;
+      onFontFamilyChange: (fontFamily: string) => void;
       onChangeInputMode: (mode: InputMode) => void;
       onChangeInputMode: (mode: VKB.InputMode) => void;
       onSelectChinese: (chinese: string) => void;
@@ -102,6 +104,8 @@ declare namespace VKB {
     '--vkb-key-borer-radius': string;
     /** 按键文字大小 */
     '--vkb-key-font-size': string;
+    /** 按键字体 */
+    '--vkb-key-font-family': string;
     /** tab 高度 */
     '--vkb-keyboard-tab': string;
     /** 内部 svg 大小 */
@@ -117,6 +121,8 @@ declare namespace VKB {
     height?: string;
     /** 按键文字大小 */
     fontSize?: string;
+    /** 按键字体 */
+    fontFamily?: string;
     /** icon 宽度 */
     iconWidth?: string;
     /** icon 高度 */
@@ -146,6 +152,8 @@ declare namespace VKB {
     positionMode?: string;
     /** 按键文字大小 */
     fontSize?: string;
+    /** 按键字体 */
+    fontFamily?: string;
     /** 按键音效 */
     useKeydownAudio?: 'Y' | 'N';
     /** 显示 ,传入的必须是 setStatus 重新 render */
@@ -160,6 +168,8 @@ declare namespace VKB {
     setHeight?: (height: string) => void;
     /** 设置按键文字大小 */
     setFontSize?: (fontSize: string) => void;
+    /** 设置按键字体 */
+    setFontFamily?: (fontFamily: string) => void;
     /** 设置是否使用按键音效 */
     setUseKeydownAudio?: (use: 'Y' | 'N') => void;
     /** 设置按键音效 url */

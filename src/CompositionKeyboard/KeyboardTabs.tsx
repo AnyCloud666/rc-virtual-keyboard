@@ -103,9 +103,11 @@ export const SettingKeyboardTab: VKB.KeyboardTabItem = {
     width,
     height,
     fontSize,
+    fontFamily,
     onWidthChange,
     onHeightChange,
     onFontSizeChange,
+    onFontFamilyChange,
     onClick,
   }) => (
     <SettingKeyBoard
@@ -115,9 +117,11 @@ export const SettingKeyboardTab: VKB.KeyboardTabItem = {
       width={width}
       height={height}
       fontSize={fontSize}
+      fontFamily={fontFamily}
       onWidthChange={onWidthChange}
       onHeightChange={onHeightChange}
       onFontSizeChange={onFontSizeChange}
+      onFontFamilyChange={onFontFamilyChange}
       onClick={onClick}
     />
   ),
