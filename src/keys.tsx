@@ -40,6 +40,12 @@ export const VKB_THEME_MODE = 'VKB_THEME_MODE';
 export const VKB_POSITION_MODE = 'VKB_POSITION_MODE';
 /** 按键音效key */
 export const VKB_KEYDOWN_MODE = 'VKB_KEYDOWN_MODE';
+/** 键盘宽度 */
+export const VKB_KEYBOARD_WIDTH = 'VKB_KEYBOARD_WIDTH';
+/** 键盘高度 */
+export const VKB_KEYBOARD_HEIGHT = 'VKB_KEYBOARD_HEIGHT';
+/** 按键文字大小 */
+export const VKB_KEY_FONT_SIZE = 'VKB_KEY_FONT_SIZE';
 
 /** ---------------------------功能控制类--------------------------- */
 /** 删除 */

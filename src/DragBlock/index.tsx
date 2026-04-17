@@ -62,6 +62,44 @@ const DragBlock = ({
   const clickTimer = useRef(0);
   /** block 是否隐藏 */
   const isHidden = useRef(true);
+
+  const syncBlockPosition = () => {
+    if (!blockRef.current) return;
+
+    switch (positionMode) {
+      case FixedBottomPosition.code:
+        blockRef.current.style.left = '0px';
+        blockRef.current.style.top = `calc(100vh - ${init?.height})`;
+        break;
+      case FixedTopPosition.code:
+      case FixedLeftPosition.code:
+        blockRef.current.style.left = '0px';
+        blockRef.current.style.top = '0px';
+        break;
+      case FixedRightPosition.code:
+        blockRef.current.style.left =
+          parseFloat(init?.width ?? '0') > window.innerWidth
+            ? '0px'
+            : `calc(100vw - ${init?.width})`;
+        blockRef.current.style.top = '0px';
+        break;
+      default: {
+        const maxLeft = Math.max(
+          0,
+          window.innerWidth - blockRef.current.offsetWidth,
+        );
+        const maxTop = Math.max(
+          0,
+          window.innerHeight - blockRef.current.offsetHeight,
+        );
+        const nextLeft = Math.min(blockRef.current.offsetLeft, maxLeft);
+        const nextTop = Math.min(blockRef.current.offsetTop, maxTop);
+
+        blockRef.current.style.left = `${Math.max(0, nextLeft)}px`;
+        blockRef.current.style.top = `${Math.max(0, nextTop)}px`;
+      }
+    }
+  };
   /** @type {*}
    * 自动靠右
    */
@@ -145,27 +183,8 @@ const DragBlock = ({
   }, [zIndex]);
 
   useEffect(() => {
-    if (blockRef.current) {
-      switch (positionMode) {
-        case FixedBottomPosition.code:
-          blockRef.current.style.left = '0px';
-          blockRef.current.style.top = `calc(100vh - ${init?.height})`;
-          break;
-        case FixedTopPosition.code:
-        case FixedLeftPosition.code:
-          blockRef.current.style.left = '0px';
-          blockRef.current.style.top = '0px';
-          break;
-        case FixedRightPosition.code:
-          blockRef.current.style.left =
-            parseFloat(init?.width ?? '0') > window.innerWidth
-              ? '0px'
-              : `calc(100vw - ${init?.width})`;
-          blockRef.current.style.top = '0px';
-          break;
-      }
-    }
-  }, [positionMode]);
+    syncBlockPosition();
+  }, [init?.height, init?.width, positionMode]);
 
   /** 监听自动靠右 */
   useUpdateEffect(() => {
@@ -277,21 +296,7 @@ const DragBlock = ({
               'px';
           }
         } else {
-          switch (positionMode) {
-            case FixedBottomPosition.code:
-              blockRef.current.style.left = '0px';
-              blockRef.current.style.top = `calc(100vh - ${init?.height})`;
-              break;
-            case FixedTopPosition.code:
-            case FixedLeftPosition.code:
-              blockRef.current.style.left = '0px';
-              blockRef.current.style.top = '0px';
-              break;
-            case FixedRightPosition.code:
-              blockRef.current.style.left = `calc(100vw - ${init?.width})`;
-              blockRef.current.style.top = '0px';
-              break;
-          }
+          syncBlockPosition();
         }
       }
     },

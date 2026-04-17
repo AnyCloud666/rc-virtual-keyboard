@@ -96,11 +96,28 @@ export const SettingKeyboardTab: VKB.KeyboardTabItem = {
   id: 'setting',
   label: <SettingSvg />,
   name: '设置',
-  Component: ({ themeMode, positionMode, vkbKeydownAudio, onClick }) => (
+  Component: ({
+    themeMode,
+    positionMode,
+    vkbKeydownAudio,
+    width,
+    height,
+    fontSize,
+    onWidthChange,
+    onHeightChange,
+    onFontSizeChange,
+    onClick,
+  }) => (
     <SettingKeyBoard
       vkbKeydownAudio={vkbKeydownAudio}
       themeMode={themeMode}
       positionMode={positionMode}
+      width={width}
+      height={height}
+      fontSize={fontSize}
+      onWidthChange={onWidthChange}
+      onHeightChange={onHeightChange}
+      onFontSizeChange={onFontSizeChange}
       onClick={onClick}
     />
   ),

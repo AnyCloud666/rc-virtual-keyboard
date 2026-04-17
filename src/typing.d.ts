@@ -32,10 +32,16 @@ declare namespace VKB {
       inputMode: InputMode;
       positionMode: string;
       vkbKeydownAudio: string;
+      width: string;
+      height: string;
+      fontSize: string;
       inputValue: string;
       chinese: string[];
       onMouseDown: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
       onClick: (e: VKB.KeyboardAttributeType) => void;
+      onWidthChange: (width: string) => void;
+      onHeightChange: (height: string) => void;
+      onFontSizeChange: (fontSize: string) => void;
       onChangeInputMode: (mode: InputMode) => void;
       onChangeInputMode: (mode: VKB.InputMode) => void;
       onSelectChinese: (chinese: string) => void;
@@ -144,6 +150,12 @@ declare namespace VKB {
     setThemeMode?: (mode: string) => void;
     /** 设置位置模式 */
     setPositionMode?: (mode: string) => void;
+    /** 设置宽度 */
+    setWidth?: (width: string) => void;
+    /** 设置高度 */
+    setHeight?: (height: string) => void;
+    /** 设置按键文字大小 */
+    setFontSize?: (fontSize: string) => void;
     /** 设置是否使用按键音效 */
     setUseKeydownAudio?: (use: 'Y' | 'N') => void;
     /** 设置按键音效 url */

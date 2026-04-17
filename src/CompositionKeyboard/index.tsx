@@ -28,12 +28,18 @@ const CompositionKeyboard = ({
   hiddenLabel = <BottomSvg />,
   themeMode = LightTheme.code,
   positionMode = FloatPosition.code,
+  width = '500px',
+  height = '320px',
+  fontSize = '14px',
   focusShow,
   useKeydownAudio = 'Y',
   keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
   onChangeShow,
   onThemeModeChange,
   onPositionModeChange,
+  onWidthChange,
+  onHeightChange,
+  onFontSizeChange,
   onUseKeydownAudioChange,
   onKeydownAudioUrlChange,
 }: {
@@ -55,6 +61,12 @@ const CompositionKeyboard = ({
   themeMode?: string;
   /** 位置 */
   positionMode?: string;
+  /** 宽度 */
+  width?: string;
+  /** 高度 */
+  height?: string;
+  /** 按键文字大小 */
+  fontSize?: string;
   /** 输入框 focus 时是否自动显示键盘 */
   focusShow?: boolean;
   /** 是否使用键盘按键声音 */
@@ -67,6 +79,12 @@ const CompositionKeyboard = ({
   onThemeModeChange?: (mode: string) => void;
   /** 位置模式改变 */
   onPositionModeChange?: (mode: string) => void;
+  /** 宽度改变 */
+  onWidthChange?: (width: string) => void;
+  /** 高度改变 */
+  onHeightChange?: (height: string) => void;
+  /** 按键文字大小改变 */
+  onFontSizeChange?: (fontSize: string) => void;
   /** 使用改变 */
   onUseKeydownAudioChange?: (mode: 'Y' | 'N') => void;
   /** 地址改变 */
@@ -155,8 +173,14 @@ const CompositionKeyboard = ({
               themeMode={vkbThemeMode}
               positionMode={vkbPositionMode}
               vkbKeydownAudio={vkbKeydownAudio}
+              width={width}
+              height={height}
+              fontSize={fontSize}
               chinese={chinese}
               onClick={onClick}
+              onWidthChange={onWidthChange ?? (() => {})}
+              onHeightChange={onHeightChange ?? (() => {})}
+              onFontSizeChange={onFontSizeChange ?? (() => {})}
               onChangeInputMode={onChangeInputMode}
               inputValue={inputValue}
               onSelectChinese={onSelectChinese}

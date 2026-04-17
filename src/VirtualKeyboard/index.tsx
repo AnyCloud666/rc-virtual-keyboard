@@ -16,6 +16,9 @@ import {
   FixedRightPosition,
   FixedTopPosition,
   FloatPosition,
+  VKB_KEY_FONT_SIZE,
+  VKB_KEYBOARD_HEIGHT,
+  VKB_KEYBOARD_WIDTH,
   VKB_KEYDOWN_MODE,
   VKB_POSITION_MODE,
   VKB_THEME_MODE,
@@ -44,7 +47,9 @@ export const VirtualKeyboard = () => {
     const styles = {
       height: virtualKeyboardCtx.height,
       width: virtualKeyboardCtx.width,
+      fontSize: virtualKeyboardCtx.fontSize ?? '14px',
       transform: virtualKeyboardCtx.show ? 'scale(1)' : 'scale(0)',
+      '--vkb-key-font-size': virtualKeyboardCtx.fontSize ?? '14px',
       ...virtualKeyboardCtx.theme,
     };
     switch (virtualKeyboardCtx.positionMode) {
@@ -69,9 +74,12 @@ export const VirtualKeyboard = () => {
     }
     return styles;
   }, [
+    virtualKeyboardCtx.fontSize,
+    virtualKeyboardCtx.height,
     virtualKeyboardCtx.positionMode,
     virtualKeyboardCtx.show,
     virtualKeyboardCtx.theme,
+    virtualKeyboardCtx.width,
   ]);
 
   return (
@@ -102,6 +110,15 @@ export const VirtualKeyboard = () => {
           style={vkbStyles}
           themeMode={virtualKeyboardCtx.themeMode}
           positionMode={virtualKeyboardCtx.positionMode}
+          width={
+            virtualKeyboardCtx.width ?? InitVirtualKeyBoardCtx.width ?? '500px'
+          }
+          height={
+            virtualKeyboardCtx.height ??
+            InitVirtualKeyBoardCtx.height ??
+            '320px'
+          }
+          fontSize={virtualKeyboardCtx.fontSize ?? '14px'}
           focusShow={virtualKeyboardCtx.focusShow}
           virtualKeyboardTab={virtualKeyboardCtx.virtualKeyboardTab}
           showDragHandle={virtualKeyboardCtx.showDragHandle}
@@ -110,6 +127,9 @@ export const VirtualKeyboard = () => {
           onChangeShow={virtualKeyboardCtx.setShow}
           onThemeModeChange={virtualKeyboardCtx.setThemeMode}
           onPositionModeChange={virtualKeyboardCtx.setPositionMode}
+          onWidthChange={virtualKeyboardCtx.setWidth}
+          onHeightChange={virtualKeyboardCtx.setHeight}
+          onFontSizeChange={virtualKeyboardCtx.setFontSize}
           onKeydownAudioUrlChange={virtualKeyboardCtx.setKeydownAudioUrl}
           onUseKeydownAudioChange={virtualKeyboardCtx.setUseKeydownAudio}
         />
@@ -138,6 +158,18 @@ const VirtualKeyboardProvider = ({
     },
   );
 
+  const [width, setWidth] = useLocalStorageState(VKB_KEYBOARD_WIDTH, {
+    defaultValue: value.width ?? InitVirtualKeyBoardCtx.width,
+  });
+
+  const [height, setHeight] = useLocalStorageState(VKB_KEYBOARD_HEIGHT, {
+    defaultValue: value.height ?? InitVirtualKeyBoardCtx.height,
+  });
+
+  const [fontSize, setFontSize] = useLocalStorageState(VKB_KEY_FONT_SIZE, {
+    defaultValue: value.theme?.['--vkb-key-font-size'] ?? '14px',
+  });
+
   const [useKeydownAudio, setUseKeydownAudio] = useLocalStorageState<
     'Y' | 'N' | undefined
   >(VKB_KEYDOWN_MODE, {
@@ -156,6 +188,12 @@ const VirtualKeyboardProvider = ({
         themeMode,
         setThemeMode,
         ...value,
+        width,
+        setWidth,
+        height,
+        setHeight,
+        fontSize,
+        setFontSize,
       }}
     >
       {children}
