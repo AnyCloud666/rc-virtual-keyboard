@@ -181,7 +181,7 @@ const SettingKeyboard = ({
   onHeightChange: (height: string) => void;
   onFontSizeChange: (fontSize: string) => void;
   onFontFamilyChange: (fontFamily: string) => void;
-  onNumberKeyboardLayoutModeChange: (
+  onNumberKeyboardLayoutModeChange?: (
     mode: VKB.NumberKeyboardLayoutMode,
   ) => void;
   onClick: (e: VKB.KeyboardAttributeType) => void;
@@ -376,11 +376,11 @@ const SettingKeyboard = ({
                   onMouseDown={keepFocusAndBubble}
                   onTouchStart={(e) =>
                     stopTouchAndRun(e, () =>
-                      onNumberKeyboardLayoutModeChange(item.value),
+                      onNumberKeyboardLayoutModeChange?.(item.value),
                     )
                   }
                   onPointerDown={keepFocusAndBubble}
-                  onClick={() => onNumberKeyboardLayoutModeChange(item.value)}
+                  onClick={() => onNumberKeyboardLayoutModeChange?.(item.value)}
                   title={item.preview}
                 >
                   {item.label}
