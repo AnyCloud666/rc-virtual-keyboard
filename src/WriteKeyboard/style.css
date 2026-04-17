@@ -133,6 +133,14 @@
   background-color: var(--vkb-key-active-background);
 }
 
+.write-control-backspace-active,
+.write-control-enter-active {
+  border: var(--vkb-key-active-border-width) solid
+    var(--vkb-key-active-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  background-color: var(--vkb-key-active-background);
+}
+
 .write-control-backspace > svg,
 .write-control-enter > svg {
   width: var(--vkb-keyboard-svg-size);

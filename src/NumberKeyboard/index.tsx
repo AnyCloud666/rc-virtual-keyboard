@@ -9,10 +9,12 @@ const NumberKeyboard = ({
   onClick,
   onKeyDown,
   onKeyUp,
+  isKeyActive,
 }: {
   onClick?: (e: VKB.KeyboardAttributeType) => void;
   onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
   onKeyUp?: (e: VKB.KeyboardAttributeType) => void;
+  isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
 }) => {
   const triggerKey = (item: VKB.KeyboardAttributeType) => {
     onKeyDown?.(item);
@@ -32,7 +34,9 @@ const NumberKeyboard = ({
 
         return (
           <div
-            className="number-key-item"
+            className={`number-key-item ${
+              isKeyActive?.(item) ? 'number-key-item-active' : ''
+            }`}
             key={item.keyCode}
             onClick={() => {
               if (!isRepeatableKey) {

@@ -9,6 +9,7 @@ import {
   ArrowUp,
   BackgroundAudio,
   Backspace,
+  CapsLock,
   Clear,
   Copy,
   DarkTheme,
@@ -22,6 +23,7 @@ import {
   LightTheme,
   Paste,
   SelectAll,
+  Shift,
   Space,
   StartSelect,
   Tab,
@@ -113,6 +115,10 @@ const useInput = ({
   const [inputValue, setInputValue] = useState('');
   /** 当前拼音转成的中文 */
   const [chinese, setChinese] = useState<string[]>([]);
+  /** 当前高亮的按键 code */
+  const [activeKeyCodes, setActiveKeyCodes] = useState<string[]>([]);
+  /** 实体键盘 caps lock 状态 */
+  const [capsLockActive, setCapsLockActive] = useState(false);
   /** 删除inputValue 不立马删除targetValue中的值 */
   const jumpDelete = useRef(false);
   /** 焦点状态 */
@@ -132,6 +138,89 @@ const useInput = ({
   );
   /** 按键音效 */
   const [vkbKeydownAudio, setVkbKeydownAudio] = useState(useKeydownAudio);
+
+  const activateKeyCode = useCallback((code: string) => {
+    setActiveKeyCodes((prev) => (prev.includes(code) ? prev : [...prev, code]));
+  }, []);
+
+  const releaseKeyCode = useCallback((code: string, delay = 0) => {
+    window.setTimeout(() => {
+      setActiveKeyCodes((prev) => prev.filter((item) => item !== code));
+    }, delay);
+  }, []);
+
+  const isKeyActive = useCallback(
+    (key: VKB.KeyboardAttributeType) => activeKeyCodes.includes(key.code),
+    [activeKeyCodes],
+  );
+
+  const resolvePhysicalKeyCodes = useCallback((e: KeyboardEvent) => {
+    const nextCodes = new Set<string>();
+    const normalizedKey = typeof e.key === 'string' ? e.key : '';
+    const digitMatch = e.code.match(/^Digit(\d)$/);
+    const isPhysicalShift =
+      e.code === 'ShiftLeft' || e.code === 'ShiftRight' || e.key === 'Shift';
+    const isPhysicalCapsLock = e.code === 'CapsLock' || e.key === 'CapsLock';
+
+    if (digitMatch) {
+      nextCodes.add(`Numpad${digitMatch[1]}`);
+    }
+
+    if (/^Numpad\d$/.test(e.code) || /^Key[A-Z]$/.test(e.code)) {
+      nextCodes.add(e.code);
+    }
+
+    switch (e.code) {
+      case Backspace.code:
+      case Enter.code:
+      case Tab.code:
+      case Space.code:
+      case CapsLock.code:
+      case ArrowUp.code:
+      case ArrowDown.code:
+      case ArrowLeft.code:
+      case ArrowRight.code:
+        nextCodes.add(e.code);
+        break;
+      case 'Home':
+        nextCodes.add(ArrowLeftFirst.code);
+        break;
+      case 'End':
+        nextCodes.add(ArrowRightEnd.code);
+        break;
+    }
+
+    if (isPhysicalShift) {
+      nextCodes.add(Shift.code);
+    }
+
+    if (isPhysicalCapsLock) {
+      nextCodes.add(CapsLock.code);
+    }
+
+    switch (normalizedKey) {
+      case '-':
+        nextCodes.add('NumpadSubtract');
+        break;
+      case '+':
+        nextCodes.add('NumpadAdd');
+        break;
+      case '*':
+        nextCodes.add('NumpadMultiply');
+        break;
+      case '/':
+        nextCodes.add('NumpadDivide');
+        break;
+      case '.':
+        nextCodes.add('NumpadDecimal');
+        break;
+      case '%':
+        nextCodes.add('NumpadPercentage');
+        break;
+    }
+
+    return [...nextCodes];
+  }, []);
 
   const isSupportedInput = (
     target: EventTarget | null,
@@ -240,6 +329,30 @@ const useInput = ({
   };
   useEventListener('click', findFocusElement, { target: document.body });
   useEventListener('focusin', findFocusElement, { target: document.body });
+  useEventListener(
+    'keydown',
+    (e: KeyboardEvent) => {
+      setCapsLockActive(e.getModifierState?.('CapsLock') ?? false);
+      if (
+        (e.code === 'ShiftLeft' ||
+          e.code === 'ShiftRight' ||
+          e.key === 'Shift') &&
+        !e.repeat
+      ) {
+        setInputMode((prev) => (prev === EN ? ZH : EN));
+      }
+      resolvePhysicalKeyCodes(e).forEach((code) => activateKeyCode(code));
+    },
+    { target: window },
+  );
+  useEventListener(
+    'keyup',
+    (e: KeyboardEvent) => {
+      setCapsLockActive(e.getModifierState?.('CapsLock') ?? false);
+      resolvePhysicalKeyCodes(e).forEach((code) => releaseKeyCode(code));
+    },
+    { target: window },
+  );
 
   /**
    * 禁用类型
@@ -816,6 +929,7 @@ const useInput = ({
    * 这里补发一个模拟事件，兼容依赖键盘事件的上层组件。
    */
   const onKeyDown = (e: VKB.KeyboardAttributeType) => {
+    activateKeyCode(e.code);
     if (!activeInputRef.current) return;
     Simulate?.keyDown?.(activeInputRef.current, {
       keyCode: e.keyCode,
@@ -831,6 +945,7 @@ const useInput = ({
    * 与 onKeyDown 配套使用，补齐完整的键盘事件链路。
    */
   const onKeyUp = (e: VKB.KeyboardAttributeType) => {
+    releaseKeyCode(e.code, 120);
     if (!activeInputRef.current) return;
     Simulate?.keyUp?.(activeInputRef.current, {
       keyCode: e.keyCode,
@@ -919,6 +1034,8 @@ const useInput = ({
     onRecognition,
     onKeyDown,
     onKeyUp,
+    isKeyActive,
+    capsLockActive,
   };
 };
 

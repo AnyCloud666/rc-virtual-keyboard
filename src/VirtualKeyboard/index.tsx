@@ -1,5 +1,5 @@
 import { useLocalStorageState } from 'ahooks';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
 
 import CompositionKeyboard from '../CompositionKeyboard';
 import DragBlock from '../DragBlock';
@@ -49,7 +49,12 @@ const VirtualKeyboard = ({
   themeMode = 'light',
   positionMode = 'float',
   useKeydownAudio = 'Y',
-}: VKB.KeyBoardCtxType) => {
+}: VKB.VirtualKeyboardProps) => {
+  type VirtualKeyboardStyles = CSSProperties & {
+    '--vkb-key-font-size'?: string;
+    '--vkb-key-font-family'?: string;
+  };
+
   const [visible, setVisible] = useState(show);
 
   const [currentThemeMode, setCurrentThemeMode] = useLocalStorageState(
@@ -146,7 +151,7 @@ const VirtualKeyboard = ({
   }, [setCurrentUseKeydownAudio, useKeydownAudio]);
 
   const vkbStyles = useMemo(() => {
-    const styles = {
+    const styles: VirtualKeyboardStyles = {
       height: currentHeight,
       width: currentWidth,
       fontSize: currentFontSize ?? InitVirtualKeyBoardCtx.fontSize,

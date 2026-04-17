@@ -120,6 +120,12 @@
   border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
 }
 
+.letter-key-item-active {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+
 .letter-key-item:nth-child(n + 11):nth-child(-n + 19) {
   margin-left: calc(50% + var(--vkb-key-gap) / 2);
   width: 100%;

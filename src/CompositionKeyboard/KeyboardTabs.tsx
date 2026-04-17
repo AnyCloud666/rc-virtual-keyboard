@@ -32,6 +32,8 @@ export const LetterKeyboardTab: VKB.KeyboardTabItem = {
     onSelectChinese,
     onKeyDown,
     onKeyUp,
+    isKeyActive,
+    capsLockActive,
   }) => (
     <LetterKeyboard
       inputValue={inputValue}
@@ -43,6 +45,8 @@ export const LetterKeyboardTab: VKB.KeyboardTabItem = {
       onSelectChinese={onSelectChinese}
       onKeyDown={onKeyDown}
       onKeyUp={onKeyUp}
+      isKeyActive={isKeyActive}
+      capsLockActive={capsLockActive}
     />
   ),
 };
@@ -52,8 +56,13 @@ export const NumberKeyboardTab: VKB.KeyboardTabItem = {
   id: 'number',
   label: <NumberSvg />,
   name: '数字键',
-  Component: ({ onClick, onKeyUp, onKeyDown }) => (
-    <NumberKeyboard onClick={onClick} onKeyDown={onKeyDown} onKeyUp={onKeyUp} />
+  Component: ({ onClick, onKeyUp, onKeyDown, isKeyActive }) => (
+    <NumberKeyboard
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      onKeyUp={onKeyUp}
+      isKeyActive={isKeyActive}
+    />
   ),
 };
 /** 符号键tab */
@@ -61,14 +70,18 @@ export const SymbolKeyboardTab: VKB.KeyboardTabItem = {
   id: 'symbol',
   label: <SymbolSvg />,
   name: '符号键',
-  Component: ({ onClick }) => <SymbolKeyboard onClick={onClick} />,
+  Component: ({ onClick, isKeyActive }) => (
+    <SymbolKeyboard onClick={onClick} isKeyActive={isKeyActive} />
+  ),
 };
 /** 编辑键tab */
 export const EditKeyboardTab: VKB.KeyboardTabItem = {
   id: 'edit',
   label: <EditSvg />,
   name: '编辑键',
-  Component: ({ onClick }) => <EditKeyboard onClick={onClick} />,
+  Component: ({ onClick, isKeyActive }) => (
+    <EditKeyboard onClick={onClick} isKeyActive={isKeyActive} />
+  ),
 };
 /** 手写板tab */
 export const WriteKeyboardTab: VKB.KeyboardTabItem = {
@@ -81,6 +94,7 @@ export const WriteKeyboardTab: VKB.KeyboardTabItem = {
     onSelectChinese,
     onRecognition,
     onClick,
+    isKeyActive,
   }) => (
     <WriteKeyboard
       chinese={chinese}
@@ -88,6 +102,7 @@ export const WriteKeyboardTab: VKB.KeyboardTabItem = {
       onMouseDown={onMouseDown}
       onRecognition={onRecognition}
       onSelectChinese={onSelectChinese}
+      isKeyActive={isKeyActive}
     />
   ),
 };

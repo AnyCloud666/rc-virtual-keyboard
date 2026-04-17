@@ -27,6 +27,8 @@ const LetterKeyboard = ({
   onSelectChinese,
   onKeyDown,
   onKeyUp,
+  isKeyActive,
+  capsLockActive = false,
 }: {
   chinese?: string[];
   inputValue?: string;
@@ -37,6 +39,8 @@ const LetterKeyboard = ({
   onSelectChinese?: (chinese: string) => void;
   onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
   onKeyUp?: (e: VKB.KeyboardAttributeType) => void;
+  isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
+  capsLockActive?: boolean;
 }) => {
   /** 临时输入区引用 */
   const tempInputAreaRef = useRef<HTMLDivElement | null>(null);
@@ -51,7 +55,31 @@ const LetterKeyboard = ({
   /** 上一次连续滚动时间戳 */
   const lastScrollTimeRef = useRef(0);
 
-  const [keys, setKeys] = useState(letterKeys);
+  const createLetterKeys = (nextInputMode: VKB.InputMode, capsLock = false) => {
+    return letterKeys.map((item) => {
+      const tempItem = { ...item };
+
+      if (item.keyType === letterType && typeof item.key === 'string') {
+        tempItem.key = capsLock
+          ? item.key.toLocaleUpperCase()
+          : item.key.toLocaleLowerCase();
+      }
+
+      if (item.code === CapsLock.code) {
+        tempItem.renderKey = capsLock ? '大' : '小';
+      }
+
+      if (item.code === Shift.code) {
+        tempItem.renderKey = nextInputMode === ZH ? '中' : '英';
+      }
+
+      return tempItem;
+    });
+  };
+
+  const [keys, setKeys] = useState(() =>
+    createLetterKeys(inputMode, capsLockActive),
+  );
 
   /** 统一触发按键事件 */
   const triggerKey = (item: VKB.KeyboardAttributeType) => {
@@ -68,45 +96,13 @@ const LetterKeyboard = ({
   /** 内部过滤 */
   const onClickLetter = (e: VKB.KeyboardAttributeType) => {
     if (e.code === CapsLock.code) {
-      // 大小写转换
-      if (e.renderKey === '小') {
-        const tempKeys = letterKeys.map((item) => {
-          const tempItem = { ...item };
-          if (item.keyType === letterType && typeof item.key === 'string') {
-            tempItem.key = item.key.toLocaleUpperCase();
-          }
-
-          if (item.code === CapsLock.code) {
-            tempItem.renderKey = '大';
-          }
-
-          if (item.code === Shift.code) {
-            tempItem.renderKey = '英';
-            onChangeInputMode && onChangeInputMode(EN);
-          }
-
-          return tempItem;
-        });
-        setKeys(tempKeys);
-      } else {
-        setKeys([...letterKeys]);
-      }
+      setKeys(createLetterKeys(EN, e.renderKey === '小'));
+      onChangeInputMode && onChangeInputMode(EN);
     } else if (e.code === Shift.code) {
-      // 中英文切换
-      if (e.renderKey === '英') {
-        const tempKeys = letterKeys.map((item) => {
-          const tempItem = { ...item };
-          if (item.code === Shift.code) {
-            tempItem.renderKey = '中';
-            onChangeInputMode && onChangeInputMode(ZH);
-          }
-          return tempItem;
-        });
-        setKeys(tempKeys);
-      } else {
-        setKeys([...letterKeys]);
-        onChangeInputMode && onChangeInputMode('en');
-      }
+      const nextMode = e.renderKey === '英' ? ZH : EN;
+
+      setKeys(createLetterKeys(nextMode, capsLockActive));
+      onChangeInputMode && onChangeInputMode(nextMode);
     }
 
     onClick && onClick(e);
@@ -187,16 +183,6 @@ const LetterKeyboard = ({
       stopContinuousScroll();
     };
 
-    if (inputMode === 'zh') {
-      const tempKeys = letterKeys.map((item) => {
-        const tempItem = { ...item };
-        if (item.code === Shift.code) {
-          tempItem.renderKey = '中';
-        }
-        return tempItem;
-      });
-      setKeys(tempKeys);
-    }
     window.addEventListener('mouseup', handleWindowMouseUp);
     window.addEventListener('touchend', handleWindowTouchEnd);
 
@@ -206,6 +192,10 @@ const LetterKeyboard = ({
       window.removeEventListener('touchend', handleWindowTouchEnd);
     };
   }, []);
+
+  useEffect(() => {
+    setKeys(createLetterKeys(inputMode, capsLockActive));
+  }, [capsLockActive, inputMode]);
 
   return (
     <div className="letter-keyboard" onMouseDown={onMouseDown}>
@@ -272,7 +262,9 @@ const LetterKeyboard = ({
 
           return (
             <div
-              className="letter-key-item"
+              className={`letter-key-item ${
+                isKeyActive?.(item) ? 'letter-key-item-active' : ''
+              }`}
               title={item.description}
               key={item.keyCode}
               onClick={() => {

@@ -112,6 +112,8 @@ const CompositionKeyboard = ({
     onRecognition,
     onKeyDown,
     onKeyUp,
+    isKeyActive,
+    capsLockActive,
   } = useInput({
     themeMode,
     positionMode,
@@ -183,8 +185,10 @@ const CompositionKeyboard = ({
               height={height}
               fontSize={fontSize}
               fontFamily={fontFamily}
+              capsLockActive={capsLockActive}
               chinese={chinese}
               onClick={onClick}
+              isKeyActive={isKeyActive}
               onWidthChange={onWidthChange ?? (() => {})}
               onHeightChange={onHeightChange ?? (() => {})}
               onFontSizeChange={onFontSizeChange ?? (() => {})}

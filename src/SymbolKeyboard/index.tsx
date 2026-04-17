@@ -6,8 +6,10 @@ import './style.css';
 
 const SymbolKeyboard = ({
   onClick,
+  isKeyActive,
 }: {
   onClick: (e: VKB.KeyboardAttributeType) => void;
+  isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
 }) => {
   const [activeSymbol, setActiveSymbol] = useState(symbolKeys[0]);
   const { startContinuousTrigger, stopContinuousTrigger } =
@@ -36,7 +38,9 @@ const SymbolKeyboard = ({
         {activeSymbol.value.map((item) => {
           return (
             <div
-              className="symbol-key-item"
+              className={`symbol-key-item ${
+                isKeyActive?.(item) ? 'symbol-key-item-active' : ''
+              }`}
               key={item.keyCode}
               onClick={(e) => e.preventDefault()}
               onMouseDown={(e) => {

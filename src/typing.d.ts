@@ -3,6 +3,32 @@ import { ReactNode } from 'react';
 declare namespace VKB {
   type InputMode = 'zh' | 'en';
 
+  type KeyboardTabComponentProps = {
+    themeMode?: string;
+    inputMode?: InputMode;
+    positionMode?: string;
+    vkbKeydownAudio?: string;
+    width?: string;
+    height?: string;
+    fontSize?: string;
+    fontFamily?: string;
+    capsLockActive?: boolean;
+    inputValue?: string;
+    chinese?: string[];
+    onMouseDown: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+    onClick: (e: VKB.KeyboardAttributeType) => void;
+    isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
+    onWidthChange?: (width: string) => void;
+    onHeightChange?: (height: string) => void;
+    onFontSizeChange?: (fontSize: string) => void;
+    onFontFamilyChange?: (fontFamily: string) => void;
+    onChangeInputMode?: (mode: VKB.InputMode) => void;
+    onSelectChinese?: (chinese: string) => void;
+    onRecognition?: (url: string) => void;
+    onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
+    onKeyUp?: (e: VKB.KeyboardAttributeType) => void;
+  };
+
   /**
    *  number:数字
    *  letter:字母
@@ -27,30 +53,7 @@ declare namespace VKB {
     id: KeyType;
     label: ReactNode;
     name: string;
-    Component: (props: {
-      themeMode: string;
-      inputMode: InputMode;
-      positionMode: string;
-      vkbKeydownAudio: string;
-      width: string;
-      height: string;
-      fontSize: string;
-      fontFamily: string;
-      inputValue: string;
-      chinese: string[];
-      onMouseDown: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
-      onClick: (e: VKB.KeyboardAttributeType) => void;
-      onWidthChange: (width: string) => void;
-      onHeightChange: (height: string) => void;
-      onFontSizeChange: (fontSize: string) => void;
-      onFontFamilyChange: (fontFamily: string) => void;
-      onChangeInputMode: (mode: InputMode) => void;
-      onChangeInputMode: (mode: VKB.InputMode) => void;
-      onSelectChinese: (chinese: string) => void;
-      onRecognition: (url: string) => void;
-      onKeyDown: (e: VKB.KeyboardAttributeType) => void;
-      onKeyUp: (e: VKB.KeyboardAttributeType) => void;
-    }) => JSX.Element;
+    Component: (props: KeyboardTabComponentProps) => JSX.Element;
   };
 
   /** 单个键盘属性 */
@@ -139,23 +142,24 @@ declare namespace VKB {
     theme?: Partial<Theme>;
   };
 
-  type KeyBoardCtxType = KeyBoardCtxTypBase & {
+  type VirtualKeyboardProps = KeyBoardCtxTypBase & {
     /** 显示移动句柄 & 允许移动 */
     showDragHandle?: boolean;
     /** 是否显示 */
     show?: boolean;
-    /** 当前输入框的值 */
-    value?: string;
     /** 主题模式 */
     themeMode?: string;
     /** 位置模式 */
     positionMode?: string;
-    /** 按键文字大小 */
-    fontSize?: string;
-    /** 按键字体 */
-    fontFamily?: string;
     /** 按键音效 */
     useKeydownAudio?: 'Y' | 'N';
+  };
+
+  type KeyBoardCtxType = VirtualKeyboardProps & {
+    /** 当前输入框的值 */
+    value?: string;
+    /** Caps Lock 状态 */
+    capsLockActive?: boolean;
     /** 显示 ,传入的必须是 setStatus 重新 render */
     setShow?: (s: boolean) => void;
     /** 设置主题模式 */

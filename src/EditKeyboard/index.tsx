@@ -23,8 +23,10 @@ const cursorSvg: Record<string, JSX.Element> = {
 
 const EditKeyboard = ({
   onClick,
+  isKeyActive,
 }: {
   onClick?: (e: VKB.KeyboardAttributeType) => void;
+  isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
 }) => {
   const [keys, setKeys] = useState(cursorKeys);
 
@@ -65,7 +67,7 @@ const EditKeyboard = ({
             <div
               className={`cursor-item ${
                 index < 7 && isSelect ? 'cursor-item-active' : ''
-              }`}
+              } ${isKeyActive?.(item) ? 'cursor-item-pressed' : ''}`}
               key={item.keyCode}
               title={item.description}
               onClick={() => {
@@ -118,7 +120,9 @@ const EditKeyboard = ({
 
         return (
           <div
-            className="edit-key-control"
+            className={`edit-key-control ${
+              isKeyActive?.(item) ? 'edit-key-control-active' : ''
+            }`}
             key={item.keyCode}
             title={item.description}
             onClick={() => {

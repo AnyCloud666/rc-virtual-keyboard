@@ -15,6 +15,7 @@ const WriteKeyboard = ({
   onSelectChinese,
   onRecognition,
   onMouseDown,
+  isKeyActive,
 }: {
   chinese: string[];
   onClick?: (e: VKB.KeyboardAttributeType) => void;
@@ -22,6 +23,7 @@ const WriteKeyboard = ({
   /** 识别图片 */
   onRecognition?: (url: string) => void;
   onMouseDown?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
 }) => {
   /** 临时输入区引用 */
   const tempInputAreaRef = useRef<HTMLDivElement | null>(null);
@@ -203,7 +205,9 @@ const WriteKeyboard = ({
         </div>
         <div className="write-control">
           <div
-            className="write-control-backspace"
+            className={`write-control-backspace ${
+              isKeyActive?.(Backspace) ? 'write-control-backspace-active' : ''
+            }`}
             onClick={(e) => e.preventDefault()}
             onMouseDown={(e) => {
               e.preventDefault();
@@ -222,7 +226,9 @@ const WriteKeyboard = ({
             <DeleteSvg />
           </div>
           <div
-            className="write-control-enter"
+            className={`write-control-enter ${
+              isKeyActive?.(Enter) ? 'write-control-enter-active' : ''
+            }`}
             onClick={() => {
               onClick && onClick(Enter);
             }}
