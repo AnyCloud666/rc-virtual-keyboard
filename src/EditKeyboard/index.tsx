@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import useContinuousTrigger from '../hooks/useContinuousTrigger';
+import useTouchClickGuard from '../hooks/useTouchClickGuard';
 import { Backspace, cursorKeys, editKeys } from '../keys';
 
 import { ReactComponent as BottomSvg } from '../svg/bottom.svg';
@@ -29,6 +30,7 @@ const EditKeyboard = ({
   isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
 }) => {
   const [keys, setKeys] = useState(cursorKeys);
+  const { markTouchInteraction, shouldIgnoreClick } = useTouchClickGuard();
 
   const [isSelect, setSelect] = useState(false);
 
@@ -71,6 +73,7 @@ const EditKeyboard = ({
               key={item.keyCode}
               title={item.description}
               onClick={() => {
+                if (shouldIgnoreClick()) return;
                 if (!isRepeatable) {
                   onClickEdit(item);
                 }
@@ -79,33 +82,37 @@ const EditKeyboard = ({
                 if (!isRepeatable) return;
 
                 e.preventDefault();
-                startContinuousTrigger(item);
+                startContinuousTrigger(item, 'mouse');
               }}
               onMouseUp={() => {
                 if (!isRepeatable) return;
 
-                stopContinuousTrigger();
+                stopContinuousTrigger('mouse');
               }}
               onMouseLeave={() => {
                 if (!isRepeatable) return;
 
-                stopContinuousTrigger();
+                stopContinuousTrigger('mouse');
               }}
               onTouchStart={(e) => {
-                if (!isRepeatable) return;
-
                 e.preventDefault();
-                startContinuousTrigger(item);
+                markTouchInteraction();
+                if (!isRepeatable) {
+                  onClickEdit(item);
+                  return;
+                }
+
+                startContinuousTrigger(item, 'touch');
               }}
               onTouchEnd={() => {
                 if (!isRepeatable) return;
 
-                stopContinuousTrigger();
+                stopContinuousTrigger('touch');
               }}
               onTouchCancel={() => {
                 if (!isRepeatable) return;
 
-                stopContinuousTrigger();
+                stopContinuousTrigger('touch');
               }}
             >
               {item.code && cursorSvg[item.code]
@@ -126,6 +133,7 @@ const EditKeyboard = ({
             key={item.keyCode}
             title={item.description}
             onClick={() => {
+              if (shouldIgnoreClick()) return;
               if (!isBackspace) {
                 onClickEdit(item);
               }
@@ -134,33 +142,37 @@ const EditKeyboard = ({
               if (!isBackspace) return;
 
               e.preventDefault();
-              startContinuousTrigger(item);
+              startContinuousTrigger(item, 'mouse');
             }}
             onMouseUp={() => {
               if (!isBackspace) return;
 
-              stopContinuousTrigger();
+              stopContinuousTrigger('mouse');
             }}
             onMouseLeave={() => {
               if (!isBackspace) return;
 
-              stopContinuousTrigger();
+              stopContinuousTrigger('mouse');
             }}
             onTouchStart={(e) => {
-              if (!isBackspace) return;
-
               e.preventDefault();
-              startContinuousTrigger(item);
+              markTouchInteraction();
+              if (!isBackspace) {
+                onClickEdit(item);
+                return;
+              }
+
+              startContinuousTrigger(item, 'touch');
             }}
             onTouchEnd={() => {
               if (!isBackspace) return;
 
-              stopContinuousTrigger();
+              stopContinuousTrigger('touch');
             }}
             onTouchCancel={() => {
               if (!isBackspace) return;
 
-              stopContinuousTrigger();
+              stopContinuousTrigger('touch');
             }}
           >
             {item.renderKey || item.key}

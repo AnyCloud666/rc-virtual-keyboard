@@ -112,6 +112,15 @@ const stopDragBubble = (
   e.stopPropagation();
 };
 
+const stopTouchAndRun = (
+  e: React.TouchEvent<HTMLElement>,
+  callback: () => void,
+) => {
+  e.preventDefault();
+  e.stopPropagation();
+  callback();
+};
+
 const SettingKeyboard = ({
   themeMode,
   positionMode,
@@ -254,6 +263,7 @@ const SettingKeyboard = ({
                       : ''
                   }`}
                   onClick={() => onClick(item)}
+                  onTouchStart={(e) => stopTouchAndRun(e, () => onClick(item))}
                   title={item.description}
                 >
                   {item.renderKey || item.key}
@@ -278,6 +288,7 @@ const SettingKeyboard = ({
                       : ''
                   }`}
                   onClick={() => onClick(item)}
+                  onTouchStart={(e) => stopTouchAndRun(e, () => onClick(item))}
                   title={item.description}
                 >
                   {item.renderKey || item.key}
@@ -301,6 +312,7 @@ const SettingKeyboard = ({
                       : ''
                   }`}
                   onClick={() => onClick(item)}
+                  onTouchStart={(e) => stopTouchAndRun(e, () => onClick(item))}
                   title={item.description}
                 >
                   {item.renderKey || item.key}
@@ -324,7 +336,11 @@ const SettingKeyboard = ({
                 className="setting-keyboard-size-button"
                 disabled={!canResizeWidth}
                 onMouseDown={stopDragBubble}
-                onTouchStart={stopDragBubble}
+                onTouchStart={(e) =>
+                  stopTouchAndRun(e, () =>
+                    changeWidth(currentWidth - SIZE_STEP),
+                  )
+                }
                 onPointerDown={stopDragBubble}
                 onClick={() => changeWidth(currentWidth - SIZE_STEP)}
               >
@@ -349,7 +365,11 @@ const SettingKeyboard = ({
                 className="setting-keyboard-size-button"
                 disabled={!canResizeWidth}
                 onMouseDown={stopDragBubble}
-                onTouchStart={stopDragBubble}
+                onTouchStart={(e) =>
+                  stopTouchAndRun(e, () =>
+                    changeWidth(currentWidth + SIZE_STEP),
+                  )
+                }
                 onPointerDown={stopDragBubble}
                 onClick={() => changeWidth(currentWidth + SIZE_STEP)}
               >
@@ -374,7 +394,11 @@ const SettingKeyboard = ({
                 className="setting-keyboard-size-button"
                 disabled={!canResizeHeight}
                 onMouseDown={stopDragBubble}
-                onTouchStart={stopDragBubble}
+                onTouchStart={(e) =>
+                  stopTouchAndRun(e, () =>
+                    changeHeight(currentHeight - SIZE_STEP),
+                  )
+                }
                 onPointerDown={stopDragBubble}
                 onClick={() => changeHeight(currentHeight - SIZE_STEP)}
               >
@@ -399,7 +423,11 @@ const SettingKeyboard = ({
                 className="setting-keyboard-size-button"
                 disabled={!canResizeHeight}
                 onMouseDown={stopDragBubble}
-                onTouchStart={stopDragBubble}
+                onTouchStart={(e) =>
+                  stopTouchAndRun(e, () =>
+                    changeHeight(currentHeight + SIZE_STEP),
+                  )
+                }
                 onPointerDown={stopDragBubble}
                 onClick={() => changeHeight(currentHeight + SIZE_STEP)}
               >
@@ -427,7 +455,9 @@ const SettingKeyboard = ({
                 type="button"
                 className="setting-keyboard-size-button"
                 onMouseDown={stopDragBubble}
-                onTouchStart={stopDragBubble}
+                onTouchStart={(e) =>
+                  stopTouchAndRun(e, () => changeFontSize(draftFontSize - 1))
+                }
                 onPointerDown={stopDragBubble}
                 onClick={() => changeFontSize(draftFontSize - 1)}
               >
@@ -450,7 +480,9 @@ const SettingKeyboard = ({
                 type="button"
                 className="setting-keyboard-size-button"
                 onMouseDown={stopDragBubble}
-                onTouchStart={stopDragBubble}
+                onTouchStart={(e) =>
+                  stopTouchAndRun(e, () => changeFontSize(draftFontSize + 1))
+                }
                 onPointerDown={stopDragBubble}
                 onClick={() => changeFontSize(draftFontSize + 1)}
               >
@@ -475,7 +507,9 @@ const SettingKeyboard = ({
                   }`}
                   style={{ fontFamily: item.value }}
                   onMouseDown={stopDragBubble}
-                  onTouchStart={stopDragBubble}
+                  onTouchStart={(e) =>
+                    stopTouchAndRun(e, () => changeFontFamily(item.value))
+                  }
                   onPointerDown={stopDragBubble}
                   onClick={() => changeFontFamily(item.value)}
                   title={item.label}

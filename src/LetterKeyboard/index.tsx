@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import useContinuousTrigger from '../hooks/useContinuousTrigger';
+import useTouchClickGuard from '../hooks/useTouchClickGuard';
 
 import { ReactComponent as LeftSvg } from '../svg/left.svg';
 import { ReactComponent as RightSvg } from '../svg/right.svg';
@@ -80,6 +81,7 @@ const LetterKeyboard = ({
   const [keys, setKeys] = useState(() =>
     createLetterKeys(inputMode, capsLockActive),
   );
+  const { markTouchInteraction, shouldIgnoreClick } = useTouchClickGuard();
 
   /** 统一触发按键事件 */
   const triggerKey = (item: VKB.KeyboardAttributeType) => {
@@ -225,7 +227,15 @@ const LetterKeyboard = ({
                 <div
                   key={index}
                   className="letter-keyboard-temp-char"
-                  onClick={() => onSelectChinese && onSelectChinese(item)}
+                  onClick={() => {
+                    if (shouldIgnoreClick()) return;
+                    onSelectChinese && onSelectChinese(item);
+                  }}
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    markTouchInteraction();
+                    onSelectChinese && onSelectChinese(item);
+                  }}
                 >
                   {item}
                 </div>
@@ -268,6 +278,7 @@ const LetterKeyboard = ({
               title={item.description}
               key={item.keyCode}
               onClick={() => {
+                if (shouldIgnoreClick()) return;
                 if (!isRepeatableKey) {
                   triggerKey(item);
                 }
@@ -276,33 +287,37 @@ const LetterKeyboard = ({
                 if (!isRepeatableKey) return;
 
                 e.preventDefault();
-                startContinuousTrigger(item);
+                startContinuousTrigger(item, 'mouse');
               }}
               onMouseUp={() => {
                 if (!isRepeatableKey) return;
 
-                stopContinuousTrigger();
+                stopContinuousTrigger('mouse');
               }}
               onMouseLeave={() => {
                 if (!isRepeatableKey) return;
 
-                stopContinuousTrigger();
+                stopContinuousTrigger('mouse');
               }}
               onTouchStart={(e) => {
-                if (!isRepeatableKey) return;
-
                 e.preventDefault();
-                startContinuousTrigger(item);
+                markTouchInteraction();
+                if (!isRepeatableKey) {
+                  triggerKey(item);
+                  return;
+                }
+
+                startContinuousTrigger(item, 'touch');
               }}
               onTouchEnd={() => {
                 if (!isRepeatableKey) return;
 
-                stopContinuousTrigger();
+                stopContinuousTrigger('touch');
               }}
               onTouchCancel={() => {
                 if (!isRepeatableKey) return;
 
-                stopContinuousTrigger();
+                stopContinuousTrigger('touch');
               }}
             >
               {item.code === 'CapsLock' ? (

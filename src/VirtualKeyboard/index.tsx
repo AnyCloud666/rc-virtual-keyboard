@@ -3,6 +3,7 @@ import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
 
 import CompositionKeyboard from '../CompositionKeyboard';
 import DragBlock from '../DragBlock';
+import useIsMobile from '../hooks/useIsMobile';
 import {
   FixedBottomPosition,
   FixedLeftPosition,
@@ -47,7 +48,7 @@ const VirtualKeyboard = ({
   showDragHandle,
   show = false,
   themeMode = 'light',
-  positionMode = 'float',
+  positionMode,
   useKeydownAudio = 'Y',
 }: VKB.VirtualKeyboardProps) => {
   type VirtualKeyboardStyles = CSSProperties & {
@@ -56,6 +57,11 @@ const VirtualKeyboard = ({
   };
 
   const [visible, setVisible] = useState(show);
+  const isMobile = useIsMobile();
+  const defaultPositionMode = isMobile
+    ? FixedBottomPosition.code
+    : FloatPosition.code;
+  const resolvedPositionMode = positionMode ?? defaultPositionMode;
 
   const [currentThemeMode, setCurrentThemeMode] = useLocalStorageState(
     VKB_THEME_MODE,
@@ -67,7 +73,7 @@ const VirtualKeyboard = ({
   const [currentPositionMode, setCurrentPositionMode] = useLocalStorageState(
     VKB_POSITION_MODE,
     {
-      defaultValue: positionMode,
+      defaultValue: resolvedPositionMode,
     },
   );
 
@@ -117,8 +123,11 @@ const VirtualKeyboard = ({
   useEffect(() => {
     if (positionMode) {
       setCurrentPositionMode(positionMode);
+      return;
     }
-  }, [positionMode, setCurrentPositionMode]);
+
+    setCurrentPositionMode(defaultPositionMode);
+  }, [defaultPositionMode, positionMode, setCurrentPositionMode]);
 
   useEffect(() => {
     if (width) {

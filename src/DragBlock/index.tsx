@@ -54,6 +54,8 @@ const DragBlock = ({
 
   /** touch 事件开始位置 */
   const startTouch = useRef({ clientX: 0, clientY: 0 });
+  /** touch 是否发生了拖动 */
+  const touchMoved = useRef(false);
 
   /** block */
   const blockRef = useRef<HTMLDivElement | null>(null);
@@ -306,6 +308,7 @@ const DragBlock = ({
   /** 移动端点击 */
   const onTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     allowMove.current = true;
+    touchMoved.current = false;
     showBlock.cancel();
     keepRight.cancel();
     e?.preventDefault?.();
@@ -324,17 +327,30 @@ const DragBlock = ({
         clientX,
         clientY,
       };
+      clickTimer.current = Date.now();
     }
   };
 
   /** 移动端点击结束 */
   const onTouchEnd = () => {
     if (blockRef.current) {
+      const shouldTriggerClick =
+        !touchMoved.current && Date.now() - clickTimer.current < delay;
+
       allowMove.current = false;
       blockRef.current.style.transition = 'all 0.3s';
       // 防止页面跟随滚动
       document.body.style.overflow = 'unset';
       startTouch.current = { clientX: 0, clientY: 0 };
+
+      if (shouldTriggerClick) {
+        if (isHidden.current && autoKeepRight) {
+          showBlock.run();
+        } else {
+          onClick && onClick();
+        }
+      }
+
       keepRight.run();
     }
   };
@@ -342,13 +358,20 @@ const DragBlock = ({
   /** 移动端移动 */
   useEventListener(
     'touchmove',
-    (e: React.TouchEvent<HTMLDivElement>) => {
+    (e: TouchEvent) => {
       if (blockRef.current && allowMove.current) {
         blockRef.current.style.transition = 'none';
         // 根据初始点击位置 client 计算移动距离
         const element = e.targetTouches[0];
         const x = element.clientX - startTouch.current.clientX;
         const y = element.clientY - startTouch.current.clientY;
+
+        if (
+          Math.abs(x - blockRef.current.offsetLeft) > 4 ||
+          Math.abs(y - blockRef.current.offsetTop) > 4
+        ) {
+          touchMoved.current = true;
+        }
 
         if (x <= window.innerWidth - blockRef?.current?.offsetWidth) {
           isHidden.current = false;

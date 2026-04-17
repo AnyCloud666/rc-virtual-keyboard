@@ -125,6 +125,8 @@ const useInput = ({
   const cacheInputFocus = useRef(new WeakSet());
   /** blur 延迟定时器，避免输入框切换时闪烁 */
   const blurTimer = useRef<number>();
+  /** 键盘交互保护窗口，避免移动端长按时误判为真正失焦 */
+  const keyboardInteractionUntilRef = useRef(0);
   /** focus 弹出配置，autoPopup 作为兼容别名保留 */
   const enableFocusShow = focusShow ?? autoPopup;
 
@@ -141,6 +143,10 @@ const useInput = ({
 
   const activateKeyCode = useCallback((code: string) => {
     setActiveKeyCodes((prev) => (prev.includes(code) ? prev : [...prev, code]));
+  }, []);
+
+  const markKeyboardInteraction = useCallback((duration = 1200) => {
+    keyboardInteractionUntilRef.current = Date.now() + duration;
   }, []);
 
   const releaseKeyCode = useCallback((code: string, delay = 0) => {
@@ -282,15 +288,22 @@ const useInput = ({
       blurTimer.current = window.setTimeout(() => {
         const nextActiveElement = document.activeElement;
         const currentInput = e.target as HTMLInputElement | null;
+        const isKeyboardInteractionActive =
+          Date.now() < keyboardInteractionUntilRef.current;
+
+        if (isSupportedInput(nextActiveElement)) {
+          return;
+        }
+
+        if (isKeyboardInteractionActive && currentInput) {
+          currentInput.focus({ preventScroll: true });
+          return;
+        }
 
         // 输入框一旦真正失焦，就清空当前中英文组合输入的待选区，
         // 避免候选内容残留到下一次输入或切换到其他输入框时产生干扰。
         setInputValue('');
         setChinese([]);
-
-        if (isSupportedInput(nextActiveElement)) {
-          return;
-        }
 
         if (activeInputRef.current === currentInput) {
           activeInputRef.current = null;
@@ -457,13 +470,16 @@ const useInput = ({
    * @return {boolean}
    *
    * @description
-   * 英文模式下支持按空格/回车直接提交当前组合串，
-   * 与中文候选点击确认保持一致，提交后可按需追加空格等字符。
+   * 当输入区存在内容时，中文模式优先提交第一个中文候选，
+   * 若没有中文候选则回退到原始输入；英文模式保持默认候选提交逻辑。
    */
   const commitCurrentCandidate = (appendText = '') => {
     if (!activeInputRef.current || !inputValue) return false;
 
-    const candidate = chinese[0] || inputValue;
+    const candidate =
+      inputMode === ZH
+        ? chinese[1] || chinese[0] || inputValue
+        : chinese[0] || inputValue;
     onSelectChinese(candidate, appendText);
     return true;
   };
@@ -832,7 +848,7 @@ const useInput = ({
         break;
       // 回车
       case Enter.code:
-        if (!(inputMode === EN && commitCurrentCandidate())) {
+        if (!commitCurrentCandidate()) {
           // onEnter && onEnter();
           // TODO
         }
@@ -897,6 +913,7 @@ const useInput = ({
    * 让外部组件有机会监听到更接近真实键盘输入的事件流。
    */
   const onClick = (e: VKB.KeyboardAttributeType) => {
+    markKeyboardInteraction();
     if (e.keyType === controlsType) {
       onControl(e);
     } else if (e.keyType === settingType) {
@@ -929,6 +946,7 @@ const useInput = ({
    * 这里补发一个模拟事件，兼容依赖键盘事件的上层组件。
    */
   const onKeyDown = (e: VKB.KeyboardAttributeType) => {
+    markKeyboardInteraction();
     activateKeyCode(e.code);
     if (!activeInputRef.current) return;
     Simulate?.keyDown?.(activeInputRef.current, {
@@ -945,6 +963,7 @@ const useInput = ({
    * 与 onKeyDown 配套使用，补齐完整的键盘事件链路。
    */
   const onKeyUp = (e: VKB.KeyboardAttributeType) => {
+    markKeyboardInteraction();
     releaseKeyCode(e.code, 120);
     if (!activeInputRef.current) return;
     Simulate?.keyUp?.(activeInputRef.current, {
@@ -977,6 +996,7 @@ const useInput = ({
       | React.MouseEvent<HTMLDivElement, MouseEvent>
       | React.TouchEvent<HTMLDivElement>,
   ) => {
+    markKeyboardInteraction();
     const isStop = checkStopPropagation(
       e.target,
       'keyboard-tab-move',

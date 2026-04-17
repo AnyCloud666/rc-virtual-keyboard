@@ -1,4 +1,4 @@
-import React, { CSSProperties, ReactNode } from 'react';
+import React, { CSSProperties, ReactNode, useCallback, useRef } from 'react';
 
 import { ReactComponent as MoveSvg } from '../svg/move.svg';
 
@@ -13,6 +13,8 @@ import './style.css';
 import useInput from '../hooks/useInput';
 import { pinyin2ChineseV2 } from '../utils/pinyin';
 import tabs from './KeyboardTabs';
+
+const TOUCH_CLICK_GUARD_MS = 800;
 /**
  * 组合键盘
  *
@@ -128,13 +130,54 @@ const CompositionKeyboard = ({
     onKeydownAudioUrlChange,
     onPinyin2Chinese: pinyin2ChineseV2,
   });
+  const lastTouchAtRef = useRef(0);
+
+  const markTouchInteraction = useCallback(() => {
+    lastTouchAtRef.current = Date.now();
+  }, []);
+
+  const shouldIgnoreCompatClick = useCallback(() => {
+    return Date.now() - lastTouchAtRef.current < TOUCH_CLICK_GUARD_MS;
+  }, []);
+
+  const stopTouchEvent = (e: React.TouchEvent<HTMLElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const shouldAllowTouchMove = (target: EventTarget | null) => {
+    if (!(target instanceof HTMLElement)) {
+      return false;
+    }
+
+    return !!target.closest('.write-content');
+  };
 
   return (
     <div
-      style={style}
+      style={{
+        touchAction: 'none',
+        ...style,
+      }}
       className={`virtual-keyboard virtual-keyboard-var virtual-keyboard-var-${vkbThemeMode}`}
       onMouseDown={onMouseDown}
       onTouchStart={onMouseDown}
+      onTouchStartCapture={() => {
+        markTouchInteraction();
+      }}
+      onTouchMoveCapture={(e) => {
+        if (shouldAllowTouchMove(e.target)) {
+          return;
+        }
+
+        e.preventDefault();
+      }}
+      onClickCapture={(e) => {
+        if (!shouldIgnoreCompatClick()) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+      }}
     >
       <div className="virtual-keyboard-tab" id="keyboard-tab">
         {showDragHandle && vkbPositionMode === FloatPosition.code ? (
@@ -155,6 +198,10 @@ const CompositionKeyboard = ({
               onClick={() => {
                 setActiveKeyboard(item.id);
               }}
+              onTouchStart={(e) => {
+                stopTouchEvent(e);
+                setActiveKeyboard(item.id);
+              }}
             >
               {item.label}
             </div>
@@ -165,6 +212,10 @@ const CompositionKeyboard = ({
             className="keyboard-tab-down "
             onClick={(e) => {
               e.stopPropagation();
+              onChangeShow && onChangeShow(false);
+            }}
+            onTouchStart={(e) => {
+              stopTouchEvent(e);
               onChangeShow && onChangeShow(false);
             }}
           >

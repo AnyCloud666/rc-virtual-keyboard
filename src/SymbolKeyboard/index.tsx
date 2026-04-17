@@ -28,6 +28,10 @@ const SymbolKeyboard = ({
               }`}
               key={item.id}
               onClick={() => setActiveSymbol(item)}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                setActiveSymbol(item);
+              }}
             >
               {item.label}
             </div>
@@ -45,16 +49,16 @@ const SymbolKeyboard = ({
               onClick={(e) => e.preventDefault()}
               onMouseDown={(e) => {
                 e.preventDefault();
-                startContinuousTrigger(item);
+                startContinuousTrigger(item, 'mouse');
               }}
-              onMouseUp={stopContinuousTrigger}
-              onMouseLeave={stopContinuousTrigger}
+              onMouseUp={() => stopContinuousTrigger('mouse')}
+              onMouseLeave={() => stopContinuousTrigger('mouse')}
               onTouchStart={(e) => {
                 e.preventDefault();
-                startContinuousTrigger(item);
+                startContinuousTrigger(item, 'touch');
               }}
-              onTouchEnd={stopContinuousTrigger}
-              onTouchCancel={stopContinuousTrigger}
+              onTouchEnd={() => stopContinuousTrigger('touch')}
+              onTouchCancel={() => stopContinuousTrigger('touch')}
             >
               {item.key}
               <span className="symbol-key-item-tips">

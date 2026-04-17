@@ -1,5 +1,6 @@
 import React from 'react';
 import useContinuousTrigger from '../hooks/useContinuousTrigger';
+import useTouchClickGuard from '../hooks/useTouchClickGuard';
 import { Enter, numberKeys } from '../keys';
 import { VKB } from '../typing';
 import './style.css';
@@ -16,6 +17,7 @@ const NumberKeyboard = ({
   onKeyUp?: (e: VKB.KeyboardAttributeType) => void;
   isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
 }) => {
+  const { markTouchInteraction, shouldIgnoreClick } = useTouchClickGuard();
   const triggerKey = (item: VKB.KeyboardAttributeType) => {
     onKeyDown?.(item);
     onClick?.(item);
@@ -39,6 +41,7 @@ const NumberKeyboard = ({
             }`}
             key={item.keyCode}
             onClick={() => {
+              if (shouldIgnoreClick()) return;
               if (!isRepeatableKey) {
                 triggerKey(item);
               }
@@ -47,33 +50,37 @@ const NumberKeyboard = ({
               if (!isRepeatableKey) return;
 
               e.preventDefault();
-              startContinuousTrigger(item);
+              startContinuousTrigger(item, 'mouse');
             }}
             onMouseUp={() => {
               if (!isRepeatableKey) return;
 
-              stopContinuousTrigger();
+              stopContinuousTrigger('mouse');
             }}
             onMouseLeave={() => {
               if (!isRepeatableKey) return;
 
-              stopContinuousTrigger();
+              stopContinuousTrigger('mouse');
             }}
             onTouchStart={(e) => {
-              if (!isRepeatableKey) return;
-
               e.preventDefault();
-              startContinuousTrigger(item);
+              markTouchInteraction();
+              if (!isRepeatableKey) {
+                triggerKey(item);
+                return;
+              }
+
+              startContinuousTrigger(item, 'touch');
             }}
             onTouchEnd={() => {
               if (!isRepeatableKey) return;
 
-              stopContinuousTrigger();
+              stopContinuousTrigger('touch');
             }}
             onTouchCancel={() => {
               if (!isRepeatableKey) return;
 
-              stopContinuousTrigger();
+              stopContinuousTrigger('touch');
             }}
           >
             {item.renderKey || item.key}

@@ -1,6 +1,7 @@
 import { useDebounceFn, useEventListener } from 'ahooks';
 import React, { useEffect, useRef, useState } from 'react';
 import useContinuousTrigger from '../hooks/useContinuousTrigger';
+import useTouchClickGuard from '../hooks/useTouchClickGuard';
 import { ReactComponent as DeleteSvg } from '../svg/delete.svg';
 import { ReactComponent as EnterSvg } from '../svg/enter.svg';
 import { ReactComponent as LeftSvg } from '../svg/left.svg';
@@ -31,10 +32,24 @@ const WriteKeyboard = ({
   const canvasCTX = useRef<CanvasRenderingContext2D | null>(null);
   const writeContentRef = useRef<HTMLDivElement | null>(null);
   const allowMove = useRef(false);
+  const { markTouchInteraction, shouldIgnoreClick } = useTouchClickGuard();
   const [canvasRect, setCanvasRect] = useState({
     width: '200px',
     height: '200px',
   });
+
+  const getTouchPoint = (touch: Touch) => {
+    const rect = canvasRef.current?.getBoundingClientRect();
+
+    if (!rect) {
+      return { x: 0, y: 0 };
+    }
+
+    return {
+      x: touch.clientX - rect.left,
+      y: touch.clientY - rect.top,
+    };
+  };
 
   function downloadCanvas(str: string) {
     let link = document.createElement('a');
@@ -55,6 +70,18 @@ const WriteKeyboard = ({
     } else {
       onClick && onClick(Backspace);
     }
+  };
+
+  const onConfirm = () => {
+    const firstCandidate = chinese?.[0];
+
+    if (firstCandidate) {
+      onDelete();
+      onSelectChinese && onSelectChinese(firstCandidate);
+      return;
+    }
+
+    onClick && onClick(Enter);
   };
 
   const { startContinuousTrigger, stopContinuousTrigger } =
@@ -131,6 +158,57 @@ const WriteKeyboard = ({
       target: canvasRef,
     },
   );
+  useEventListener(
+    'touchstart',
+    (e: TouchEvent) => {
+      const touch = e.targetTouches[0];
+      const ctx = canvasCTX.current;
+
+      if (!touch || !ctx) return;
+
+      const point = getTouchPoint(touch);
+      allowMove.current = true;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(point.x, point.y);
+    },
+    {
+      target: canvasRef,
+    },
+  );
+  useEventListener(
+    'touchmove',
+    (e: TouchEvent) => {
+      const touch = e.targetTouches[0];
+
+      if (!touch || !allowMove.current || !canvasCTX.current) return;
+
+      const point = getTouchPoint(touch);
+      const ctx = canvasCTX.current;
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineTo(point.x, point.y);
+      ctx.stroke();
+    },
+    {
+      target: canvasRef,
+    },
+  );
+  useEventListener(
+    'touchend',
+    () => {
+      allowMove.current = false;
+      const ctx = canvasCTX.current;
+      ctx && ctx.closePath();
+      generateImage.run();
+    },
+    {
+      target: writeContentRef.current,
+    },
+  );
   useEffect(() => {
     if (canvasRef.current) {
       canvasCTX.current = canvasRef.current.getContext(
@@ -165,7 +243,15 @@ const WriteKeyboard = ({
         <div className="write-keyboard-temp">
           <div
             className="write-keyboard-temp-left"
-            onClick={() => onMore('minus')}
+            onClick={() => {
+              if (shouldIgnoreClick()) return;
+              onMore('minus');
+            }}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              markTouchInteraction();
+              onMore('minus');
+            }}
           >
             <LeftSvg />
           </div>
@@ -176,6 +262,13 @@ const WriteKeyboard = ({
                   key={index}
                   className="letter-keyboard-temp-char"
                   onClick={() => {
+                    if (shouldIgnoreClick()) return;
+                    onDelete();
+                    onSelectChinese && onSelectChinese(item);
+                  }}
+                  onTouchStart={(e) => {
+                    e.preventDefault();
+                    markTouchInteraction();
                     onDelete();
                     onSelectChinese && onSelectChinese(item);
                   }}
@@ -187,7 +280,15 @@ const WriteKeyboard = ({
           </div>
           <div
             className="write-keyboard-temp-right"
-            onClick={() => onMore('add')}
+            onClick={() => {
+              if (shouldIgnoreClick()) return;
+              onMore('add');
+            }}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              markTouchInteraction();
+              onMore('add');
+            }}
           >
             <RightSvg />
           </div>
@@ -211,16 +312,17 @@ const WriteKeyboard = ({
             onClick={(e) => e.preventDefault()}
             onMouseDown={(e) => {
               e.preventDefault();
-              startContinuousTrigger();
+              startContinuousTrigger(undefined, 'mouse');
             }}
-            onMouseUp={stopContinuousTrigger}
-            onMouseLeave={stopContinuousTrigger}
+            onMouseUp={() => stopContinuousTrigger('mouse')}
+            onMouseLeave={() => stopContinuousTrigger('mouse')}
             onTouchStart={(e) => {
               e.preventDefault();
-              startContinuousTrigger();
+              markTouchInteraction();
+              startContinuousTrigger(undefined, 'touch');
             }}
-            onTouchEnd={stopContinuousTrigger}
-            onTouchCancel={stopContinuousTrigger}
+            onTouchEnd={() => stopContinuousTrigger('touch')}
+            onTouchCancel={() => stopContinuousTrigger('touch')}
           >
             {/* Del */}
             <DeleteSvg />
@@ -230,7 +332,13 @@ const WriteKeyboard = ({
               isKeyActive?.(Enter) ? 'write-control-enter-active' : ''
             }`}
             onClick={() => {
-              onClick && onClick(Enter);
+              if (shouldIgnoreClick()) return;
+              onConfirm();
+            }}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              markTouchInteraction();
+              onConfirm();
             }}
           >
             {/* Enter */}
