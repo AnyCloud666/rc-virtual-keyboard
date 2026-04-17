@@ -1,6 +1,8 @@
 import React from 'react';
 
+import FunctionKeyboard from '../FunctionKeyboard';
 import { ReactComponent as EditSvg } from '../svg/edit.svg';
+import { ReactComponent as FunctionSvg } from '../svg/function.svg';
 import { ReactComponent as KeyboardSvg } from '../svg/keyboard.svg';
 import { ReactComponent as NumberSvg } from '../svg/number.svg';
 import { ReactComponent as SymbolSvg } from '../svg/symbol.svg';
@@ -68,6 +70,20 @@ export const NumberKeyboardTab: VKB.KeyboardTabItem = {
   }) => (
     <NumberKeyboard
       numberKeyboardLayoutMode={numberKeyboardLayoutMode}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      onKeyUp={onKeyUp}
+      isKeyActive={isKeyActive}
+    />
+  ),
+};
+/** 功能键tab */
+export const FunctionKeyboardTab: VKB.KeyboardTabItem = {
+  id: 'function',
+  label: <FunctionSvg />,
+  name: '功能键',
+  Component: ({ onClick, onKeyUp, onKeyDown, isKeyActive }) => (
+    <FunctionKeyboard
       onClick={onClick}
       onKeyDown={onKeyDown}
       onKeyUp={onKeyUp}
@@ -161,6 +177,7 @@ export const SettingKeyboardTab: VKB.KeyboardTabItem = {
 const tabs: VKB.KeyboardTabItem[] = [
   LetterKeyboardTab,
   NumberKeyboardTab,
+  FunctionKeyboardTab,
   SymbolKeyboardTab,
   EditKeyboardTab,
   WriteKeyboardTab,

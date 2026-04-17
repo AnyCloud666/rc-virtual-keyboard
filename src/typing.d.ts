@@ -38,6 +38,7 @@ declare namespace VKB {
   /**
    *  number:数字
    *  letter:字母
+   *  function:功能键
    *  symbol:符号
    *  controls:操作
    *  edit: 表情
@@ -47,6 +48,7 @@ declare namespace VKB {
   type KeyType =
     | 'number'
     | 'letter'
+    | 'function'
     | 'symbol'
     | 'controls'
     | 'edit'

@@ -14,6 +14,8 @@ import { VKB } from './typing';
 
 /** 数字键盘 */
 export const numberType = 'number';
+/** 功能键盘 */
+export const functionType = 'function';
 /** 字母键盘 */
 export const letterType = 'letter';
 /** 符号键盘 */
@@ -259,6 +261,80 @@ export const Numpad9: VKB.KeyboardAttributeType = {
 };
 
 /** ---------------------------字母类--------------------------- */
+
+/** ---------------------------功能键类--------------------------- */
+export const F1: VKB.KeyboardAttributeType = {
+  key: 'F1',
+  code: 'F1',
+  keyCode: 112,
+  keyType: functionType,
+};
+export const F2: VKB.KeyboardAttributeType = {
+  key: 'F2',
+  code: 'F2',
+  keyCode: 113,
+  keyType: functionType,
+};
+export const F3: VKB.KeyboardAttributeType = {
+  key: 'F3',
+  code: 'F3',
+  keyCode: 114,
+  keyType: functionType,
+};
+export const F4: VKB.KeyboardAttributeType = {
+  key: 'F4',
+  code: 'F4',
+  keyCode: 115,
+  keyType: functionType,
+};
+export const F5: VKB.KeyboardAttributeType = {
+  key: 'F5',
+  code: 'F5',
+  keyCode: 116,
+  keyType: functionType,
+};
+export const F6: VKB.KeyboardAttributeType = {
+  key: 'F6',
+  code: 'F6',
+  keyCode: 117,
+  keyType: functionType,
+};
+export const F7: VKB.KeyboardAttributeType = {
+  key: 'F7',
+  code: 'F7',
+  keyCode: 118,
+  keyType: functionType,
+};
+export const F8: VKB.KeyboardAttributeType = {
+  key: 'F8',
+  code: 'F8',
+  keyCode: 119,
+  keyType: functionType,
+};
+export const F9: VKB.KeyboardAttributeType = {
+  key: 'F9',
+  code: 'F9',
+  keyCode: 120,
+  keyType: functionType,
+};
+export const F10: VKB.KeyboardAttributeType = {
+  key: 'F10',
+  code: 'F10',
+  keyCode: 121,
+  keyType: functionType,
+};
+export const F11: VKB.KeyboardAttributeType = {
+  key: 'F11',
+  code: 'F11',
+  keyCode: 122,
+  keyType: functionType,
+};
+export const F12: VKB.KeyboardAttributeType = {
+  key: 'F12',
+  code: 'F12',
+  keyCode: 123,
+  keyType: functionType,
+};
 
 /** q */
 export const KeyQ: VKB.KeyboardAttributeType = {
@@ -1024,6 +1100,21 @@ export const getNumberKeys = (
 ) => {
   return layoutMode === 'desc' ? numberKeysDesc : numberKeysAsc;
 };
+
+export const functionKeys: VKB.KeyboardAttributeType[] = [
+  F1,
+  F2,
+  F3,
+  F4,
+  F5,
+  F6,
+  F7,
+  F8,
+  F9,
+  F10,
+  F11,
+  F12,
+];
 
 /** 字母键 */
 export const letterKeys: VKB.KeyboardAttributeType[] = [

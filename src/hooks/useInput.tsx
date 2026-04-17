@@ -31,6 +31,7 @@ import {
   VKB_THEME_MODE,
   ZH,
   controlsType,
+  functionType,
   letterType,
   numberType,
   settingType,
@@ -167,12 +168,17 @@ const useInput = ({
     const nextCodes = new Set<string>();
     const normalizedKey = typeof e.key === 'string' ? e.key : '';
     const digitMatch = e.code.match(/^Digit(\d)$/);
+    const functionMatch = e.code.match(/^F([1-9]|1[0-2])$/);
     const isPhysicalShift =
       e.code === 'ShiftLeft' || e.code === 'ShiftRight' || e.key === 'Shift';
     const isPhysicalCapsLock = e.code === 'CapsLock' || e.key === 'CapsLock';
 
     if (digitMatch) {
       nextCodes.add(`Numpad${digitMatch[1]}`);
+    }
+
+    if (functionMatch) {
+      nextCodes.add(`F${functionMatch[1]}`);
     }
 
     if (/^Numpad\d$/.test(e.code) || /^Key[A-Z]$/.test(e.code)) {
@@ -921,6 +927,35 @@ const useInput = ({
     }
   };
 
+  /** 功能键 */
+  const onFunction = (e: VKB.KeyboardAttributeType) => {
+    const keyboardEventInit = {
+      bubbles: true,
+      cancelable: true,
+      key: e.key,
+      code: e.code,
+    };
+
+    if (activeInputRef.current) {
+      Simulate?.keyDown?.(activeInputRef.current, {
+        key: e.key,
+        code: e.code,
+        keyCode: e.keyCode,
+        which: e.keyCode,
+      });
+      Simulate?.keyUp?.(activeInputRef.current, {
+        key: e.key,
+        code: e.code,
+        keyCode: e.keyCode,
+        which: e.keyCode,
+      });
+      return;
+    }
+
+    window.dispatchEvent(new KeyboardEvent('keydown', keyboardEventInit));
+    window.dispatchEvent(new KeyboardEvent('keyup', keyboardEventInit));
+  };
+
   /**
    * 点击事件分发
    *
@@ -932,6 +967,8 @@ const useInput = ({
     markKeyboardInteraction();
     if (e.keyType === controlsType) {
       onControl(e);
+    } else if (e.keyType === functionType) {
+      onFunction(e);
     } else if (e.keyType === settingType) {
       onSetting(e);
     } else {
