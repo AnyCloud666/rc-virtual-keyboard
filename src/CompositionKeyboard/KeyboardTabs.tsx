@@ -1,7 +1,9 @@
 import React from 'react';
 
+import EmojiKeyboard from '../EmojiKeyboard';
 import FunctionKeyboard from '../FunctionKeyboard';
 import { ReactComponent as EditSvg } from '../svg/edit.svg';
+import { ReactComponent as EmjoSvg } from '../svg/emjo.svg';
 import { ReactComponent as FunctionSvg } from '../svg/function.svg';
 import { ReactComponent as KeyboardSvg } from '../svg/keyboard.svg';
 import { ReactComponent as NumberSvg } from '../svg/number.svg';
@@ -91,6 +93,15 @@ export const FunctionKeyboardTab: VKB.KeyboardTabItem = {
     />
   ),
 };
+/** Emoji 键tab */
+export const EmojiKeyboardTab: VKB.KeyboardTabItem = {
+  id: 'emjo',
+  label: <EmjoSvg />,
+  name: 'Emoji 键',
+  Component: ({ onClick, isKeyActive }) => (
+    <EmojiKeyboard onClick={onClick ?? noop} isKeyActive={isKeyActive} />
+  ),
+};
 /** 符号键tab */
 export const SymbolKeyboardTab: VKB.KeyboardTabItem = {
   id: 'symbol',
@@ -177,6 +188,7 @@ export const SettingKeyboardTab: VKB.KeyboardTabItem = {
 const tabs: VKB.KeyboardTabItem[] = [
   LetterKeyboardTab,
   NumberKeyboardTab,
+  EmojiKeyboardTab,
   FunctionKeyboardTab,
   SymbolKeyboardTab,
   EditKeyboardTab,

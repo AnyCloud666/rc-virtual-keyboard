@@ -1,5 +1,6 @@
 import {
   EditKeyboardTab,
+  EmojiKeyboardTab,
   FunctionKeyboardTab,
   LetterKeyboardTab,
   NumberKeyboardTab,
@@ -10,6 +11,7 @@ import {
 import * as keys from './keys';
 export {
   EditKeyboardTab,
+  EmojiKeyboardTab,
   FunctionKeyboardTab,
   keys,
   LetterKeyboardTab,
@@ -19,6 +21,7 @@ export {
   WriteKeyboardTab,
 };
 
+export { default as EmojiKeyboard } from './EmojiKeyboard';
 export { default as FunctionKeyboard } from './FunctionKeyboard';
 export { default as NumberKeyboard } from './NumberKeyboard';
 

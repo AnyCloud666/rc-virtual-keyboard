@@ -53,6 +53,119 @@ import {
 
 let audio: HTMLAudioElement;
 
+const isHighSurrogate = (value: string, index: number) => {
+  const code = value.charCodeAt(index);
+  return code >= 0xd800 && code <= 0xdbff;
+};
+
+const isLowSurrogate = (value: string, index: number) => {
+  const code = value.charCodeAt(index);
+  return code >= 0xdc00 && code <= 0xdfff;
+};
+
+const getPreviousCursorIndexFallback = (value: string, index: number) => {
+  if (index <= 0) return 0;
+
+  if (
+    index >= 2 &&
+    isLowSurrogate(value, index - 1) &&
+    isHighSurrogate(value, index - 2)
+  ) {
+    return index - 2;
+  }
+
+  return index - 1;
+};
+
+const getNextCursorIndexFallback = (value: string, index: number) => {
+  if (index >= value.length) return value.length;
+
+  if (
+    index + 1 < value.length &&
+    isHighSurrogate(value, index) &&
+    isLowSurrogate(value, index + 1)
+  ) {
+    return index + 2;
+  }
+
+  return index + 1;
+};
+
+type SegmentLike = {
+  index?: number;
+  segment: string;
+};
+
+const getGraphemeBoundaries = (value: string) => {
+  const boundaries = [0];
+
+  if (
+    typeof Intl !== 'undefined' &&
+    typeof (
+      Intl as typeof Intl & {
+        Segmenter?: new (
+          locales?: string | string[],
+          options?: { granularity?: 'grapheme' | 'word' | 'sentence' },
+        ) => { segment(input: string): Iterable<SegmentLike> };
+      }
+    ).Segmenter === 'function'
+  ) {
+    const segmenter = new (
+      Intl as typeof Intl & {
+        Segmenter: new (
+          locales?: string | string[],
+          options?: { granularity?: 'grapheme' | 'word' | 'sentence' },
+        ) => { segment(input: string): Iterable<SegmentLike> };
+      }
+    ).Segmenter(undefined, {
+      granularity: 'grapheme',
+    });
+
+    for (const item of segmenter.segment(value)) {
+      if (typeof item.index === 'number') {
+        boundaries.push(item.index + item.segment.length);
+      }
+    }
+  } else {
+    let cursor = 0;
+
+    while (cursor < value.length) {
+      cursor = getNextCursorIndexFallback(value, cursor);
+      boundaries.push(cursor);
+    }
+  }
+
+  if (boundaries[boundaries.length - 1] !== value.length) {
+    boundaries.push(value.length);
+  }
+
+  return [...new Set(boundaries)].sort((a, b) => a - b);
+};
+
+const getPreviousCursorIndex = (value: string, index: number) => {
+  const boundaries = getGraphemeBoundaries(value);
+
+  for (let i = boundaries.length - 1; i >= 0; i -= 1) {
+    if (boundaries[i] < index) {
+      return boundaries[i];
+    }
+  }
+
+  return 0;
+};
+
+const getNextCursorIndex = (value: string, index: number) => {
+  const boundaries = getGraphemeBoundaries(value);
+
+  for (let i = 0; i < boundaries.length; i += 1) {
+    if (boundaries[i] > index) {
+      return boundaries[i];
+    }
+  }
+
+  return value.length;
+};
+
 const useInput = ({
   themeMode = LightTheme.code,
   positionMode = FloatPosition.code,
@@ -586,6 +699,8 @@ const useInput = ({
       ) {
         commitCurrentCandidate(' ');
       } else {
+        const insertedLength = e.key.length;
+
         // 处理 type = 'number' 时输入的其他字符
         if (isAllowInputNumber(inputType.current, value, e.key)) return;
 
@@ -606,8 +721,8 @@ const useInput = ({
         applyInputValue(
           activeInputRef.current,
           value,
-          selectionStart + 1,
-          selectionStart + 1,
+          selectionStart + insertedLength,
+          selectionStart + insertedLength,
         );
 
         emitInputEvent();
@@ -638,15 +753,16 @@ const useInput = ({
       // 获取光标位置
       const { selectionStart, selectionEnd, value, isCollapsed } =
         getSelectionInfo(activeInputRef.current);
+      const deleteStart = isCollapsed
+        ? getPreviousCursorIndex(value, selectionStart)
+        : selectionStart;
 
-      const tempValue =
-        value.slice(0, selectionStart - (isCollapsed ? 1 : 0)) +
-        value.slice(selectionEnd);
+      const tempValue = value.slice(0, deleteStart) + value.slice(selectionEnd);
       applyInputValue(
         activeInputRef.current,
         tempValue,
-        selectionStart - (isCollapsed ? 1 : 0),
-        isCollapsed ? selectionEnd - 1 : selectionStart,
+        deleteStart,
+        deleteStart,
       );
 
       // 删除后补发输入事件，驱动上层受控状态同步。
@@ -676,11 +792,11 @@ const useInput = ({
             activeInputRef.current.setSelectionRange(0, 0);
             break;
           case ArrowLeft.code:
-            index = selectionEnd - 1 > 0 ? selectionEnd - 1 : 0;
+            index = getPreviousCursorIndex(value, selectionEnd);
             activeInputRef.current.setSelectionRange(index, index);
             break;
           case ArrowRight.code:
-            index = selectionEnd + 1 > maxLength ? maxLength : selectionEnd + 1;
+            index = getNextCursorIndex(value, selectionEnd);
             activeInputRef.current.setSelectionRange(index, index);
             break;
           case ArrowDown.code:
@@ -701,17 +817,15 @@ const useInput = ({
             activeInputRef.current.setSelectionRange(0, selectionEnd);
             break;
           case ArrowLeft.code:
-            index = selectionStart - 1 > 0 ? selectionStart - 1 : 0;
+            index = getPreviousCursorIndex(value, selectionStart);
             activeInputRef.current.setSelectionRange(index, selectionEnd);
             break;
           case ArrowRight.code:
             if (selectionEnd < maxLength) {
-              index =
-                selectionEnd + 1 > maxLength ? maxLength : selectionEnd + 1;
+              index = getNextCursorIndex(value, selectionEnd);
               activeInputRef.current.setSelectionRange(selectionStart, index);
             } else {
-              index =
-                selectionStart + 1 > maxLength ? maxLength : selectionStart + 1;
+              index = getNextCursorIndex(value, selectionStart);
               activeInputRef.current.setSelectionRange(index, selectionEnd);
             }
 
@@ -777,13 +891,14 @@ const useInput = ({
         chinese +
         appendText +
         value.slice(selectionEnd);
+      const insertedText = chinese + appendText;
 
       // 选择中文候选词后，同样通过原生 setter 回填输入框。
       applyInputValue(
         activeInputRef.current,
         value,
-        chinese.length + appendText.length + selectionEnd,
-        chinese.length + appendText.length + selectionEnd,
+        insertedText.length + selectionEnd,
+        insertedText.length + selectionEnd,
       );
 
       // 通知 React / 业务侧当前值已经变化。
