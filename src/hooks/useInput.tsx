@@ -277,7 +277,9 @@ const useInput = ({
     bindInputListener(inputEl);
 
     if (options?.syncShow) {
-      onChangeShow && onChangeShow(shouldShowOnFocus(inputEl));
+      if (shouldShowOnFocus(inputEl)) {
+        onChangeShow && onChangeShow(true);
+      }
     }
   };
 
