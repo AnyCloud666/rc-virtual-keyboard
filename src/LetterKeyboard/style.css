@@ -49,6 +49,9 @@
   flex-wrap: nowrap;
   align-items: stretch;
   box-sizing: border-box;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
 }
 
 .letter-keyboard-temp-char {

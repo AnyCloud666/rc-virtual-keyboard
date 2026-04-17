@@ -1,4 +1,5 @@
 import React, { CSSProperties, useRef } from 'react';
+import useHorizontalDragScroll from '../hooks/useHorizontalDragScroll';
 
 import { ReactComponent as LeftSvg } from '../svg/left.svg';
 import { ReactComponent as RightSvg } from '../svg/right.svg';
@@ -26,6 +27,7 @@ const WordTempList = ({
 }) => {
   /** 临时输入区引用 */
   const tempInputAreaRef = useRef<HTMLDivElement | null>(null);
+  const dragScroll = useHorizontalDragScroll(tempInputAreaRef);
 
   /** 翻页 */
   const onMore = (type: string) => {
@@ -64,6 +66,8 @@ const WordTempList = ({
         style={styles?.wordKeyboardTempList}
         className="word-keyboard-temp-list"
         ref={tempInputAreaRef}
+        onMouseDown={dragScroll.onMouseDown}
+        onTouchStart={dragScroll.onTouchStart}
       >
         {words?.map((item, index) => {
           return (
@@ -71,7 +75,10 @@ const WordTempList = ({
               key={index}
               style={styles?.wordKeyboardTempChar}
               className="word-keyboard-temp-char"
-              onClick={() => onSelectWord && onSelectWord(item)}
+              onClick={() => {
+                if (dragScroll.shouldIgnoreClick()) return;
+                onSelectWord && onSelectWord(item);
+              }}
             >
               {item}
             </div>

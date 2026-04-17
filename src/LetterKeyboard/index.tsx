@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import useContinuousTrigger from '../hooks/useContinuousTrigger';
+import useHorizontalDragScroll from '../hooks/useHorizontalDragScroll';
 import useTouchClickGuard from '../hooks/useTouchClickGuard';
 
 import { ReactComponent as LeftSvg } from '../svg/left.svg';
@@ -82,6 +83,7 @@ const LetterKeyboard = ({
     createLetterKeys(inputMode, capsLockActive),
   );
   const { markTouchInteraction, shouldIgnoreClick } = useTouchClickGuard();
+  const dragScroll = useHorizontalDragScroll(tempInputAreaRef);
 
   /** 统一触发按键事件 */
   const triggerKey = (item: VKB.KeyboardAttributeType) => {
@@ -221,19 +223,27 @@ const LetterKeyboard = ({
           >
             <LeftSvg />
           </div>
-          <div className="letter-keyboard-temp-list" ref={tempInputAreaRef}>
+          <div
+            className="letter-keyboard-temp-list"
+            ref={tempInputAreaRef}
+            onMouseDown={dragScroll.onMouseDown}
+            onTouchStart={dragScroll.onTouchStart}
+          >
             {chinese?.map((item, index) => {
               return (
                 <div
                   key={index}
                   className="letter-keyboard-temp-char"
                   onClick={() => {
-                    if (shouldIgnoreClick()) return;
+                    if (shouldIgnoreClick() || dragScroll.shouldIgnoreClick()) {
+                      return;
+                    }
                     onSelectChinese && onSelectChinese(item);
                   }}
-                  onTouchStart={(e) => {
+                  onTouchEnd={(e) => {
                     e.preventDefault();
                     markTouchInteraction();
+                    if (dragScroll.shouldIgnoreClick()) return;
                     onSelectChinese && onSelectChinese(item);
                   }}
                 >

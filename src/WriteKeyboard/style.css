@@ -31,6 +31,9 @@
   width: 80%;
   height: 100%;
   overflow: hidden;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
 }
 
 .write-keyboard-temp-right,

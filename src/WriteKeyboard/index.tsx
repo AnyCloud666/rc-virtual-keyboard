@@ -1,6 +1,7 @@
 import { useDebounceFn, useEventListener } from 'ahooks';
 import React, { useEffect, useRef, useState } from 'react';
 import useContinuousTrigger from '../hooks/useContinuousTrigger';
+import useHorizontalDragScroll from '../hooks/useHorizontalDragScroll';
 import useTouchClickGuard from '../hooks/useTouchClickGuard';
 import { ReactComponent as DeleteSvg } from '../svg/delete.svg';
 import { ReactComponent as EnterSvg } from '../svg/enter.svg';
@@ -33,6 +34,7 @@ const WriteKeyboard = ({
   const writeContentRef = useRef<HTMLDivElement | null>(null);
   const allowMove = useRef(false);
   const { markTouchInteraction, shouldIgnoreClick } = useTouchClickGuard();
+  const dragScroll = useHorizontalDragScroll(tempInputAreaRef);
   const [canvasRect, setCanvasRect] = useState({
     width: '200px',
     height: '200px',
@@ -255,20 +257,28 @@ const WriteKeyboard = ({
           >
             <LeftSvg />
           </div>
-          <div className="write-keyboard-temp-list" ref={tempInputAreaRef}>
+          <div
+            className="write-keyboard-temp-list"
+            ref={tempInputAreaRef}
+            onMouseDown={dragScroll.onMouseDown}
+            onTouchStart={dragScroll.onTouchStart}
+          >
             {chinese?.map((item, index) => {
               return (
                 <div
                   key={index}
                   className="letter-keyboard-temp-char"
                   onClick={() => {
-                    if (shouldIgnoreClick()) return;
+                    if (shouldIgnoreClick() || dragScroll.shouldIgnoreClick()) {
+                      return;
+                    }
                     onDelete();
                     onSelectChinese && onSelectChinese(item);
                   }}
-                  onTouchStart={(e) => {
+                  onTouchEnd={(e) => {
                     e.preventDefault();
                     markTouchInteraction();
+                    if (dragScroll.shouldIgnoreClick()) return;
                     onDelete();
                     onSelectChinese && onSelectChinese(item);
                   }}
