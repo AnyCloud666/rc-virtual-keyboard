@@ -7,6 +7,7 @@ import MobileNoSystemKeyboardDemo from '../demos/MobileNoSystemKeyboardDemo';
 import MobilePushInputIntoViewDemo from '../demos/MobilePushInputIntoViewDemo';
 import NumberKeyboardLayoutDemo from '../demos/NumberKeyboardLayoutDemo';
 import PcPushInputIntoViewDemo from '../demos/PcPushInputIntoViewDemo';
+import RefInputDemo from '../demos/RefInputDemo';
 import type { DocRoute } from './types';
 
 const { Paragraph } = Typography;
@@ -53,6 +54,86 @@ export const exampleRoutes: DocRoute[] = [
         code={`<VirtualKeyboard show showIcon={false} />`}
       >
         <HideIconDemo />
+      </DemoPage>
+    ),
+  },
+  {
+    key: 'ref-input',
+    path: '/examples/ref-input',
+    title: 'Ref 输入联调',
+    menuLabel: 'Ref 输入联调',
+    description: '对比原生 input、antd Input、InputNumber、ProFormText、ProFormDigit 在 ref 控制下接入虚拟键盘后的行为。',
+    group: 'examples',
+    render: () => (
+      <DemoPage
+        title="原生 input / antd Input / InputNumber / ProFormText / ProFormDigit ref 联调"
+        description="这个页面用于检查虚拟键盘在 ref 聚焦、选区调整、ref 回写 value 和事件派发上的兼容性。"
+        points={[
+          '分别验证原生 input、antd Input、InputNumber、ProFormText、ProFormDigit 的 ref 聚焦能力',
+          '通过 ref 把光标移动到末尾或直接全选，观察虚拟键盘是否还能继续输入',
+          'onInput 中不使用 state，而是直接通过 ref 回写 value，方便排查 ref 接管场景',
+          '页面会记录 focus / input / change 事件，方便判断是否存在丢事件或值不同步',
+        ]}
+        code={`const nativeInputRef = useRef<HTMLInputElement | null>(null);
+const antdInputRef = useRef<InputRef>(null);
+const inputNumberRef = useRef<unknown>(null);
+const proFormInputRef = useRef<InputRef>(null);
+const proFormDigitRef = useRef<unknown>(null);
+
+const resolveNativeInput = (target: unknown) => {
+  if (target instanceof HTMLInputElement) return target;
+  if (target instanceof HTMLElement) return target.querySelector('input');
+  if (typeof target === 'object' && target && 'input' in target) {
+    return (target as { input?: HTMLInputElement | null }).input ?? null;
+  }
+  if (typeof target === 'object' && target && 'nativeElement' in target) {
+    const nativeElement = (target as { nativeElement?: HTMLElement | null }).nativeElement;
+    return nativeElement?.querySelector('input') ?? null;
+  }
+  return null;
+};
+
+<input
+  ref={nativeInputRef}
+  onInput={(e) => {
+    nativeInputRef.current!.value = e.currentTarget.value;
+  }}
+/>
+<Input
+  ref={antdInputRef}
+  onInput={(e) => {
+    antdInputRef.current?.input!.value = e.currentTarget.value;
+  }}
+/>
+<InputNumber
+  ref={inputNumberRef}
+  onInput={(value) => {
+    const input = resolveNativeInput(inputNumberRef.current);
+    if (input) input.value = String(value ?? '');
+  }}
+/>
+<ProFormText
+  name="proFormTextDemo"
+  fieldProps={{
+    ref: proFormInputRef,
+    onInput: (e) => {
+      proFormInputRef.current?.input!.value = e.currentTarget.value;
+    },
+  }}
+/>
+<ProFormDigit
+  name="proFormDigitDemo"
+  fieldProps={{
+    ref: proFormDigitRef,
+    onInput: (value) => {
+      const input = resolveNativeInput(proFormDigitRef.current);
+      if (input) input.value = String(value ?? '');
+    },
+  }}
+/>
+<VirtualKeyboard showIcon={false} />`}
+      >
+        <RefInputDemo />
       </DemoPage>
     ),
   },
