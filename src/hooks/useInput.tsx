@@ -253,6 +253,8 @@ const useInput = ({
   const blurTimer = useRef<number>();
   /** 键盘指针交互窗口，只在确实点击了虚拟键盘时用于抢回焦点 */
   const keyboardPointerUntilRef = useRef(0);
+  /** 键盘内部触摸会话，长按期间保持激活，避免移动端被误判为真正失焦 */
+  const keyboardTouchSessionRef = useRef(false);
   /** 监听器引用，避免回调依赖形成循环 */
   const onBlurHandlerRef = useRef<(e: FocusEvent) => void>();
   const onFocusHandlerRef = useRef<(e: FocusEvent) => void>();
@@ -458,6 +460,7 @@ const useInput = ({
           relatedTarget instanceof HTMLElement &&
           !!relatedTarget.closest('.virtual-keyboard');
         const isKeyboardPointerActive =
+          keyboardTouchSessionRef.current ||
           Date.now() < keyboardPointerUntilRef.current;
 
         if (isSupportedInput(nextActiveElement)) {
@@ -1255,7 +1258,15 @@ const useInput = ({
       | React.MouseEvent<HTMLDivElement, MouseEvent>
       | React.TouchEvent<HTMLDivElement>,
   ) => {
-    markKeyboardPointerInteraction();
+    const isTouchEvent = 'touches' in e;
+
+    if (isTouchEvent) {
+      keyboardTouchSessionRef.current = true;
+      markKeyboardPointerInteraction(10_000);
+    } else {
+      markKeyboardPointerInteraction();
+    }
+
     const isStop = checkStopPropagation(
       e.target,
       'keyboard-tab-move',
@@ -1268,7 +1279,17 @@ const useInput = ({
   };
 
   /** 键盘指针抬起时快速收缩保护窗口，避免外部点击隐藏需要多次触发 */
-  const onMouseUp = () => {
+  const onMouseUp = (
+    e?:
+      | React.MouseEvent<HTMLDivElement, MouseEvent>
+      | React.TouchEvent<HTMLDivElement>,
+  ) => {
+    if (e && 'changedTouches' in e) {
+      keyboardTouchSessionRef.current = false;
+      releaseKeyboardPointerInteraction(120);
+      return;
+    }
+
     releaseKeyboardPointerInteraction();
   };
 

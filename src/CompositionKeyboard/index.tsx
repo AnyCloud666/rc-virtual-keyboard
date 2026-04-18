@@ -179,10 +179,10 @@ const CompositionKeyboard = ({
       }}
       className={`virtual-keyboard virtual-keyboard-var virtual-keyboard-var-${vkbThemeMode}`}
       onMouseDown={onMouseDown}
-      onMouseUp={onMouseUp}
+      onMouseUp={(e) => onMouseUp(e)}
       onTouchStart={onMouseDown}
-      onTouchEnd={onMouseUp}
-      onTouchCancel={onMouseUp}
+      onTouchEnd={(e) => onMouseUp(e)}
+      onTouchCancel={(e) => onMouseUp(e)}
       onTouchStartCapture={() => {
         markTouchInteraction();
       }}
