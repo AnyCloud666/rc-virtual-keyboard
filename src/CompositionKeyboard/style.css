@@ -194,11 +194,36 @@
 }
 
 .virtual-keyboard-content {
+  position: relative;
   flex: 1;
   min-height: 0;
   padding: 0;
   overflow: visible;
   box-sizing: border-box;
+}
+
+.virtual-keyboard-pane {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.virtual-keyboard-pane-active {
+  z-index: 1;
+  opacity: 1;
+  visibility: visible;
+  transform: translate3d(0, 0, 0);
+  pointer-events: auto;
+}
+
+.virtual-keyboard-pane-hidden {
+  z-index: -1;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate3d(-200vw, 0, 0);
+  pointer-events: none;
 }
 
 .virtual-drag-block {

@@ -1,5 +1,5 @@
 import { useDebounceFn, useEventListener } from 'ahooks';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import useContinuousTrigger from '../hooks/useContinuousTrigger';
 import useTouchClickGuard from '../hooks/useTouchClickGuard';
 import CandidateBar from '../lib/CandidateBar';
@@ -61,6 +61,7 @@ const WriteKeyboard = ({
   const drawCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const drawCanvasCTX = useRef<CanvasRenderingContext2D | null>(null);
   const writeContentRef = useRef<HTMLDivElement | null>(null);
+  const previousCanvasSizeRef = useRef<CanvasSize | null>(null);
   const allowMove = useRef(false);
   const lastPointRef = useRef<StrokeSamplePoint | null>(null);
   const lastMidPointRef = useRef<StrokeSamplePoint | null>(null);
@@ -416,7 +417,7 @@ const WriteKeyboard = ({
       target: writeContentRef.current,
     },
   );
-  useEffect(() => {
+  useLayoutEffect(() => {
     const updateCanvasSize = () => {
       if (!writeContentRef.current) return;
 
@@ -460,6 +461,9 @@ const WriteKeyboard = ({
     };
 
     updateCanvasSize();
+    const frameId = window.requestAnimationFrame(() => {
+      updateCanvasSize();
+    });
 
     const resizeObserver = new ResizeObserver(() => {
       updateCanvasSize();
@@ -472,12 +476,13 @@ const WriteKeyboard = ({
     window.addEventListener('resize', updateCanvasSize);
 
     return () => {
+      window.cancelAnimationFrame(frameId);
       resizeObserver.disconnect();
       window.removeEventListener('resize', updateCanvasSize);
     };
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const displayCanvas = canvasRef.current;
 
     if (!displayCanvas) return;
@@ -496,6 +501,24 @@ const WriteKeyboard = ({
 
     if (!drawContext) return;
 
+    const previousCanvasSize = previousCanvasSizeRef.current;
+    let snapshotCanvas: HTMLCanvasElement | null = null;
+
+    if (
+      drawCanvas.width > 0 &&
+      drawCanvas.height > 0 &&
+      previousCanvasSize
+    ) {
+      snapshotCanvas = document.createElement('canvas');
+      snapshotCanvas.width = drawCanvas.width;
+      snapshotCanvas.height = drawCanvas.height;
+      const snapshotContext = snapshotCanvas.getContext('2d');
+
+      if (snapshotContext) {
+        snapshotContext.drawImage(drawCanvas, 0, 0);
+      }
+    }
+
     displayCanvas.width = canvasSize.displayWidth;
     displayCanvas.height = canvasSize.displayHeight;
     drawCanvas.width = canvasSize.drawWidth;
@@ -510,6 +533,18 @@ const WriteKeyboard = ({
     drawContext.imageSmoothingEnabled = true;
     drawContext.imageSmoothingQuality = 'high';
     setupStrokeContext(drawContext);
+
+    if (snapshotCanvas && previousCanvasSize) {
+      drawContext.drawImage(
+        snapshotCanvas,
+        0,
+        0,
+        previousCanvasSize.cssWidth,
+        previousCanvasSize.cssHeight,
+      );
+    }
+
+    previousCanvasSizeRef.current = canvasSize;
     syncDisplayCanvas();
   }, [canvasSize]);
 

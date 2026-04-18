@@ -237,39 +237,47 @@ const CompositionKeyboard = ({
       </div>
       <div className="virtual-keyboard-content">
         {virtualKeyboardTab.map((item) => {
-          return activeKeyboard === item.id ? (
-            <item.Component
+          const isActive = activeKeyboard === item.id;
+
+          return (
+            <div
               key={item.id}
-              inputMode={inputMode}
-              themeMode={vkbThemeMode}
-              positionMode={vkbPositionMode}
-              vkbKeydownAudio={vkbKeydownAudio}
-              width={width}
-              height={height}
-              fontSize={fontSize}
-              fontFamily={fontFamily}
-              numberKeyboardLayoutMode={numberKeyboardLayoutMode}
-              capsLockActive={capsLockActive}
-              chinese={chinese}
-              onClick={onClick}
-              isKeyActive={isKeyActive}
-              onWidthChange={onWidthChange ?? (() => {})}
-              onHeightChange={onHeightChange ?? (() => {})}
-              onFontSizeChange={onFontSizeChange ?? (() => {})}
-              onFontFamilyChange={onFontFamilyChange ?? (() => {})}
-              onNumberKeyboardLayoutModeChange={
-                onNumberKeyboardLayoutModeChange ?? (() => {})
-              }
-              onChangeInputMode={onChangeInputMode}
-              inputValue={inputValue}
-              onSelectChinese={onSelectChinese}
-              onMouseDown={onMouseDown}
-              onRecognition={onRecognition}
-              onKeyDown={onKeyDown}
-              onKeyUp={onKeyUp}
-            />
-          ) : (
-            ''
+              className={`virtual-keyboard-pane ${
+                isActive
+                  ? 'virtual-keyboard-pane-active'
+                  : 'virtual-keyboard-pane-hidden'
+              }`}
+            >
+              <item.Component
+                inputMode={inputMode}
+                themeMode={vkbThemeMode}
+                positionMode={vkbPositionMode}
+                vkbKeydownAudio={vkbKeydownAudio}
+                width={width}
+                height={height}
+                fontSize={fontSize}
+                fontFamily={fontFamily}
+                numberKeyboardLayoutMode={numberKeyboardLayoutMode}
+                capsLockActive={capsLockActive}
+                chinese={chinese}
+                onClick={onClick}
+                isKeyActive={isKeyActive}
+                onWidthChange={onWidthChange ?? (() => {})}
+                onHeightChange={onHeightChange ?? (() => {})}
+                onFontSizeChange={onFontSizeChange ?? (() => {})}
+                onFontFamilyChange={onFontFamilyChange ?? (() => {})}
+                onNumberKeyboardLayoutModeChange={
+                  onNumberKeyboardLayoutModeChange ?? (() => {})
+                }
+                onChangeInputMode={onChangeInputMode}
+                inputValue={inputValue}
+                onSelectChinese={onSelectChinese}
+                onMouseDown={onMouseDown}
+                onRecognition={onRecognition}
+                onKeyDown={onKeyDown}
+                onKeyUp={onKeyUp}
+              />
+            </div>
           );
         })}
       </div>
