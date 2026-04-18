@@ -1,5 +1,13 @@
 @import url('../var.css');
 
+.number-keyboard-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  color: var(--vkb-key-color);
+  background-color: var(--vkb-background);
+}
+
 .number-keyboard {
   display: grid;
   grid-template-columns: repeat(5, calc((100% - var(--vkb-key-gap) * 4) / 5));

@@ -1,0 +1,100 @@
+@import url('../../var.css');
+
+.candidate-bar {
+  position: absolute;
+  top: calc((var(--vkb-keyboard-tab) + var(--vkb-key-gap) * 2) * -1);
+  left: 0;
+  z-index: 3;
+  display: flex;
+  align-items: stretch;
+  gap: var(--vkb-key-gap);
+  width: 100%;
+  height: calc(var(--vkb-keyboard-tab) + var(--vkb-key-gap) * 2);
+  padding: var(--vkb-key-gap) 0;
+  background-color: var(--vkb-background);
+  box-sizing: border-box;
+}
+
+.candidate-bar-list {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  gap: var(--vkb-key-gap);
+  overflow: hidden;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+  box-sizing: border-box;
+}
+
+.candidate-bar-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-width: max-content;
+  height: var(--vkb-keyboard-tab);
+  padding: 0 10px;
+  white-space: nowrap;
+  word-break: keep-all;
+  flex-shrink: 0;
+  cursor: pointer;
+  user-select: none;
+  background-color: var(--vkb-key-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  box-sizing: border-box;
+}
+
+.candidate-bar-item-input {
+  background-color: var(--vkb-background);
+}
+
+.candidate-bar-arrow {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--vkb-keyboard-tab);
+  height: var(--vkb-keyboard-tab);
+  cursor: pointer;
+  color: var(--vkb-key-color);
+  fill: var(--vkb-key-color);
+  background-color: var(--vkb-key-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  border-radius: var(--vkb-key-borer-radius);
+  box-sizing: border-box;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.candidate-bar-arrow svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+  transition: fill 0.2s ease;
+}
+
+.candidate-bar-arrow:hover {
+  background-color: var(--vkb-key-active-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+}
+
+.candidate-bar-arrow:hover svg {
+  fill: var(--vkb-key-active-font-color);
+}
+
+.candidate-bar-item:active,
+.candidate-bar-arrow:active {
+  background-color: var(--vkb-key-active-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+}
+
+.candidate-bar-arrow:active svg {
+  fill: var(--vkb-key-active-font-color);
+}

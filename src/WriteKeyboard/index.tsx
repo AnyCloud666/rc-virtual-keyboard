@@ -1,12 +1,10 @@
 import { useDebounceFn, useEventListener } from 'ahooks';
 import React, { useEffect, useRef, useState } from 'react';
 import useContinuousTrigger from '../hooks/useContinuousTrigger';
-import useHorizontalDragScroll from '../hooks/useHorizontalDragScroll';
 import useTouchClickGuard from '../hooks/useTouchClickGuard';
+import CandidateBar from '../lib/CandidateBar';
 import { ReactComponent as DeleteSvg } from '../svg/delete.svg';
 import { ReactComponent as EnterSvg } from '../svg/enter.svg';
-import { ReactComponent as LeftSvg } from '../svg/left.svg';
-import { ReactComponent as RightSvg } from '../svg/right.svg';
 
 import { Backspace, Clear, Enter } from '../keys';
 import { VKB } from '../typing';
@@ -58,8 +56,6 @@ const WriteKeyboard = ({
   onMouseDown?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
 }) => {
-  /** 临时输入区引用 */
-  const tempInputAreaRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const canvasCTX = useRef<CanvasRenderingContext2D | null>(null);
   const drawCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -70,7 +66,6 @@ const WriteKeyboard = ({
   const lastMidPointRef = useRef<StrokeSamplePoint | null>(null);
   const lastRadiusRef = useRef(BASE_STROKE_WIDTH / 2);
   const { markTouchInteraction, shouldIgnoreClick } = useTouchClickGuard();
-  const dragScroll = useHorizontalDragScroll(tempInputAreaRef);
   const [canvasSize, setCanvasSize] = useState<CanvasSize>({
     cssWidth: 200,
     cssHeight: 200,
@@ -518,84 +513,15 @@ const WriteKeyboard = ({
     syncDisplayCanvas();
   }, [canvasSize]);
 
-  /** 翻页 */
-  const onMore = (type: string) => {
-    if (tempInputAreaRef.current) {
-      const width = tempInputAreaRef.current.offsetWidth;
-      tempInputAreaRef.current.scrollTo({
-        left:
-          tempInputAreaRef.current.scrollLeft +
-          (type === 'add' ? width : -width) / 10,
-        behavior: 'smooth',
-      });
-    }
-  };
-
   return (
     <div className="write-keyboard" onMouseDown={onMouseDown}>
-      {chinese && chinese.length > 0 && (
-        <div className="write-keyboard-temp">
-          <div
-            className="write-keyboard-temp-left"
-            onClick={() => {
-              if (shouldIgnoreClick()) return;
-              onMore('minus');
-            }}
-            onTouchStart={(e) => {
-              e.preventDefault();
-              markTouchInteraction();
-              onMore('minus');
-            }}
-          >
-            <LeftSvg />
-          </div>
-          <div
-            className="write-keyboard-temp-list"
-            ref={tempInputAreaRef}
-            onMouseDown={dragScroll.onMouseDown}
-            onTouchStart={dragScroll.onTouchStart}
-          >
-            {chinese?.map((item, index) => {
-              return (
-                <div
-                  key={index}
-                  className="letter-keyboard-temp-char"
-                  onClick={() => {
-                    if (shouldIgnoreClick() || dragScroll.shouldIgnoreClick()) {
-                      return;
-                    }
-                    onDelete();
-                    onSelectChinese && onSelectChinese(item);
-                  }}
-                  onTouchEnd={(e) => {
-                    e.preventDefault();
-                    markTouchInteraction();
-                    if (dragScroll.shouldIgnoreClick()) return;
-                    onDelete();
-                    onSelectChinese && onSelectChinese(item);
-                  }}
-                >
-                  {item}
-                </div>
-              );
-            })}
-          </div>
-          <div
-            className="write-keyboard-temp-right"
-            onClick={() => {
-              if (shouldIgnoreClick()) return;
-              onMore('add');
-            }}
-            onTouchStart={(e) => {
-              e.preventDefault();
-              markTouchInteraction();
-              onMore('add');
-            }}
-          >
-            <RightSvg />
-          </div>
-        </div>
-      )}
+      <CandidateBar
+        items={chinese}
+        onSelectItem={(item) => {
+          onDelete();
+          onSelectChinese?.(item);
+        }}
+      />
 
       <div className="write-keyboard-area">
         <div className="write-content" ref={writeContentRef}>

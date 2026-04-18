@@ -222,6 +222,8 @@ const useInput = ({
   const inputType = useRef('');
   /** 当前活动的input */
   const activeInputRef = useRef<HTMLInputElement | null>(null);
+  /** 最近一次有效激活的 input，供候选回填时兜底使用 */
+  const lastActiveInputRef = useRef<HTMLInputElement | null>(null);
   /** 当前活动的键盘 */
   const [activeKeyboard, setActiveKeyboard] = useState<string>(
     defaultActiveKeyboard,
@@ -412,6 +414,7 @@ const useInput = ({
 
     inputType.current = inputEl.dataset?.vkbType ?? '';
     activeInputRef.current = inputEl;
+    lastActiveInputRef.current = inputEl;
     bindInputListener(inputEl);
 
     if (options?.syncShow) {
@@ -890,33 +893,55 @@ const useInput = ({
   };
 
   /** 选择输入的中文 */
-  const onSelectChinese = (chinese: string, appendText = '') => {
+  const onSelectChinese = (
+    chinese: string,
+    appendText = '',
+    options?: { replaceText?: string },
+  ) => {
+    const targetInput = activeInputRef.current ?? lastActiveInputRef.current;
+
     if (
-      activeInputRef.current &&
+      targetInput &&
       !NEED_HANDLE_INPUT_TYPES.includes(inputType.current)
     ) {
-      let { value, selectionEnd } = getSelectionInfo(activeInputRef.current);
-      selectionEnd = selectionEnd || 1;
+      let { value, selectionStart, selectionEnd } = getSelectionInfo(
+        targetInput,
+      );
+      const replaceText = options?.replaceText;
+      let insertStart = selectionStart;
+      let insertEnd = selectionEnd;
+
+      if (replaceText) {
+        const beforeCursor = value.slice(0, selectionEnd);
+        const replaceStart =
+          beforeCursor.lastIndexOf(replaceText) !== -1
+            ? beforeCursor.lastIndexOf(replaceText)
+            : value.lastIndexOf(replaceText);
+
+        if (replaceStart !== -1) {
+          insertStart = replaceStart;
+          insertEnd = replaceStart + replaceText.length;
+        }
+      }
 
       value =
-        value.slice(0, selectionEnd) +
+        value.slice(0, insertStart) +
         chinese +
         appendText +
-        value.slice(selectionEnd);
+        value.slice(insertEnd);
       const insertedText = chinese + appendText;
 
       // 选择中文候选词后，同样通过原生 setter 回填输入框。
       applyInputValue(
-        activeInputRef.current,
+        targetInput,
         value,
-        insertedText.length + selectionEnd,
-        insertedText.length + selectionEnd,
+        insertedText.length + insertStart,
+        insertedText.length + insertStart,
       );
 
       // 通知 React / 业务侧当前值已经变化。
-      emitInputEvent();
-    } else {
-      console.error('input type = email or number not allow input chinese');
+      Simulate?.input?.(targetInput);
+      Simulate?.change?.(targetInput);
     }
     setInputValue('');
     setChinese([]);

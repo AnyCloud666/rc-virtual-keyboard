@@ -64,6 +64,10 @@ export const NumberKeyboardTab: VKB.KeyboardTabItem = {
   label: <NumberSvg />,
   name: '数字键',
   Component: ({
+    inputValue,
+    chinese,
+    onMouseDown,
+    onSelectChinese,
     onClick,
     onKeyUp,
     onKeyDown,
@@ -72,9 +76,13 @@ export const NumberKeyboardTab: VKB.KeyboardTabItem = {
   }) => (
     <NumberKeyboard
       numberKeyboardLayoutMode={numberKeyboardLayoutMode}
+      inputValue={inputValue}
+      chinese={chinese}
+      onMouseDown={onMouseDown}
       onClick={onClick}
       onKeyDown={onKeyDown}
       onKeyUp={onKeyUp}
+      onSelectChinese={onSelectChinese}
       isKeyActive={isKeyActive}
     />
   ),

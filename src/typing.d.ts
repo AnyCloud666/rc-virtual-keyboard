@@ -20,7 +20,11 @@ declare namespace VKB {
     capsLockActive?: boolean;
     inputValue?: string;
     chinese?: string[];
-    onMouseDown: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+    onMouseDown: (
+      e:
+        | React.MouseEvent<HTMLDivElement, MouseEvent>
+        | React.TouchEvent<HTMLDivElement>,
+    ) => void;
     onClick: (e: VKB.KeyboardAttributeType) => void;
     isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
     onWidthChange?: (width: string) => void;
@@ -29,7 +33,11 @@ declare namespace VKB {
     onFontFamilyChange?: (fontFamily: string) => void;
     onNumberKeyboardLayoutModeChange?: (mode: NumberKeyboardLayoutMode) => void;
     onChangeInputMode?: (mode: VKB.InputMode) => void;
-    onSelectChinese?: (chinese: string) => void;
+    onSelectChinese?: (
+      chinese: string,
+      appendText?: string,
+      options?: { replaceText?: string },
+    ) => void;
     onRecognition?: (url: string) => void;
     onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
     onKeyUp?: (e: VKB.KeyboardAttributeType) => void;

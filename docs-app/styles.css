@@ -402,6 +402,8 @@ body {
 
 .component-demo-keyboard-frame-write {
   min-height: 284px;
+  height: 320px;
+  overflow: visible;
 }
 
 .component-demo-keyboard-frame-setting {
@@ -543,8 +545,12 @@ body {
   .component-demo-keyboard-frame-symbol,
   .component-demo-keyboard-frame-function,
   .component-demo-keyboard-frame-edit,
-  .component-demo-keyboard-frame-write,
   .component-demo-keyboard-frame-setting {
     min-height: auto;
+  }
+
+  .component-demo-keyboard-frame-write {
+    min-height: 284px;
+    height: 284px;
   }
 }

@@ -259,9 +259,7 @@ const CompositionKeyboard = ({
               onChangeInputMode={onChangeInputMode}
               inputValue={inputValue}
               onSelectChinese={onSelectChinese}
-              onMouseDown={(e) => {
-                e.preventDefault();
-              }}
+              onMouseDown={onMouseDown}
               onRecognition={onRecognition}
               onKeyDown={onKeyDown}
               onKeyUp={onKeyUp}

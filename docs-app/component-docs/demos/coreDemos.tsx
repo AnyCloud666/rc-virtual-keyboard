@@ -46,7 +46,18 @@ export function CompositionKeyboardDemo() {
 }
 
 export function NumberKeyboardDemo() {
-  const { value, setValue, onClick, onKeyDown, onKeyUp, isKeyActive } =
+  const {
+    value,
+    setValue,
+    inputValue,
+    chinese,
+    onMouseDown,
+    onClick,
+    onKeyDown,
+    onKeyUp,
+    onSelectChinese,
+    isKeyActive,
+  } =
     useDemoInputController({
       defaultActiveKeyboard: keys.numberType,
     });
@@ -61,9 +72,13 @@ export function NumberKeyboardDemo() {
       <div className="component-demo-keyboard-frame component-demo-keyboard-frame-number">
         <NumberKeyboard
           numberKeyboardLayoutMode="desc"
+          inputValue={inputValue}
+          chinese={chinese}
+          onMouseDown={onMouseDown}
           onClick={onClick}
           onKeyDown={onKeyDown}
           onKeyUp={onKeyUp}
+          onSelectChinese={onSelectChinese}
           isKeyActive={isKeyActive}
         />
       </div>
