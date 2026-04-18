@@ -1,5 +1,5 @@
 import { GithubOutlined, LinkOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Card, ConfigProvider, Layout, Menu, Space, Spin, Tag, Typography } from 'antd';
+import { Breadcrumb, Button, Card, ConfigProvider, Layout, Menu, Skeleton, Space, Spin, Tag, Typography } from 'antd';
 import type { MenuProps } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { menuItems, routeMap } from './routes';
@@ -95,11 +95,28 @@ function App() {
   );
 
   const contentLoadingNode = (
-    <div className="content-loading">
-      <div className="content-loading-inner">
-        <Spin size="large" />
-        <div className="content-loading-title">内容加载中</div>
-        <div className="content-loading-desc">右侧文档区域正在切换，请稍候。</div>
+    <div className="content-skeleton">
+      <div className="content-skeleton-head">
+        <Skeleton.Button active size="small" shape="round" className="content-skeleton-breadcrumb" />
+        <Skeleton.Input active size="large" className="content-skeleton-title" />
+        <Skeleton active title={false} paragraph={{ rows: 2, width: ['56%', '38%'] }} />
+      </div>
+
+      <div className="content-skeleton-section">
+        <Skeleton active title={{ width: '24%' }} paragraph={{ rows: 4, width: ['96%', '92%', '88%', '78%'] }} />
+      </div>
+
+      <div className="content-skeleton-grid">
+        <div className="content-skeleton-card">
+          <Skeleton active title={{ width: '32%' }} paragraph={{ rows: 6 }} />
+        </div>
+        <div className="content-skeleton-card">
+          <Skeleton active title={{ width: '28%' }} paragraph={{ rows: 6 }} />
+        </div>
+      </div>
+
+      <div className="content-skeleton-footer">
+        <Skeleton active title={{ width: '18%' }} paragraph={{ rows: 1, width: ['62%'] }} />
       </div>
     </div>
   );
