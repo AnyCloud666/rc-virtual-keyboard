@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { CSSProperties, InputHTMLAttributes, ReactNode } from 'react';
 
 declare namespace VKB {
   type InputMode = 'zh' | 'en';
@@ -177,6 +177,16 @@ declare namespace VKB {
     useKeydownAudio?: 'Y' | 'N';
     /** 指定虚拟键盘挂载节点，返回值为空时回退到当前渲染位置 */
     getContainer?: () => HTMLElement | null;
+  };
+
+  type VirtualInputProps = Omit<
+    InputHTMLAttributes<HTMLInputElement>,
+    'readOnly' | 'size'
+  > & {
+    wrapperClassName?: string;
+    wrapperStyle?: CSSProperties;
+    prefix?: ReactNode;
+    suffix?: ReactNode;
   };
 
   type KeyBoardCtxType = VirtualKeyboardProps & {

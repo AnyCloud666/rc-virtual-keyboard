@@ -40,6 +40,7 @@ export { default as DragBlock } from './DragBlock';
 export { default as CompositionKeyboard } from './CompositionKeyboard';
 
 export { default as WordTempList } from './WordTempList';
+export { default as VirtualInput } from './VirtualInput';
 
 export {
   InitVirtualKeyBoardCtx,

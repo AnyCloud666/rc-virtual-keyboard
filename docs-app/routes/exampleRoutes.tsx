@@ -217,18 +217,42 @@ const resolveNativeInput = (target: unknown) => {
     path: '/examples/mobile-no-system-keyboard',
     title: '移动端接管输入',
     menuLabel: '移动端接管输入',
-    description: '移动端 readOnly + inputMode=none 场景。',
+    description: '移动端原生输入接管与 VirtualInput 自定义输入框对比场景。',
     group: 'examples',
     render: () => (
       <DemoPage
         title="移动端聚焦输入框，但不唤起系统键盘"
-        description="通过读写限制和独立路由页，让这个场景的行为更容易单独验证。"
+        description="这个页面同时保留旧方案和新的 VirtualInput 方案，方便直接对比移动端接管输入体验。"
         points={[
-          '移动端推荐在输入框上加 readOnly',
-          'inputMode="none" 用于增强兼容性',
+          '旧方案仍然展示为原生 input + readOnly + inputMode="none"',
+          '新方案通过 VirtualInput 提供自定义外观，同时继续复用虚拟键盘接管能力',
           '组件在移动端默认切到 fixedBottom 布局',
         ]}
-        code={`<input readOnly inputMode="none" />`}
+        code={`import { useState } from 'react';
+import { VirtualInput, VirtualKeyboard } from 'rc-virtual-keyboard';
+
+export default function Demo() {
+  const [value, setValue] = useState('');
+
+  return (
+    <>
+      <VirtualInput
+        value={value}
+        placeholder="点击这里，只使用虚拟键盘输入"
+        onChange={(e) => setValue(e.target.value)}
+        prefix={<span>ID</span>}
+        suffix={<span>移动端</span>}
+        style={{
+          minHeight: 46,
+          borderRadius: 12,
+          borderColor: '#91caff',
+          background: '#f6fbff',
+        }}
+      />
+      <VirtualKeyboard />
+    </>
+  );
+}`}
       >
         <MobileNoSystemKeyboardDemo />
       </DemoPage>
