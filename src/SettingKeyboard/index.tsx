@@ -286,6 +286,54 @@ const SettingKeyboard = ({
     commitFontFamily(nextValue);
   };
 
+  const sizeControls = [
+    canResizeWidth
+      ? {
+          key: 'width',
+          label: positionMode === 'float' ? '宽度' : 'X 轴缩放',
+          value: formatPx(draftWidth),
+          min: WIDTH_MIN,
+          max: WIDTH_MAX,
+          step: SIZE_STEP,
+          currentValue: currentWidth,
+          draftValue: draftWidth,
+          onChange: changeWidth,
+          tips:
+            positionMode === 'float'
+              ? '浮动模式下可独立调整横向尺寸'
+              : '固定左侧、固定右侧时通过 X 轴调整键盘宽度',
+        }
+      : null,
+    canResizeHeight
+      ? {
+          key: 'height',
+          label: positionMode === 'float' ? '高度' : 'Y 轴缩放',
+          value: formatPx(draftHeight),
+          min: HEIGHT_MIN,
+          max: HEIGHT_MAX,
+          step: SIZE_STEP,
+          currentValue: currentHeight,
+          draftValue: draftHeight,
+          onChange: changeHeight,
+          tips:
+            positionMode === 'float'
+              ? '浮动模式下可独立调整纵向尺寸'
+              : '固定上方、固定下方时通过 Y 轴调整键盘高度',
+        }
+      : null,
+  ].filter(Boolean) as Array<{
+    key: 'width' | 'height';
+    label: string;
+    value: string;
+    min: number;
+    max: number;
+    step: number;
+    currentValue: number;
+    draftValue: number;
+    onChange: (value: number) => void;
+    tips: string;
+  }>;
+
   return (
     <div className="setting-keyboard">
       <div className="setting-keyboard-item">
@@ -397,121 +445,62 @@ const SettingKeyboard = ({
       <div className="setting-keyboard-item">
         <div>键盘尺寸：</div>
         <div className="setting-keyboard-size-box">
-          <div className="setting-keyboard-size-item">
-            <div className="setting-keyboard-size-header">
-              <span>宽度</span>
-              <span>{canResizeWidth ? formatPx(draftWidth) : '100%'}</span>
+          {sizeControls.map((control) => (
+            <div className="setting-keyboard-size-item" key={control.key}>
+              <div className="setting-keyboard-size-header">
+                <span>{control.label}</span>
+                <span>{control.value}</span>
+              </div>
+              <div className="setting-keyboard-size-control">
+                <button
+                  type="button"
+                  className="setting-keyboard-size-button"
+                  onMouseDown={stopDragBubble}
+                  onTouchStart={(e) =>
+                    stopTouchAndRun(e, () =>
+                      control.onChange(control.currentValue - control.step),
+                    )
+                  }
+                  onPointerDown={stopDragBubble}
+                  onClick={() =>
+                    control.onChange(control.currentValue - control.step)
+                  }
+                >
+                  -
+                </button>
+                <input
+                  className="setting-keyboard-size-range"
+                  type="range"
+                  min={control.min}
+                  max={control.max}
+                  step={control.step}
+                  value={control.draftValue}
+                  onMouseDown={stopDragBubble}
+                  onTouchStart={stopDragBubble}
+                  onPointerDown={stopDragBubble}
+                  onClick={stopDragBubble}
+                  onChange={(e) => control.onChange(Number(e.target.value))}
+                />
+                <button
+                  type="button"
+                  className="setting-keyboard-size-button"
+                  onMouseDown={stopDragBubble}
+                  onTouchStart={(e) =>
+                    stopTouchAndRun(e, () =>
+                      control.onChange(control.currentValue + control.step),
+                    )
+                  }
+                  onPointerDown={stopDragBubble}
+                  onClick={() =>
+                    control.onChange(control.currentValue + control.step)
+                  }
+                >
+                  +
+                </button>
+              </div>
+              <div className="setting-keyboard-size-tips">{control.tips}</div>
             </div>
-            <div className="setting-keyboard-size-control">
-              <button
-                type="button"
-                className="setting-keyboard-size-button"
-                disabled={!canResizeWidth}
-                onMouseDown={stopDragBubble}
-                onTouchStart={(e) =>
-                  stopTouchAndRun(e, () =>
-                    changeWidth(currentWidth - SIZE_STEP),
-                  )
-                }
-                onPointerDown={stopDragBubble}
-                onClick={() => changeWidth(currentWidth - SIZE_STEP)}
-              >
-                -
-              </button>
-              <input
-                className="setting-keyboard-size-range"
-                type="range"
-                min={WIDTH_MIN}
-                max={WIDTH_MAX}
-                step={SIZE_STEP}
-                value={draftWidth}
-                disabled={!canResizeWidth}
-                onMouseDown={stopDragBubble}
-                onTouchStart={stopDragBubble}
-                onPointerDown={stopDragBubble}
-                onClick={stopDragBubble}
-                onChange={(e) => changeWidth(Number(e.target.value))}
-              />
-              <button
-                type="button"
-                className="setting-keyboard-size-button"
-                disabled={!canResizeWidth}
-                onMouseDown={stopDragBubble}
-                onTouchStart={(e) =>
-                  stopTouchAndRun(e, () =>
-                    changeWidth(currentWidth + SIZE_STEP),
-                  )
-                }
-                onPointerDown={stopDragBubble}
-                onClick={() => changeWidth(currentWidth + SIZE_STEP)}
-              >
-                +
-              </button>
-            </div>
-            <div className="setting-keyboard-size-tips">
-              {canResizeWidth
-                ? '浮动、靠左、靠右时宽度生效'
-                : '靠上、靠下时宽度固定为 100%'}
-            </div>
-          </div>
-
-          <div className="setting-keyboard-size-item">
-            <div className="setting-keyboard-size-header">
-              <span>高度</span>
-              <span>{canResizeHeight ? formatPx(draftHeight) : '100%'}</span>
-            </div>
-            <div className="setting-keyboard-size-control">
-              <button
-                type="button"
-                className="setting-keyboard-size-button"
-                disabled={!canResizeHeight}
-                onMouseDown={stopDragBubble}
-                onTouchStart={(e) =>
-                  stopTouchAndRun(e, () =>
-                    changeHeight(currentHeight - SIZE_STEP),
-                  )
-                }
-                onPointerDown={stopDragBubble}
-                onClick={() => changeHeight(currentHeight - SIZE_STEP)}
-              >
-                -
-              </button>
-              <input
-                className="setting-keyboard-size-range"
-                type="range"
-                min={HEIGHT_MIN}
-                max={HEIGHT_MAX}
-                step={SIZE_STEP}
-                value={draftHeight}
-                disabled={!canResizeHeight}
-                onMouseDown={stopDragBubble}
-                onTouchStart={stopDragBubble}
-                onPointerDown={stopDragBubble}
-                onClick={stopDragBubble}
-                onChange={(e) => changeHeight(Number(e.target.value))}
-              />
-              <button
-                type="button"
-                className="setting-keyboard-size-button"
-                disabled={!canResizeHeight}
-                onMouseDown={stopDragBubble}
-                onTouchStart={(e) =>
-                  stopTouchAndRun(e, () =>
-                    changeHeight(currentHeight + SIZE_STEP),
-                  )
-                }
-                onPointerDown={stopDragBubble}
-                onClick={() => changeHeight(currentHeight + SIZE_STEP)}
-              >
-                +
-              </button>
-            </div>
-            <div className="setting-keyboard-size-tips">
-              {canResizeHeight
-                ? '浮动、靠上、靠下时高度生效'
-                : '靠左、靠右时高度固定为 100%'}
-            </div>
-          </div>
+          ))}
         </div>
       </div>
       <div className="setting-keyboard-item">
