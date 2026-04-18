@@ -39,6 +39,8 @@ function App() {
         ? '指南'
         : currentRoute.group === 'components'
           ? '组件'
+          : currentRoute.group === 'hooks'
+            ? 'Hooks'
           : '示例';
 
     return [{ title: '文档' }, { title: groupLabel }, { title: currentRoute.title }];

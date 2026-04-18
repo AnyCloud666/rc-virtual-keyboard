@@ -6,7 +6,7 @@ export type DocRoute = {
   title: string;
   menuLabel: string;
   description: string;
-  group: 'guide' | 'components' | 'examples';
+  group: 'guide' | 'components' | 'hooks' | 'examples';
   render: () => ReactNode;
 };
 

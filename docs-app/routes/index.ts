@@ -2,11 +2,13 @@
 import { componentRoutes } from './componentRoutes';
 import { exampleRoutes } from './exampleRoutes';
 import { guideRoutes } from './guideRoutes';
+import { hookRoutes } from './hookRoutes';
 import type { DocRoute } from './types';
 
 export const routes: DocRoute[] = [
   ...guideRoutes,
   ...componentRoutes,
+  ...hookRoutes,
   ...exampleRoutes,
 ];
 
@@ -27,6 +29,14 @@ export const menuItems: MenuProps['items'] = [
     label: '组件',
     children: routes
       .filter((route) => route.group === 'components')
+      .map((route) => ({ key: route.path, label: route.menuLabel })),
+  },
+  {
+    key: 'hooks-group',
+    type: 'group',
+    label: 'Hooks',
+    children: routes
+      .filter((route) => route.group === 'hooks')
       .map((route) => ({ key: route.path, label: route.menuLabel })),
   },
   {

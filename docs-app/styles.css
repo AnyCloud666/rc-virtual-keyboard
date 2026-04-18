@@ -366,19 +366,46 @@ body {
 }
 
 .component-demo-preview {
-  overflow: hidden;
-  height: 560px;
+  overflow: visible;
+  height: auto;
 }
 
 .component-demo-stack {
   display: grid;
-  align-content: start;
   gap: 16px;
-  height: 100%;
+  align-content: start;
 }
 
 .component-demo-keyboard-frame {
-  height: 320px;
+  height: auto;
+}
+
+.component-demo-keyboard-frame-number {
+  min-height: 248px;
+}
+
+.component-demo-keyboard-frame-letter {
+  min-height: 248px;
+}
+
+.component-demo-keyboard-frame-symbol {
+  min-height: 220px;
+}
+
+.component-demo-keyboard-frame-function {
+  min-height: 148px;
+}
+
+.component-demo-keyboard-frame-edit {
+  min-height: 284px;
+}
+
+.component-demo-keyboard-frame-write {
+  min-height: 284px;
+}
+
+.component-demo-keyboard-frame-setting {
+  min-height: 420px;
 }
 
 .component-demo-result {
@@ -405,6 +432,45 @@ body {
   color: #1677ff;
   font-weight: 700;
   box-shadow: 0 12px 28px rgba(22, 119, 255, 0.12);
+}
+
+.hook-demo-button {
+  width: fit-content;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid #1677ff;
+  border-radius: 10px;
+  background: #1677ff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.hook-demo-button-secondary {
+  border-color: #d9d9d9;
+  background: #fff;
+  color: #262626;
+}
+
+.hook-demo-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 8px 0 12px;
+  cursor: grab;
+}
+
+.hook-demo-chip {
+  flex: 0 0 auto;
+  min-width: 88px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #d9d9d9;
+  border-radius: 999px;
+  background: #fff;
+  color: #262626;
+  cursor: pointer;
 }
 
 .docs-table .ant-table {
@@ -471,12 +537,14 @@ body {
   .home-next-section {
     padding: 0 0 24px;
   }
-
-  .component-demo-preview {
-    height: 480px;
-  }
-
-  .component-demo-keyboard-frame {
-    height: 280px;
+  
+  .component-demo-keyboard-frame-number,
+  .component-demo-keyboard-frame-letter,
+  .component-demo-keyboard-frame-symbol,
+  .component-demo-keyboard-frame-function,
+  .component-demo-keyboard-frame-edit,
+  .component-demo-keyboard-frame-write,
+  .component-demo-keyboard-frame-setting {
+    min-height: auto;
   }
 }
