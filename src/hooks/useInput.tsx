@@ -244,6 +244,9 @@ const useInput = ({
   const blurTimer = useRef<number>();
   /** 键盘交互保护窗口，避免移动端长按时误判为真正失焦 */
   const keyboardInteractionUntilRef = useRef(0);
+  /** 监听器引用，避免回调依赖形成循环 */
+  const onBlurHandlerRef = useRef<(e: FocusEvent) => void>();
+  const onFocusHandlerRef = useRef<(e: FocusEvent) => void>();
   /** focus 弹出配置，autoPopup 作为兼容别名保留 */
   const enableFocusShow = focusShow ?? autoPopup;
 
@@ -364,7 +367,7 @@ const useInput = ({
     );
   };
 
-  const shouldShowOnFocus = (inputEl: HTMLInputElement) => {
+  const shouldShowOnFocus = useCallback((inputEl: HTMLInputElement) => {
     const vkbShow = inputEl.dataset?.vkbShow;
     const vkbAutoPopup = inputEl.dataset?.vkbAutoPopup;
 
@@ -374,7 +377,7 @@ const useInput = ({
     if (vkbAutoPopup === 'false') return false;
 
     return enableFocusShow;
-  };
+  }, [enableFocusShow]);
 
   const shouldHideOnBlur = (inputEl: HTMLInputElement | null) => {
     if (!inputEl) return true;
@@ -382,15 +385,19 @@ const useInput = ({
     return inputEl.dataset?.vkbBlurHidden !== 'false';
   };
 
-  const bindInputListener = (inputEl: HTMLInputElement) => {
+  const bindInputListener = useCallback((inputEl: HTMLInputElement) => {
     if (!cacheInputFocus.current.has(inputEl)) {
       cacheInputFocus.current.add(inputEl);
-      inputEl.addEventListener('blur', onBlur);
-      inputEl.addEventListener('focus', onFocus);
+      inputEl.addEventListener('blur', (event) => {
+        onBlurHandlerRef.current?.(event as FocusEvent);
+      });
+      inputEl.addEventListener('focus', (event) => {
+        onFocusHandlerRef.current?.(event as FocusEvent);
+      });
     }
-  };
+  }, []);
 
-  const activateInput = (
+  const activateInput = useCallback((
     inputEl: HTMLInputElement,
     options?: { syncShow?: boolean },
   ) => {
@@ -412,7 +419,7 @@ const useInput = ({
         onChangeShow && onChangeShow(true);
       }
     }
-  };
+  }, [bindInputListener, onChangeShow, shouldShowOnFocus]);
 
   /** 失去焦点 */
   const onBlur = useCallback(
@@ -462,8 +469,13 @@ const useInput = ({
 
       activateInput(activeElement, { syncShow: true });
     },
-    [onChangeShow, enableFocusShow],
+    [activateInput],
   );
+
+  useEffect(() => {
+    onBlurHandlerRef.current = onBlur;
+    onFocusHandlerRef.current = onFocus;
+  }, [onBlur, onFocus]);
 
   /** 寻找聚焦有效的input */
   const findFocusElement = (e: MouseEvent | FocusEvent) => {
@@ -1177,7 +1189,7 @@ const useInput = ({
   };
 
   /** 创建按键背景音乐 */
-  const createBackgroundAudio = () => {
+  const createBackgroundAudio = useCallback(() => {
     if (!keydownAudioUrl) return;
     audio = document.body.querySelector(
       '#keyboard-bg-audio',
@@ -1188,7 +1200,7 @@ const useInput = ({
       audio.id = 'keyboard-bg-audio';
     }
     audio.src = keydownAudioUrl;
-  };
+  }, [keydownAudioUrl]);
 
   useEffect(() => {
     setVkbThemeMode(themeMode);
@@ -1204,7 +1216,7 @@ const useInput = ({
 
   useEffect(() => {
     createBackgroundAudio();
-  }, []);
+  }, [createBackgroundAudio]);
 
   return {
     inputMode,

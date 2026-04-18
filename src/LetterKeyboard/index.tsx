@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import useContinuousTrigger from '../hooks/useContinuousTrigger';
 import useHorizontalDragScroll from '../hooks/useHorizontalDragScroll';
 import useTouchClickGuard from '../hooks/useTouchClickGuard';
@@ -131,7 +131,7 @@ const LetterKeyboard = ({
   };
 
   /** 停止连续滚动 */
-  const stopContinuousScroll = (shouldKeepSingleStep = true) => {
+  const stopContinuousScroll = useCallback((shouldKeepSingleStep = true) => {
     window.clearTimeout(scrollDelayTimerRef.current);
     if (typeof scrollFrameRef.current === 'number') {
       window.cancelAnimationFrame(scrollFrameRef.current);
@@ -147,7 +147,7 @@ const LetterKeyboard = ({
     isContinuousScrollingRef.current = false;
     scrollDirectionRef.current = null;
     lastScrollTimeRef.current = 0;
-  };
+  }, []);
 
   /** 开始连续滚动，短按单次平滑滚动，长按持续匀速滚动 */
   const startContinuousScroll = (type: 'add' | 'minus') => {
@@ -195,7 +195,7 @@ const LetterKeyboard = ({
       window.removeEventListener('mouseup', handleWindowMouseUp);
       window.removeEventListener('touchend', handleWindowTouchEnd);
     };
-  }, []);
+  }, [stopContinuousScroll]);
 
   useEffect(() => {
     setKeys(createLetterKeys(inputMode, capsLockActive));

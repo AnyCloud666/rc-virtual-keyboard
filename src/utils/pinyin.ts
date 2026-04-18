@@ -168,8 +168,9 @@ function findPinyinSegments(pinyin: string) {
   const cache = new Map<number, string[][]>();
 
   const dfs = (start: number): string[][] => {
-    if (cache.has(start)) {
-      return cache.get(start)!;
+    const cached = cache.get(start);
+    if (cached) {
+      return cached;
     }
 
     if (start >= normalized.length) {

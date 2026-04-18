@@ -1,4 +1,10 @@
-import React, { CSSProperties, ReactNode, useEffect, useRef } from 'react';
+import React, {
+  CSSProperties,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
 
 import { useDebounceFn, useEventListener, useUpdateEffect } from 'ahooks';
 
@@ -65,7 +71,7 @@ const DragBlock = ({
   /** block 是否隐藏 */
   const isHidden = useRef(true);
 
-  const syncBlockPosition = () => {
+  const syncBlockPosition = useCallback(() => {
     if (!blockRef.current) return;
 
     switch (positionMode) {
@@ -101,7 +107,7 @@ const DragBlock = ({
         blockRef.current.style.top = `${Math.max(0, nextTop)}px`;
       }
     }
-  };
+  }, [init?.height, init?.width, positionMode]);
   /** @type {*}
    * 自动靠右
    */
@@ -175,7 +181,7 @@ const DragBlock = ({
         }px)`;
       }
     }
-  }, []);
+  }, [init]);
 
   /** 层级 */
   useEffect(() => {
@@ -186,7 +192,7 @@ const DragBlock = ({
 
   useEffect(() => {
     syncBlockPosition();
-  }, [init?.height, init?.width, positionMode]);
+  }, [syncBlockPosition]);
 
   /** 监听自动靠右 */
   useUpdateEffect(() => {

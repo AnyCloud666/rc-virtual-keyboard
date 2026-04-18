@@ -12,24 +12,31 @@
     "url": "https://github.com/AnyCloud666/rc-vitrual-keyboard.git"
   },
   "license": "MIT",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./style.css": "./dist/style.css"
+  },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "father build",
-    "build:watch": "father dev",
-    "dev": "node -r ./scripts/http-parser-shim.js ./node_modules/dumi/bin/dumi.js dev",
-    "docs:build": "node -r ./scripts/http-parser-shim.js ./node_modules/dumi/bin/dumi.js build",
-    "docs:preview": "node -r ./scripts/http-parser-shim.js ./node_modules/dumi/bin/dumi.js preview",
-    "docs:setup": "node -r ./scripts/http-parser-shim.js ./node_modules/dumi/bin/dumi.js setup",
-    "doctor": "father doctor",
+    "build": "vite build --config vite.lib.config.mjs",
+    "build:watch": "vite build --config vite.lib.config.mjs --watch",
+    "dev": "vite",
+    "docs:build": "vite build",
+    "docs:preview": "vite preview",
     "lint": "npm run lint:es && npm run lint:css",
     "lint:css": "stylelint \"{src,test}/**/*.{css,less}\"",
-    "lint:es": "eslint \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
+    "lint:es": "eslint \"{src,docs-app,test}/**/*.{js,jsx,ts,tsx}\"",
     "prepare": "husky install",
-    "prepublishOnly": "father doctor && npm run build",
+    "prepublishOnly": "npm run build",
     "start": "npm run dev"
   },
   "commitlint": {
@@ -60,17 +67,21 @@
     "tesseract.js": "^5.1.1"
   },
   "devDependencies": {
-    "@ant-design/pro-components": "^2.8.7",
+    "@ant-design/icons": "^5.5.0",
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
+    "ajv": "^8.17.1",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "@types/node": "^20.17.57",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
-    "@umijs/lint": "^4.0.0",
+    "@vitejs/plugin-react": "^4.4.1",
     "ahooks": "^3.8.0",
     "antd": "5.20.6",
-    "dumi": "^2.3.0",
     "eslint": "^8.23.0",
-    "father": "^4.1.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
@@ -78,8 +89,13 @@
     "prettier-plugin-packagejson": "^2.2.18",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "stylelint": "^14.9.1",
-    "umi-plugin-icons": "^0.1.1"
+    "react-syntax-highlighter": "^15.6.1",
+    "stylelint": "^16.25.0",
+    "stylelint-config-standard": "^39.0.1",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10",
+    "vite-plugin-dts": "^4.2.1",
+    "vite-plugin-svgr": "^4.2.0"
   },
   "peerDependencies": {
     "react": ">=16.9.0",

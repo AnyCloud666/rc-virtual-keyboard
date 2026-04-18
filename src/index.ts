@@ -39,6 +39,8 @@ export { default as DragBlock } from './DragBlock';
 
 export { default as CompositionKeyboard } from './CompositionKeyboard';
 
+export { default as WordTempList } from './WordTempList';
+
 export {
   InitVirtualKeyBoardCtx,
   default as VirtualKeyboard,
