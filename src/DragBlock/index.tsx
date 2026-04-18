@@ -40,6 +40,10 @@ const DragBlock = ({
   floatAnchorRect,
   floatOffset = 12,
   onManualMove,
+  defaultTopRatio,
+  defaultHiddenWidthRatio,
+  defaultRightOffset,
+  defaultBottomOffset,
 }: {
   init?: { width: string; height: string };
   resizeOverRight?: boolean;
@@ -65,6 +69,10 @@ const DragBlock = ({
   } | null;
   floatOffset?: number;
   onManualMove?: () => void;
+  defaultTopRatio?: number;
+  defaultHiddenWidthRatio?: number;
+  defaultRightOffset?: number;
+  defaultBottomOffset?: number;
 }) => {
   const hasInit = !!init;
   const initWidth = init?.width;
@@ -89,6 +97,55 @@ const DragBlock = ({
   /** block 是否隐藏 */
   const isHidden = useRef(true);
 
+  const applyEdgeDockPosition = useCallback(() => {
+    if (!blockRef.current) return;
+
+    const hiddenWidthRatio = defaultHiddenWidthRatio ?? 0.5;
+    const topRatio = defaultTopRatio ?? 0.8;
+    const nextTop = Math.max(
+      0,
+      window.innerHeight * topRatio - blockRef.current.offsetHeight / 2,
+    );
+    const nextLeft =
+      window.innerWidth -
+      blockRef.current.offsetWidth * hiddenWidthRatio;
+
+    blockRef.current.style.left = `${nextLeft}px`;
+    blockRef.current.style.top = `${nextTop}px`;
+  }, [defaultHiddenWidthRatio, defaultTopRatio]);
+
+  const applyEdgeExpandedPosition = useCallback(() => {
+    if (!blockRef.current) return;
+
+    const topRatio = defaultTopRatio ?? 0.8;
+    const nextTop = Math.max(
+      0,
+      window.innerHeight * topRatio - blockRef.current.offsetHeight / 2,
+    );
+    const nextLeft = window.innerWidth - blockRef.current.offsetWidth;
+
+    blockRef.current.style.left = `${nextLeft}px`;
+    blockRef.current.style.top = `${nextTop}px`;
+  }, [defaultTopRatio]);
+
+  const applyCornerExpandedPosition = useCallback(() => {
+    if (!blockRef.current) return;
+
+    const rightOffset = defaultRightOffset ?? 0;
+    const bottomOffset = defaultBottomOffset ?? 0;
+    const nextLeft = Math.max(
+      0,
+      window.innerWidth - blockRef.current.offsetWidth - rightOffset,
+    );
+    const nextTop = Math.max(
+      0,
+      window.innerHeight - blockRef.current.offsetHeight - bottomOffset,
+    );
+
+    blockRef.current.style.left = `${nextLeft}px`;
+    blockRef.current.style.top = `${nextTop}px`;
+  }, [defaultBottomOffset, defaultRightOffset]);
+
   const syncBlockPosition = useCallback(() => {
     if (!blockRef.current) return;
 
@@ -110,6 +167,22 @@ const DragBlock = ({
         blockRef.current.style.top = '0px';
         break;
       default: {
+        if (resizeOverRight && hasInit && autoKeepRight) {
+          applyEdgeDockPosition();
+          return;
+        }
+
+        if (
+          hasInit &&
+          !autoKeepRight &&
+          positionMode === FloatPosition.code &&
+          (typeof defaultRightOffset === 'number' ||
+            typeof defaultBottomOffset === 'number')
+        ) {
+          applyCornerExpandedPosition();
+          return;
+        }
+
         const maxLeft = Math.max(
           0,
           window.innerWidth - blockRef.current.offsetWidth,
@@ -125,7 +198,18 @@ const DragBlock = ({
         blockRef.current.style.top = `${Math.max(0, nextTop)}px`;
       }
     }
-  }, [init?.height, init?.width, positionMode]);
+  }, [
+    applyEdgeDockPosition,
+    applyCornerExpandedPosition,
+    autoKeepRight,
+    defaultBottomOffset,
+    defaultRightOffset,
+    hasInit,
+    init?.height,
+    init?.width,
+    positionMode,
+    resizeOverRight,
+  ]);
 
   const syncFloatAnchorPosition = useCallback(() => {
     if (
@@ -188,8 +272,12 @@ const DragBlock = ({
     () => {
       if (blockRef.current && autoKeepRight) {
         isHidden.current = true;
-        blockRef.current.style.left =
-          window.innerWidth - blockRef.current.offsetWidth / 2 + 'px';
+        if (resizeOverRight && hasInit) {
+          applyEdgeDockPosition();
+        } else {
+          blockRef.current.style.left =
+            window.innerWidth - blockRef.current.offsetWidth / 2 + 'px';
+        }
 
         setTimeout(() => {
           if (blockRef.current) {
@@ -209,7 +297,11 @@ const DragBlock = ({
     () => {
       if (blockRef.current) {
         isHidden.current = false;
-        blockRef.current.style.left = `calc(100% - ${blockRef.current.offsetWidth}px)`;
+        if (resizeOverRight && hasInit) {
+          applyEdgeExpandedPosition();
+        } else {
+          blockRef.current.style.left = `calc(100% - ${blockRef.current.offsetWidth}px)`;
+        }
         // blockRef.current.style.transition = "all 0.3s";
         keepRight.run();
       }
@@ -239,12 +331,22 @@ const DragBlock = ({
   useEffect(() => {
     if (blockRef.current) {
       if (hasInit) {
-        blockRef.current.style.top = `calc(100% - ${initHeight})`;
-        // blockRef.current.style.left =  `calc(100% - ${init.width})`;
-        blockRef.current.style.left =
-          parseFloat(initWidth ?? '0') > window.innerWidth
-            ? '0px'
-            : `calc(100vw - ${initWidth})`;
+        if (resizeOverRight && autoKeepRight) {
+          applyEdgeDockPosition();
+        } else if (
+          !autoKeepRight &&
+          positionMode === FloatPosition.code &&
+          (typeof defaultRightOffset === 'number' ||
+            typeof defaultBottomOffset === 'number')
+        ) {
+          applyCornerExpandedPosition();
+        } else {
+          blockRef.current.style.top = `calc(100% - ${initHeight})`;
+          blockRef.current.style.left =
+            parseFloat(initWidth ?? '0') > window.innerWidth
+              ? '0px'
+              : `calc(100vw - ${initWidth})`;
+        }
       } else {
         blockRef.current.style.top = `calc(50% - ${
           blockRef.current.offsetHeight / 2
@@ -254,7 +356,18 @@ const DragBlock = ({
         }px)`;
       }
     }
-  }, [hasInit, initHeight, initWidth]);
+  }, [
+    applyCornerExpandedPosition,
+    applyEdgeDockPosition,
+    autoKeepRight,
+    defaultBottomOffset,
+    defaultRightOffset,
+    hasInit,
+    initHeight,
+    initWidth,
+    positionMode,
+    resizeOverRight,
+  ]);
 
   /** 层级 */
   useEffect(() => {
@@ -378,20 +491,36 @@ const DragBlock = ({
       if (blockRef.current) {
         if (resizeOverRight) {
           if (blockRef.current.offsetLeft >= 0) {
-            blockRef.current.style.left =
-              window.innerWidth -
-              blockRef.current.offsetWidth / (isHidden.current ? 2 : 1) +
-              'px';
+            if (hasInit && autoKeepRight) {
+              applyEdgeDockPosition();
+            } else {
+              blockRef.current.style.left =
+                window.innerWidth -
+                blockRef.current.offsetWidth / (isHidden.current ? 2 : 1) +
+                'px';
+            }
           }
 
           if (blockRef.current.offsetTop >= 0) {
-            blockRef.current.style.top =
-              window.innerHeight / 2 -
-              blockRef.current.offsetHeight / (isHidden.current ? 2 : 1) +
-              'px';
+            if (!hasInit || !autoKeepRight) {
+              blockRef.current.style.top =
+                window.innerHeight / 2 -
+                blockRef.current.offsetHeight / (isHidden.current ? 2 : 1) +
+                'px';
+            }
           }
         } else {
-          syncBlockPosition();
+          if (
+            hasInit &&
+            !autoKeepRight &&
+            positionMode === FloatPosition.code &&
+            (typeof defaultRightOffset === 'number' ||
+              typeof defaultBottomOffset === 'number')
+          ) {
+            applyCornerExpandedPosition();
+          } else {
+            syncBlockPosition();
+          }
         }
       }
     },

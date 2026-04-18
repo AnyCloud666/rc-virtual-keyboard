@@ -304,7 +304,13 @@ const VirtualKeyboard = ({
     <>
       {showIcon && (
         <DragBlock
+          init={{
+            width: iconWidth,
+            height: iconHeight,
+          }}
           resizeOverRight={true}
+          defaultTopRatio={0.8}
+          defaultHiddenWidthRatio={0.5}
           onClick={() => {
             setVisible(true);
           }}
@@ -323,6 +329,8 @@ const VirtualKeyboard = ({
           width: currentWidth ?? '0px',
           height: currentHeight ?? '0px',
         }}
+        defaultRightOffset={12}
+        defaultBottomOffset={12}
         zIndex={visible ? zIndex : -1}
         positionMode={currentPositionMode}
         floatAnchorRect={
