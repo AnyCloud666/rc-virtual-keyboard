@@ -23,7 +23,7 @@ export const hookDocs: ComponentDoc[] = [
       { name: 'defaultActiveKeyboard', type: 'string', defaultValue: 'number', description: '默认激活的键盘类型' },
       { name: 'focusShow', type: 'boolean', defaultValue: 'autoPopup', description: '输入框聚焦时是否自动弹出键盘' },
       { name: 'useKeydownAudio', type: "'Y' | 'N'", defaultValue: 'Y', description: '是否开启按键音效' },
-      { name: 'keydownAudioUrl', type: 'string', defaultValue: '/audio/typing-sound-02-229861.mp3', description: '按键音效资源地址' },
+      { name: 'keydownAudioUrl', type: 'string', defaultValue: '内置打包音频资源', description: '按键音效资源地址' },
       { name: 'autoPopup', type: 'boolean', defaultValue: 'true', description: '兼容旧参数，等价于 focusShow' },
       { name: 'onChangeShow', type: '(visible: boolean) => void', defaultValue: '-', description: '控制键盘显隐' },
       { name: 'onPinyin2Chinese', type: '(value: string) => { pinyin: string; chinese: string[] }', defaultValue: '内置实现', description: '自定义拼音转汉字逻辑' },

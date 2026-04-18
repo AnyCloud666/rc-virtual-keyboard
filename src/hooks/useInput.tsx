@@ -1,5 +1,6 @@
 import { useEventListener } from 'ahooks';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { DEFAULT_KEYDOWN_AUDIO_URL } from '../assets/defaultKeydownAudio';
 import {
   ArrowDown,
   ArrowLeft,
@@ -173,7 +174,7 @@ const useInput = ({
   keyboardVisible = true,
   focusShow,
   useKeydownAudio = 'Y',
-  keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
+  keydownAudioUrl = DEFAULT_KEYDOWN_AUDIO_URL,
   autoPopup = true,
   onChangeShow,
   onActiveInputChange,

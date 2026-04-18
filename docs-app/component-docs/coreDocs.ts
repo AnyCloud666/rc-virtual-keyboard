@@ -32,7 +32,7 @@ export const coreComponentDocs: ComponentDoc[] = [
       { name: 'virtualKeyboardTab', type: 'KeyboardTabItem[]', defaultValue: '内置全部 tab', description: '自定义 tab 集合' },
       { name: 'theme', type: 'Partial<Theme>', defaultValue: '-', description: '通过 CSS 变量覆写主题' },
       { name: 'useKeydownAudio', type: "'Y' | 'N'", defaultValue: 'Y', description: '是否启用按键音效' },
-      { name: 'keydownAudioUrl', type: 'string', defaultValue: '/audio/typing-sound-02-229861.mp3', description: '按键音效地址' },
+      { name: 'keydownAudioUrl', type: 'string', defaultValue: '内置打包音频资源', description: '按键音效地址' },
     ],
     methods: [
       { name: 'setShow', signature: '(visible: boolean) => void', description: '通过上下文控制显示或隐藏' },

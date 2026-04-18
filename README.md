@@ -141,7 +141,7 @@ export default function Demo() {
 | `virtualKeyboardTab` | 自定义 tab 列表 | `KeyboardTabItem[]` | 内置全部 tab |
 | `theme` | 自定义主题变量 | `Partial<Theme>` | - |
 | `useKeydownAudio` | 是否启用按键音效 | `'Y' \| 'N'` | `'Y'` |
-| `keydownAudioUrl` | 按键音效地址 | `string` | `/audio/typing-sound-02-229861.mp3` |
+| `keydownAudioUrl` | 按键音效地址 | `string` | 内置打包音频资源 |
 
 ### 浮动模式行为
 
@@ -277,7 +277,7 @@ export default function Demo() {
 | `focusShow` | 输入框获得焦点时是否自动显示键盘 | `boolean` | `true` |
 | `autoPopup` | `focusShow` 的兼容别名 | `boolean` | `true` |
 | `useKeydownAudio` | 是否启用按键音效 | `'Y' \| 'N'` | `'Y'` |
-| `keydownAudioUrl` | 按键音效地址 | `string` | `/audio/typing-sound-02-229861.mp3` |
+| `keydownAudioUrl` | 按键音效地址 | `string` | 内置打包音频资源 |
 | `onChangeShow` | 键盘显示/隐藏回调 | `(show: boolean) => void` | - |
 | `onThemeModeChange` | 主题变化回调 | `(mode: string) => void` | - |
 | `onPositionModeChange` | 位置变化回调 | `(mode: string) => void` | - |

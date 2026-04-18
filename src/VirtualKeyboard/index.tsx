@@ -8,6 +8,7 @@ import React, {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { DEFAULT_KEYDOWN_AUDIO_URL } from '../assets/defaultKeydownAudio';
 
 import CompositionKeyboard from '../CompositionKeyboard';
 import DragBlock from '../DragBlock';
@@ -39,7 +40,7 @@ export const InitVirtualKeyBoardCtx: VKB.KeyBoardCtxTypBase = {
   iconWidth: '100px',
   iconHeight: '100px',
   zIndex: 9999,
-  keydownAudioUrl: '/audio/typing-sound-02-229861.mp3',
+  keydownAudioUrl: DEFAULT_KEYDOWN_AUDIO_URL,
 };
 
 const VirtualKeyboard = ({

@@ -1,4 +1,5 @@
 import React, { CSSProperties, ReactNode, useCallback, useRef } from 'react';
+import { DEFAULT_KEYDOWN_AUDIO_URL } from '../assets/defaultKeydownAudio';
 
 import { ReactComponent as MoveSvg } from '../svg/move.svg';
 
@@ -38,7 +39,7 @@ const CompositionKeyboard = ({
   numberKeyboardLayoutMode = 'asc',
   focusShow,
   useKeydownAudio = 'Y',
-  keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
+  keydownAudioUrl = DEFAULT_KEYDOWN_AUDIO_URL,
   onChangeShow,
   onActiveInputChange,
   onThemeModeChange,

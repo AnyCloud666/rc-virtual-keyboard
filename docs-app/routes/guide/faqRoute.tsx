@@ -31,7 +31,7 @@ export const faqRoute: DocRoute = {
 
       <Title level={4}>5. 按键音效播放异常如何排查？</Title>
       <ul className="docs-list">
-        <li>检查静态资源里是否存在 <Text code>/audio/typing-sound-02-229861.mp3</Text>。</li>
+        <li>如果你覆盖了 <Text code>keydownAudioUrl</Text>，请确认你传入的音频资源地址可访问。</li>
         <li>如果你有自己的资源地址，直接传入 <Text code>keydownAudioUrl</Text> 覆盖默认值。</li>
       </ul>
     </Card>

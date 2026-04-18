@@ -21,7 +21,7 @@ nav:
 | themeMode             | 主题模式                                                                    | string                                                   | -                                   |
 | positionMode          | 位置模式                                                                    | string                                                   | -                                   |
 | useKeydownAudio       | 使用按键音效                                                                | 'Y'\|'N'                                                 | 'Y'                                 |
-| keydownAudioUrl       | 按键音效 url                                                                | string                                                   | \/audio\/typing-sound-02-229861.mp3 |
+| keydownAudioUrl       | 按键音效 url                                                                | string                                                   | 内置打包音频资源 |
 | defaultActiveKeyboard | 默认选中的键盘                                                              | string                                                   | -                                   |
 | focusShow             | 输入框获得焦点时是否自动显示键盘，全局关闭后可通过 `data-vkb-show` 单独开启 | boolean                                                  | true                                |
 | autoPopup             | 键盘是否自动弹出(控制全局，元素 data-vkb-auto-popup 属性可单独控制)         | boolean                                                  | true                                |
