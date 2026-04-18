@@ -359,6 +359,9 @@ const SettingKeyboard = ({
             );
           })}
         </div>
+        <div className="setting-keyboard-size-tips">
+          虚拟键盘点击与虚拟键盘打开时的实体键盘输入，都会使用这一项音效开关。
+        </div>
       </div>
       <div className="setting-keyboard-item">
         <div>数字排列：</div>

@@ -170,6 +170,7 @@ const useInput = ({
   themeMode = LightTheme.code,
   positionMode = FloatPosition.code,
   defaultActiveKeyboard = numberType,
+  keyboardVisible = true,
   focusShow,
   useKeydownAudio = 'Y',
   keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
@@ -190,6 +191,8 @@ const useInput = ({
   positionMode?: string;
   /** 默认活跃的键盘 */
   defaultActiveKeyboard?: string;
+  /** 当前键盘是否处于可见状态 */
+  keyboardVisible?: boolean;
   /** 输入框 focus 时是否自动显示键盘，全局关闭后可通过 data-vkb-show 单独开启 */
   focusShow?: boolean;
   /** 使用按键音效 */
@@ -269,6 +272,16 @@ const useInput = ({
   const activateKeyCode = useCallback((code: string) => {
     setActiveKeyCodes((prev) => (prev.includes(code) ? prev : [...prev, code]));
   }, []);
+
+  const playKeydownAudio = useCallback(() => {
+    if (!audio || vkbKeydownAudio !== 'Y' || !keyboardVisible) {
+      return;
+    }
+
+    audio.pause();
+    audio.currentTime = 0;
+    void audio.play().catch(() => undefined);
+  }, [keyboardVisible, vkbKeydownAudio]);
 
   const markKeyboardInteraction = useCallback((duration = 1200) => {
     keyboardInteractionUntilRef.current = Date.now() + duration;
@@ -507,7 +520,12 @@ const useInput = ({
       ) {
         setInputMode((prev) => (prev === EN ? ZH : EN));
       }
-      resolvePhysicalKeyCodes(e).forEach((code) => activateKeyCode(code));
+      const physicalCodes = resolvePhysicalKeyCodes(e);
+      physicalCodes.forEach((code) => activateKeyCode(code));
+
+      if (physicalCodes.length > 0 && !e.repeat) {
+        playKeydownAudio();
+      }
     },
     { target: window },
   );
@@ -1131,10 +1149,7 @@ const useInput = ({
     } else {
       onInput(e);
     }
-    if (audio && vkbKeydownAudio === 'Y') {
-      audio.pause();
-      audio.play();
-    }
+    playKeydownAudio();
 
     if (!activeInputRef.current) return;
     Simulate?.keyPress?.(activeInputRef.current, {

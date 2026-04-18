@@ -343,6 +343,7 @@ const VirtualKeyboard = ({
       >
         <CompositionKeyboard
           style={vkbStyles}
+          keyboardVisible={visible}
           themeMode={currentThemeMode}
           positionMode={currentPositionMode}
           width={currentWidth ?? InitVirtualKeyBoardCtx.width ?? '500px'}

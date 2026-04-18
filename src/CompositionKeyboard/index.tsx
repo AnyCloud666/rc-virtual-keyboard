@@ -28,6 +28,7 @@ const CompositionKeyboard = ({
   virtualKeyboardTab = tabs,
   moveLabel = <MoveSvg />,
   hiddenLabel = <BottomSvg />,
+  keyboardVisible = true,
   themeMode = LightTheme.code,
   positionMode = FloatPosition.code,
   width = '500px',
@@ -66,6 +67,8 @@ const CompositionKeyboard = ({
   hiddenLabel?: ReactNode;
   /** 主题 */
   themeMode?: string;
+  /** 当前键盘是否可见 */
+  keyboardVisible?: boolean;
   /** 位置 */
   positionMode?: string;
   /** 宽度 */
@@ -131,6 +134,7 @@ const CompositionKeyboard = ({
     themeMode,
     positionMode,
     defaultActiveKeyboard,
+    keyboardVisible,
     focusShow,
     useKeydownAudio,
     keydownAudioUrl,
