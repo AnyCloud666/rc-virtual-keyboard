@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import useContinuousTrigger from '../hooks/useContinuousTrigger';
 import useTouchClickGuard from '../hooks/useTouchClickGuard';
 import CandidateBar from '../lib/CandidateBar';
@@ -21,7 +21,6 @@ const LetterKeyboard = ({
   inputValue,
   chinese,
   onClick,
-  onMouseDown,
   onChangeInputMode,
   onSelectChinese,
   onKeyDown,
@@ -33,7 +32,6 @@ const LetterKeyboard = ({
   inputValue?: string;
   inputMode: typeof ZH | typeof EN;
   onClick?: (e: VKB.KeyboardAttributeType) => void;
-  onMouseDown?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   onChangeInputMode?: (mode: VKB.InputMode) => void;
   onSelectChinese?: (chinese: string) => void;
   onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
@@ -66,6 +64,10 @@ const LetterKeyboard = ({
   const [keys, setKeys] = useState(() =>
     createLetterKeys(inputMode, capsLockActive),
   );
+  const pointerTriggeredRef = useRef<{
+    code: string;
+    at: number;
+  } | null>(null);
   const { markTouchInteraction, shouldIgnoreClick } = useTouchClickGuard();
 
   /** 统一触发按键事件 */
@@ -100,7 +102,7 @@ const LetterKeyboard = ({
   }, [capsLockActive, inputMode]);
 
   return (
-    <div className="letter-keyboard" onMouseDown={onMouseDown}>
+    <div className="letter-keyboard">
       <CandidateBar
         tempValue={inputValue}
         items={chinese}
@@ -126,14 +128,32 @@ const LetterKeyboard = ({
               key={item.keyCode}
               onClick={() => {
                 if (shouldIgnoreClick()) return;
+                const recentPointerTrigger = pointerTriggeredRef.current;
+                const shouldSkipClick =
+                  !!recentPointerTrigger &&
+                  recentPointerTrigger.code === item.code &&
+                  Date.now() - recentPointerTrigger.at < 250;
+
+                if (shouldSkipClick) {
+                  pointerTriggeredRef.current = null;
+                  return;
+                }
+
                 if (!isRepeatableKey) {
                   triggerKey(item);
+                  return;
                 }
+
+                triggerKey(item);
               }}
               onMouseDown={(e) => {
                 if (!isRepeatableKey) return;
 
                 e.preventDefault();
+                pointerTriggeredRef.current = {
+                  code: item.code,
+                  at: Date.now(),
+                };
                 startContinuousTrigger(item, 'mouse');
               }}
               onMouseUp={() => {
@@ -154,6 +174,10 @@ const LetterKeyboard = ({
                   return;
                 }
 
+                pointerTriggeredRef.current = {
+                  code: item.code,
+                  at: Date.now(),
+                };
                 startContinuousTrigger(item, 'touch');
               }}
               onTouchEnd={() => {

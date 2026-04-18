@@ -1,5 +1,11 @@
 import { useLocalStorageState } from 'ahooks';
-import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
+import React, {
+  CSSProperties,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import CompositionKeyboard from '../CompositionKeyboard';
 import DragBlock from '../DragBlock';
@@ -60,6 +66,17 @@ const VirtualKeyboard = ({
   };
 
   const [visible, setVisible] = useState(show);
+  const [activeInputElement, setActiveInputElement] =
+    useState<HTMLInputElement | null>(null);
+  const [floatFollowInput, setFloatFollowInput] = useState(true);
+  const [floatAnchorRect, setFloatAnchorRect] = useState<{
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+    width: number;
+    height: number;
+  } | null>(null);
   const isMobile = useIsMobile();
   const defaultPositionMode = isMobile
     ? FixedBottomPosition.code
@@ -120,6 +137,12 @@ const VirtualKeyboard = ({
       },
     );
 
+  const resolveFollowFocus = useCallback((input: HTMLInputElement | null) => {
+    if (!input) return floatFollowInput;
+
+    return input.dataset?.vkbFollowFocus !== 'false';
+  }, [floatFollowInput]);
+
   useEffect(() => {
     setVisible(show);
   }, [show]);
@@ -175,9 +198,64 @@ const VirtualKeyboard = ({
     }
   }, [numberKeyboardLayoutMode, setCurrentNumberKeyboardLayoutMode]);
 
+  const updateFloatAnchorRect = useCallback((input: HTMLInputElement | null) => {
+    if (!input) {
+      setFloatAnchorRect(null);
+      return;
+    }
+
+    const rect = input.getBoundingClientRect();
+    setFloatAnchorRect({
+      left: rect.left,
+      top: rect.top,
+      right: rect.right,
+      bottom: rect.bottom,
+      width: rect.width,
+      height: rect.height,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (currentPositionMode !== FloatPosition.code || !visible) {
+      return;
+    }
+
+    const syncAnchor = () => {
+      updateFloatAnchorRect(activeInputElement);
+    };
+
+    syncAnchor();
+    window.addEventListener('resize', syncAnchor);
+    window.addEventListener('scroll', syncAnchor, true);
+
+    return () => {
+      window.removeEventListener('resize', syncAnchor);
+      window.removeEventListener('scroll', syncAnchor, true);
+    };
+  }, [activeInputElement, currentPositionMode, updateFloatAnchorRect, visible]);
+
+  const floatMaxHeight = useMemo(() => {
+    if (
+      currentPositionMode !== FloatPosition.code ||
+      !visible ||
+      !floatAnchorRect
+    ) {
+      return undefined;
+    }
+
+    const safeMargin = 12;
+    const availableBelow =
+      window.innerHeight - floatAnchorRect.bottom - safeMargin * 2;
+    const availableAbove = floatAnchorRect.top - safeMargin * 2;
+    const nextHeight = Math.max(availableBelow, availableAbove);
+
+    return nextHeight > 0 ? `${Math.floor(nextHeight)}px` : undefined;
+  }, [currentPositionMode, floatAnchorRect, visible]);
+
   const vkbStyles = useMemo(() => {
     const styles: VirtualKeyboardStyles = {
       height: currentHeight,
+      maxHeight: floatMaxHeight,
       width: currentWidth,
       fontSize: currentFontSize ?? InitVirtualKeyBoardCtx.fontSize,
       fontFamily: currentFontFamily ?? InitVirtualKeyBoardCtx.fontFamily,
@@ -217,6 +295,7 @@ const VirtualKeyboard = ({
     currentHeight,
     currentPositionMode,
     currentWidth,
+    floatMaxHeight,
     theme,
     visible,
   ]);
@@ -246,6 +325,13 @@ const VirtualKeyboard = ({
         }}
         zIndex={visible ? zIndex : -1}
         positionMode={currentPositionMode}
+        floatAnchorRect={
+          visible && floatFollowInput ? floatAnchorRect : null
+        }
+        floatOffset={12}
+        onManualMove={() => {
+          setFloatFollowInput(false);
+        }}
       >
         <CompositionKeyboard
           style={vkbStyles}
@@ -268,6 +354,13 @@ const VirtualKeyboard = ({
           useKeydownAudio={currentUseKeydownAudio}
           keydownAudioUrl={keydownAudioUrl}
           onChangeShow={setVisible}
+          onActiveInputChange={(input) => {
+            setActiveInputElement(input);
+            if (input) {
+              setFloatFollowInput(resolveFollowFocus(input));
+            }
+            updateFloatAnchorRect(input);
+          }}
           onThemeModeChange={setCurrentThemeMode}
           onPositionModeChange={setCurrentPositionMode}
           onWidthChange={setCurrentWidth}

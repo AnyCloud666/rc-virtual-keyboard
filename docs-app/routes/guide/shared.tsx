@@ -11,13 +11,14 @@ export const codeBasicUsage = `import { useState } from 'react';\nimport { Virtu
 
 export const codeViteSvgr = `import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\nimport svgr from 'vite-plugin-svgr';\n\nexport default defineConfig({\n  plugins: [\n    react(),\n    svgr({\n      include: '**/*.svg',\n      svgrOptions: {\n        exportType: 'named',\n        ref: true,\n        svgo: false,\n        titleProp: true,\n      },\n    }),\n  ],\n});`;
 
-export const codeDatasetUsage = `<VirtualKeyboard focusShow={false} />\n\n<input\n  placeholder="只有我聚焦时弹出键盘"\n  data-vkb-show\n/>\n\n<input\n  placeholder="我不自动弹出键盘"\n  data-vkb-auto-popup={false}\n/>\n\n<input\n  placeholder="失焦后保持键盘展示"\n  data-vkb-blur-hidden={false}\n/>\n\n<input\n  type="text"\n  placeholder="数字输入建议这样接管"\n  data-vkb-type="number"\n/>\n\n<input\n  placeholder="禁用虚拟键盘接管"\n  data-vkb-disabled="true"\n/>;`;
+export const codeDatasetUsage = `<VirtualKeyboard focusShow={false} />\n\n<input\n  placeholder="只有我聚焦时弹出键盘"\n  data-vkb-show\n/>\n\n<input\n  placeholder="我不自动弹出键盘"\n  data-vkb-auto-popup={false}\n/>\n\n<input\n  placeholder="失焦后保持键盘展示"\n  data-vkb-blur-hidden={false}\n/>\n\n<input\n  type="text"\n  placeholder="数字输入建议这样接管"\n  data-vkb-type="number"\n/>\n\n<input\n  placeholder='浮动模式下不跟随当前输入框'\n  data-vkb-follow-focus="false"\n/>\n\n<input\n  placeholder="禁用虚拟键盘接管"\n  data-vkb-disabled="true"\n/>;`;
 
 export function DatasetUsageDemo() {
   const [forcedValue, setForcedValue] = useState('');
   const [manualValue, setManualValue] = useState('');
   const [stickyValue, setStickyValue] = useState('');
   const [numberValue, setNumberValue] = useState('');
+  const [followFocusValue, setFollowFocusValue] = useState('');
   const [disabledValue, setDisabledValue] = useState('');
 
   return (
@@ -64,6 +65,15 @@ export function DatasetUsageDemo() {
         />
 
         <input
+          placeholder='data-vkb-follow-focus="false"：浮动模式不自动吸附'
+          data-vkb-follow-focus="false"
+          value={followFocusValue}
+          onInput={(e) => {
+            setFollowFocusValue((e.target as HTMLInputElement).value);
+          }}
+        />
+
+        <input
           placeholder='data-vkb-disabled="true"：不受虚拟键盘接管'
           data-vkb-disabled="true"
           value={disabledValue}
@@ -76,6 +86,7 @@ export function DatasetUsageDemo() {
         <div className="basic-usage-value">auto-popup=false: {manualValue || '未输入'}</div>
         <div className="basic-usage-value">blur-hidden=false: {stickyValue || '未输入'}</div>
         <div className="basic-usage-value">number: {numberValue || '未输入'}</div>
+        <div className="basic-usage-value">follow-focus=false: {followFocusValue || '未输入'}</div>
         <div className="basic-usage-value">disabled: {disabledValue || '未输入'}</div>
       </div>
 

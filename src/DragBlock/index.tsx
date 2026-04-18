@@ -37,6 +37,9 @@ const DragBlock = ({
   style,
   positionMode = FloatPosition.code,
   onClick,
+  floatAnchorRect,
+  floatOffset = 12,
+  onManualMove,
 }: {
   init?: { width: string; height: string };
   resizeOverRight?: boolean;
@@ -52,7 +55,20 @@ const DragBlock = ({
   children?: ReactNode;
   style?: CSSProperties;
   positionMode?: string;
+  floatAnchorRect?: {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+    width: number;
+    height: number;
+  } | null;
+  floatOffset?: number;
+  onManualMove?: () => void;
 }) => {
+  const hasInit = !!init;
+  const initWidth = init?.width;
+  const initHeight = init?.height;
   /** 是否允许移动 */
   const allowMove = useRef(false);
   /** 开始位置 */
@@ -62,6 +78,8 @@ const DragBlock = ({
   const startTouch = useRef({ clientX: 0, clientY: 0 });
   /** touch 是否发生了拖动 */
   const touchMoved = useRef(false);
+  /** 当前这一轮拖动是否已经通知上层 */
+  const manualMoveNotified = useRef(false);
 
   /** block */
   const blockRef = useRef<HTMLDivElement | null>(null);
@@ -108,6 +126,61 @@ const DragBlock = ({
       }
     }
   }, [init?.height, init?.width, positionMode]);
+
+  const syncFloatAnchorPosition = useCallback(() => {
+    if (
+      !blockRef.current ||
+      positionMode !== FloatPosition.code ||
+      !floatAnchorRect
+    ) {
+      return;
+    }
+
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const blockWidth = blockRef.current.offsetWidth;
+    const blockHeight = blockRef.current.offsetHeight;
+    const safeMargin = 12;
+    const maxLeft = Math.max(
+      safeMargin,
+      viewportWidth - blockWidth - safeMargin,
+    );
+    const maxTop = Math.max(
+      safeMargin,
+      viewportHeight - blockHeight - safeMargin,
+    );
+
+    const preferredLeft = floatAnchorRect.left;
+    const fallbackLeft = floatAnchorRect.right - blockWidth;
+    let nextLeft = preferredLeft;
+    let nextTop = floatAnchorRect.bottom + floatOffset;
+
+    if (preferredLeft + blockWidth > viewportWidth - safeMargin) {
+      nextLeft =
+        fallbackLeft >= safeMargin
+          ? fallbackLeft
+          : Math.min(preferredLeft, maxLeft);
+    }
+
+    if (nextLeft > maxLeft) {
+      nextLeft = maxLeft;
+    }
+    if (nextLeft < safeMargin) {
+      nextLeft = safeMargin;
+    }
+
+    if (nextTop + blockHeight > viewportHeight - safeMargin) {
+      const fallbackTop = floatAnchorRect.top - blockHeight - floatOffset;
+      nextTop = fallbackTop >= safeMargin ? fallbackTop : maxTop;
+    }
+
+    if (nextTop < safeMargin) {
+      nextTop = safeMargin;
+    }
+
+    blockRef.current.style.left = `${nextLeft}px`;
+    blockRef.current.style.top = `${nextTop}px`;
+  }, [floatAnchorRect, floatOffset, positionMode]);
   /** @type {*}
    * 自动靠右
    */
@@ -165,13 +238,13 @@ const DragBlock = ({
   /** 初始位置 */
   useEffect(() => {
     if (blockRef.current) {
-      if (init) {
-        blockRef.current.style.top = `calc(100% - ${init.height})`;
+      if (hasInit) {
+        blockRef.current.style.top = `calc(100% - ${initHeight})`;
         // blockRef.current.style.left =  `calc(100% - ${init.width})`;
         blockRef.current.style.left =
-          parseFloat(init?.width ?? '0') > window.innerWidth
+          parseFloat(initWidth ?? '0') > window.innerWidth
             ? '0px'
-            : `calc(100vw - ${init?.width})`;
+            : `calc(100vw - ${initWidth})`;
       } else {
         blockRef.current.style.top = `calc(50% - ${
           blockRef.current.offsetHeight / 2
@@ -181,7 +254,7 @@ const DragBlock = ({
         }px)`;
       }
     }
-  }, [init]);
+  }, [hasInit, initHeight, initWidth]);
 
   /** 层级 */
   useEffect(() => {
@@ -193,6 +266,10 @@ const DragBlock = ({
   useEffect(() => {
     syncBlockPosition();
   }, [syncBlockPosition]);
+
+  useEffect(() => {
+    syncFloatAnchorPosition();
+  }, [syncFloatAnchorPosition]);
 
   /** 监听自动靠右 */
   useUpdateEffect(() => {
@@ -209,6 +286,7 @@ const DragBlock = ({
   /** 鼠标按下 */
   const onMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     allowMove.current = true;
+    manualMoveNotified.current = false;
     showBlock.cancel();
     keepRight.cancel();
 
@@ -237,6 +315,15 @@ const DragBlock = ({
         const y = e.clientY - start.current.clientY;
 
         if (blockRef.current) {
+          if (
+            !manualMoveNotified.current &&
+            (Math.abs(x - blockRef.current.offsetLeft) > 4 ||
+              Math.abs(y - blockRef.current.offsetTop) > 4)
+          ) {
+            manualMoveNotified.current = true;
+            onManualMove?.();
+          }
+
           blockRef.current.style.transition = 'none';
 
           if (x <= window.innerWidth - blockRef?.current?.offsetWidth) {
@@ -315,6 +402,7 @@ const DragBlock = ({
   const onTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     allowMove.current = true;
     touchMoved.current = false;
+    manualMoveNotified.current = false;
     showBlock.cancel();
     keepRight.cancel();
     e?.preventDefault?.();
@@ -377,6 +465,10 @@ const DragBlock = ({
           Math.abs(y - blockRef.current.offsetTop) > 4
         ) {
           touchMoved.current = true;
+          if (!manualMoveNotified.current) {
+            manualMoveNotified.current = true;
+            onManualMove?.();
+          }
         }
 
         if (x <= window.innerWidth - blockRef?.current?.offsetWidth) {

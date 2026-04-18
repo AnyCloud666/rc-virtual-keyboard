@@ -39,6 +39,7 @@ const CompositionKeyboard = ({
   useKeydownAudio = 'Y',
   keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
   onChangeShow,
+  onActiveInputChange,
   onThemeModeChange,
   onPositionModeChange,
   onWidthChange,
@@ -85,6 +86,8 @@ const CompositionKeyboard = ({
   keydownAudioUrl?: string;
   /** 显示/隐藏虚拟键盘 */
   onChangeShow?: (b: boolean) => void;
+  /** 当前激活输入框变化 */
+  onActiveInputChange?: (input: HTMLInputElement | null) => void;
   /** 主题改变 */
   onThemeModeChange?: (mode: string) => void;
   /** 位置模式改变 */
@@ -132,6 +135,7 @@ const CompositionKeyboard = ({
     useKeydownAudio,
     keydownAudioUrl,
     onChangeShow,
+    onActiveInputChange,
     onThemeModeChange,
     onPositionModeChange,
     onUseKeydownAudioChange,

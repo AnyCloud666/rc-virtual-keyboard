@@ -24,6 +24,7 @@ const CandidateBar = ({
   const lastScrollTimeRef = useRef(0);
   const { markTouchInteraction, shouldIgnoreClick } = useTouchClickGuard();
   const dragScroll = useHorizontalDragScroll(tempInputAreaRef);
+  const dedupedItems = items.filter((item) => item !== tempValue);
 
   const onMore = useCallback(
     (
@@ -112,6 +113,41 @@ const CandidateBar = ({
     return null;
   }
 
+  const handleSelect = (item: string) => {
+    onSelectItem?.(item);
+  };
+
+  const renderCandidateItem = (
+    item: string,
+    key: string,
+    className = 'candidate-bar-item',
+  ) => (
+    <div
+      key={key}
+      className={className}
+      onMouseDown={(e) => {
+        e.preventDefault();
+        if (shouldIgnoreClick() || dragScroll.shouldIgnoreClick()) {
+          return;
+        }
+        handleSelect(item);
+      }}
+      onClick={(e) => {
+        e.preventDefault();
+      }}
+      onTouchEnd={(e) => {
+        e.preventDefault();
+        markTouchInteraction();
+        if (dragScroll.shouldIgnoreClick()) {
+          return;
+        }
+        handleSelect(item);
+      }}
+    >
+      {item}
+    </div>
+  );
+
   return (
     <div className="candidate-bar">
       <div
@@ -138,38 +174,17 @@ const CandidateBar = ({
         onMouseDown={dragScroll.onMouseDown}
         onTouchStart={dragScroll.onTouchStart}
       >
-        {tempValue ? (
-          <div className="candidate-bar-item candidate-bar-item-input">
-            {tempValue}
-          </div>
-        ) : null}
+        {tempValue
+          ? renderCandidateItem(
+            tempValue,
+            `temp-${tempValue}`,
+            'candidate-bar-item candidate-bar-item-input',
+          )
+          : null}
 
-        {items.map((item, index) => (
-          <div
-            key={`${item}-${index}`}
-            className="candidate-bar-item"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              if (shouldIgnoreClick() || dragScroll.shouldIgnoreClick()) {
-                return;
-              }
-              onSelectItem?.(item);
-            }}
-            onClick={(e) => {
-              e.preventDefault();
-            }}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              markTouchInteraction();
-              if (dragScroll.shouldIgnoreClick()) {
-                return;
-              }
-              onSelectItem?.(item);
-            }}
-          >
-            {item}
-          </div>
-        ))}
+        {dedupedItems.map((item, index) =>
+          renderCandidateItem(item, `${item}-${index}`),
+        )}
       </div>
 
       <div

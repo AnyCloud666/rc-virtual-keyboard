@@ -175,6 +175,7 @@ const useInput = ({
   keydownAudioUrl = '/audio/typing-sound-02-229861.mp3',
   autoPopup = true,
   onChangeShow,
+  onActiveInputChange,
   onThemeModeChange,
   onPositionModeChange,
   onUseKeydownAudioChange,
@@ -199,6 +200,8 @@ const useInput = ({
   autoPopup?: boolean;
   /** 显示/隐藏 */
   onChangeShow?: (s: boolean) => void;
+  /** 当前激活输入框变化 */
+  onActiveInputChange?: (input: HTMLInputElement | null) => void;
   /** 主题改变 */
   onThemeModeChange?: (mode: string) => void;
   /** 位置模式改变 */
@@ -415,6 +418,7 @@ const useInput = ({
     inputType.current = inputEl.dataset?.vkbType ?? '';
     activeInputRef.current = inputEl;
     lastActiveInputRef.current = inputEl;
+    onActiveInputChange?.(inputEl);
     bindInputListener(inputEl);
 
     if (options?.syncShow) {
@@ -422,7 +426,7 @@ const useInput = ({
         onChangeShow && onChangeShow(true);
       }
     }
-  }, [bindInputListener, onChangeShow, shouldShowOnFocus]);
+  }, [bindInputListener, onActiveInputChange, onChangeShow, shouldShowOnFocus]);
 
   /** 失去焦点 */
   const onBlur = useCallback(
@@ -451,6 +455,7 @@ const useInput = ({
         if (activeInputRef.current === currentInput) {
           activeInputRef.current = null;
           inputType.current = '';
+          onActiveInputChange?.(null);
         }
 
         if (shouldHideOnBlur(currentInput)) {
@@ -458,7 +463,7 @@ const useInput = ({
         }
       }, 0);
     },
-    [onChangeShow],
+    [onActiveInputChange, onChangeShow],
   );
   /** 获得焦点 */
   const onFocus = useCallback(
