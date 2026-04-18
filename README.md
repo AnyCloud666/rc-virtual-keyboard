@@ -135,6 +135,7 @@ export default function Demo() {
 | `themeMode` | 主题模式 | `string` | `light` |
 | `positionMode` | 位置模式 | `string` | `float` |
 | `focusShow` | 输入框聚焦时是否自动显示键盘 | `boolean` | `true` |
+| `pushInputIntoView` | `fixedBottom` 模式下，将被键盘遮挡的输入框推回可视区域 | `boolean` | `false` |
 | `numberKeyboardLayoutMode` | 数字键盘排列方式 | `'asc' \| 'desc'` | `asc` |
 | `virtualKeyboardTab` | 自定义 tab 列表 | `KeyboardTabItem[]` | 内置全部 tab |
 | `theme` | 自定义主题变量 | `Partial<Theme>` | - |
@@ -151,6 +152,19 @@ export default function Demo() {
 - 视口空间不足时，自动限制最大高度并转为内部滚动
 - 手动拖动过键盘后，自动跟随会暂停
 - 再聚焦新的输入框时，会恢复自动吸附
+
+### 固定底部模式下顶起输入框
+
+当 `positionMode="fixedBottom"` 且输入框可能被键盘遮挡时，可以开启 `pushInputIntoView`：
+
+```tsx
+<VirtualKeyboard
+  positionMode="fixedBottom"
+  pushInputIntoView
+/>
+```
+
+启用后会优先尝试滚动最近的可滚动容器；如果可滚动空间不足，会临时补充底部空间，再把当前输入框推回可视区域。
 
 ## `CompositionKeyboard` 使用示例
 

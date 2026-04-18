@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -58,6 +59,7 @@ const VirtualKeyboard = ({
   show = false,
   themeMode = 'light',
   positionMode,
+  pushInputIntoView = false,
   useKeydownAudio = 'Y',
 }: VKB.VirtualKeyboardProps) => {
   type VirtualKeyboardStyles = CSSProperties & {
@@ -76,6 +78,10 @@ const VirtualKeyboard = ({
     bottom: number;
     width: number;
     height: number;
+  } | null>(null);
+  const pushedSpaceRef = useRef<{
+    element: HTMLElement;
+    paddingBottom: string;
   } | null>(null);
   const isMobile = useIsMobile();
   const defaultPositionMode = isMobile
@@ -136,12 +142,183 @@ const VirtualKeyboard = ({
         defaultValue: numberKeyboardLayoutMode,
       },
     );
+  const shouldPushInputIntoView =
+    visible &&
+    currentPositionMode === FixedBottomPosition.code &&
+    pushInputIntoView;
 
   const resolveFollowFocus = useCallback((input: HTMLInputElement | null) => {
     if (!input) return floatFollowInput;
 
     return input.dataset?.vkbFollowFocus !== 'false';
   }, [floatFollowInput]);
+
+  const getScrollableAncestors = useCallback((element: HTMLElement) => {
+    const ancestors: HTMLElement[] = [];
+    let current = element.parentElement;
+
+    while (current) {
+      const style = window.getComputedStyle(current);
+      const overflowY = style.overflowY;
+      const canScrollY =
+        (overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay') &&
+        current.scrollHeight > current.clientHeight;
+
+      if (canScrollY) {
+        ancestors.push(current);
+      }
+
+      current = current.parentElement;
+    }
+
+    return ancestors;
+  }, []);
+
+  const resetPushedSpace = useCallback(() => {
+    if (!pushedSpaceRef.current) {
+      return;
+    }
+
+    const { element, paddingBottom } = pushedSpaceRef.current;
+    element.style.paddingBottom = paddingBottom;
+    pushedSpaceRef.current = null;
+  }, []);
+
+  const ensureScrollableSpace = useCallback((
+    input: HTMLInputElement,
+    requiredSpace: number,
+  ) => {
+    if (requiredSpace <= 0) {
+      return null;
+    }
+
+    const ancestors = getScrollableAncestors(input);
+    const target = ancestors[0] ?? (document.scrollingElement as HTMLElement | null) ?? document.documentElement;
+
+    if (!target) {
+      return null;
+    }
+
+    if (pushedSpaceRef.current?.element !== target) {
+      resetPushedSpace();
+    }
+
+    const computedStyle = window.getComputedStyle(target);
+    const originalPaddingBottom =
+      pushedSpaceRef.current?.element === target
+        ? pushedSpaceRef.current.paddingBottom
+        : computedStyle.paddingBottom;
+    const currentPaddingBottom =
+      parseFloat(target.style.paddingBottom || computedStyle.paddingBottom || '0') || 0;
+    const nextPaddingBottom = Math.ceil(
+      Math.max(currentPaddingBottom, parseFloat(originalPaddingBottom || '0') || 0) +
+        requiredSpace,
+    );
+
+    if (!pushedSpaceRef.current) {
+      pushedSpaceRef.current = {
+        element: target,
+        paddingBottom: originalPaddingBottom,
+      };
+    }
+
+    target.style.paddingBottom = `${nextPaddingBottom}px`;
+
+    return target;
+  }, [getScrollableAncestors, resetPushedSpace]);
+
+  const scrollInputIntoVisibleArea = useCallback((input: HTMLInputElement | null) => {
+    if (
+      !input ||
+      !shouldPushInputIntoView
+    ) {
+      return;
+    }
+
+    const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+    const keyboardHeight = Math.max(
+      0,
+      Math.min(parseFloat(currentHeight ?? '0') || 0, viewportHeight),
+    );
+    const safeGap = 12;
+    const rect = input.getBoundingClientRect();
+    const visibleTop = safeGap;
+    const visibleBottom = viewportHeight - keyboardHeight - safeGap;
+
+    let delta = 0;
+
+    if (rect.bottom > visibleBottom) {
+      delta = rect.bottom - visibleBottom;
+    } else if (rect.top < visibleTop) {
+      delta = rect.top - visibleTop;
+    }
+
+    if (Math.abs(delta) < 1) {
+      resetPushedSpace();
+      return;
+    }
+
+    let remainingDelta = delta;
+    const ancestors = getScrollableAncestors(input);
+
+    ancestors.forEach((ancestor) => {
+      if (remainingDelta === 0) {
+        return;
+      }
+
+      if (remainingDelta > 0) {
+        const availableDown = ancestor.scrollHeight - ancestor.clientHeight - ancestor.scrollTop;
+        const consumed = Math.min(availableDown, remainingDelta);
+
+        if (consumed > 0) {
+          ancestor.scrollTop += consumed;
+          remainingDelta -= consumed;
+        }
+
+        return;
+      }
+
+      const availableUp = ancestor.scrollTop;
+      const consumed = Math.min(availableUp, Math.abs(remainingDelta));
+
+      if (consumed > 0) {
+        ancestor.scrollTop -= consumed;
+        remainingDelta += consumed;
+      }
+    });
+
+    if (remainingDelta > 0) {
+      const target = ensureScrollableSpace(input, remainingDelta + safeGap);
+
+      if (target) {
+        if (target === document.scrollingElement || target === document.documentElement) {
+          window.scrollBy({
+            top: remainingDelta,
+            behavior: 'smooth',
+          });
+        } else {
+          target.scrollBy({
+            top: remainingDelta,
+            behavior: 'smooth',
+          });
+        }
+        return;
+      }
+    }
+
+    if (remainingDelta !== 0) {
+      window.scrollBy({
+        top: remainingDelta,
+        behavior: 'smooth',
+      });
+    }
+  }, [
+    currentHeight,
+    ensureScrollableSpace,
+    getScrollableAncestors,
+    resetPushedSpace,
+    shouldPushInputIntoView,
+  ]);
 
   useEffect(() => {
     setVisible(show);
@@ -233,6 +410,54 @@ const VirtualKeyboard = ({
       window.removeEventListener('scroll', syncAnchor, true);
     };
   }, [activeInputElement, currentPositionMode, updateFloatAnchorRect, visible]);
+
+  useEffect(() => {
+    if (
+      !shouldPushInputIntoView ||
+      !activeInputElement
+    ) {
+      return;
+    }
+
+    let frameId = 0;
+    let timeoutId = 0;
+
+    const runScroll = () => {
+      frameId = window.requestAnimationFrame(() => {
+        scrollInputIntoVisibleArea(activeInputElement);
+      });
+    };
+
+    runScroll();
+    timeoutId = window.setTimeout(runScroll, 120);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [
+    activeInputElement,
+    currentHeight,
+    scrollInputIntoVisibleArea,
+    shouldPushInputIntoView,
+  ]);
+
+  useEffect(() => {
+    if (shouldPushInputIntoView) {
+      return;
+    }
+
+    resetPushedSpace();
+  }, [
+    resetPushedSpace,
+    shouldPushInputIntoView,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      resetPushedSpace();
+    };
+  }, [resetPushedSpace]);
 
   const floatMaxHeight = useMemo(() => {
     if (

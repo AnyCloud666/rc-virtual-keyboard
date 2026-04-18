@@ -152,6 +152,8 @@ declare namespace VKB {
     keydownAudioUrl?: string;
     /** 输入框 focus 时是否自动显示键盘 */
     focusShow?: boolean;
+    /** fixedBottom 模式下，自动将被键盘遮挡的输入框顶回可视区域 */
+    pushInputIntoView?: boolean;
     /** 数字键盘排列 */
     numberKeyboardLayoutMode?: NumberKeyboardLayoutMode;
     /** 自定义键盘内容 */

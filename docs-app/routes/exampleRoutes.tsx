@@ -1,9 +1,15 @@
-﻿import FocusShowDemo from '../demos/FocusShowDemo';
+import { Alert, Card, Space, Typography } from 'antd';
+import CodeBlock from '../components/CodeBlock';
+import DemoPage from '../components/DemoPage';
+import FocusShowDemo from '../demos/FocusShowDemo';
 import HideIconDemo from '../demos/HideIconDemo';
 import MobileNoSystemKeyboardDemo from '../demos/MobileNoSystemKeyboardDemo';
+import MobilePushInputIntoViewDemo from '../demos/MobilePushInputIntoViewDemo';
 import NumberKeyboardLayoutDemo from '../demos/NumberKeyboardLayoutDemo';
-import DemoPage from '../components/DemoPage';
+import PcPushInputIntoViewDemo from '../demos/PcPushInputIntoViewDemo';
 import type { DocRoute } from './types';
+
+const { Paragraph } = Typography;
 
 export const exampleRoutes: DocRoute[] = [
   {
@@ -48,6 +54,81 @@ export const exampleRoutes: DocRoute[] = [
       >
         <HideIconDemo />
       </DemoPage>
+    ),
+  },
+  {
+    key: 'mobile-push-input-into-view',
+    path: '/examples/mobile-push-input-into-view',
+    title: '移动端输入框顶起',
+    menuLabel: '移动端输入框顶起',
+    description: 'fixedBottom 模式下，将被键盘遮挡的输入框推回可视区域。',
+    group: 'examples',
+    render: () => (
+      <Space direction="vertical" size={20} style={{ width: '100%' }}>
+        <Alert
+          type="info"
+          showIcon
+          message="当前 demo 采用独立路由隔离"
+          description="这个页面特意把说明和代码移到了前面，方便把最底部输入框真正放到当前路由内容区末尾。"
+        />
+
+        <Card className="docs-card" title="移动端 fixedBottom 输入框顶起">
+          <Paragraph>
+            当前路由专门验证 <code>pushInputIntoView</code>，在移动端浏览器里更容易观察页面是否会自动滚动，让输入框回到可视区域。
+          </Paragraph>
+          <ul className="docs-list">
+            <li>示例里固定使用 <code>positionMode="fixedBottom"</code></li>
+            <li>同时开启 <code>pushInputIntoView</code></li>
+            <li>请重点测试页面最底部输入框是否会被自动顶回可视区域</li>
+          </ul>
+          <CodeBlock code={`<VirtualKeyboard
+  positionMode="fixedBottom"
+  pushInputIntoView
+/>`}
+          />
+        </Card>
+
+        <Card className="docs-card" title="长页面测试区">
+          <MobilePushInputIntoViewDemo />
+        </Card>
+      </Space>
+    ),
+  },
+  {
+    key: 'pc-push-input-into-view',
+    path: '/examples/pc-push-input-into-view',
+    title: 'PC 输入框顶起',
+    menuLabel: 'PC 输入框顶起',
+    description: 'fixedBottom 模式下，PC 页面底部输入框被键盘遮挡时自动顶回可视区域。',
+    group: 'examples',
+    render: () => (
+      <Space direction="vertical" size={20} style={{ width: '100%' }}>
+        <Alert
+          type="info"
+          showIcon
+          message="PC 端 fixedBottom 顶起测试"
+          description="这个页面用于验证 pushInputIntoView，在桌面端浏览器里聚焦底部输入框后，页面是否会自动撑开并滚动。"
+        />
+
+        <Card className="docs-card" title="PC 端页面顶起输入框">
+          <Paragraph>
+            当前路由专门验证 <code>positionMode="fixedBottom"</code> 和 <code>pushInputIntoView</code> 的组合行为。
+          </Paragraph>
+          <ul className="docs-list">
+            <li>示例固定使用 <code>positionMode="fixedBottom"</code></li>
+            <li>同时开启 <code>pushInputIntoView</code></li>
+            <li>请滚动到底部后聚焦最后一个输入框，观察页面是否自动顶起</li>
+          </ul>
+          <CodeBlock code={`<VirtualKeyboard
+  positionMode="fixedBottom"
+  pushInputIntoView
+/>`} />
+        </Card>
+
+        <Card className="docs-card" title="长页面测试区">
+          <PcPushInputIntoViewDemo />
+        </Card>
+      </Space>
     ),
   },
   {

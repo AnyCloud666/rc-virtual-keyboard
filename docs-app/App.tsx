@@ -1,5 +1,5 @@
-import { GithubOutlined, LinkOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Card, ConfigProvider, Layout, Menu, Skeleton, Space, Spin, Tag, Typography } from 'antd';
+import { GithubOutlined, LinkOutlined, MenuOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, Card, ConfigProvider, Drawer, Layout, Menu, Skeleton, Space, Spin, Tag, Typography } from 'antd';
 import type { MenuProps } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { menuItems, routeMap } from './routes';
@@ -12,6 +12,8 @@ function App() {
   const [currentPath, setCurrentPath] = useState(() => normalizeHashPath(window.location.hash));
   const [isAppLoading, setIsAppLoading] = useState(true);
   const [isContentLoading, setIsContentLoading] = useState(false);
+  const [isMobileNav, setIsMobileNav] = useState(() => window.innerWidth <= 991);
+  const [navOpen, setNavOpen] = useState(false);
 
   useEffect(() => {
     let frameId = 0;
@@ -62,11 +64,29 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const syncViewport = () => {
+      const nextIsMobile = window.innerWidth <= 991;
+      setIsMobileNav(nextIsMobile);
+      if (!nextIsMobile) {
+        setNavOpen(false);
+      }
+    };
+
+    syncViewport();
+    window.addEventListener('resize', syncViewport);
+
+    return () => {
+      window.removeEventListener('resize', syncViewport);
+    };
+  }, []);
+
   const currentRoute = useMemo(() => routeMap.get(currentPath) ?? routeMap.get('/'), [currentPath]);
   const isHomeRoute = currentRoute?.path === '/';
 
   const onMenuClick: MenuProps['onClick'] = ({ key }) => {
     window.location.hash = String(key);
+    setNavOpen(false);
   };
 
   const breadcrumbItems = useMemo(() => {
@@ -83,6 +103,7 @@ function App() {
 
     return [{ title: '文档' }, { title: groupLabel }, { title: currentRoute.title }];
   }, [currentRoute]);
+  const showFooterRouteCard = currentRoute?.group !== 'examples';
 
   const appLoadingNode = (
     <div className={isHomeRoute ? 'app-loading app-loading-home' : 'app-loading'}>
@@ -144,11 +165,20 @@ function App() {
           {isAppLoading ? appLoadingNode : (
             <>
               <Header className="docs-header ant-style-header">
-                <div>
+                <div className="docs-header-main">
+                  {isMobileNav ? (
+                    <Button
+                      className="docs-menu-trigger"
+                      icon={<MenuOutlined />}
+                      onClick={() => setNavOpen(true)}
+                    >
+                      导航
+                    </Button>
+                  ) : null}
                   <div className="docs-brand">rc-virtual-keyboard</div>
                   <div className="docs-subtitle">react 虚拟键盘</div>
                 </div>
-                <Space size={12} wrap>
+                <Space size={12} wrap className="docs-header-actions">
                   <Tag color="blue">React</Tag>
                   <Tag color="processing">Vite</Tag>
                   <Tag color="gold">Ant Design</Tag>
@@ -159,10 +189,28 @@ function App() {
               </Header>
 
               <Layout>
-                <Sider width={256} breakpoint="lg" collapsedWidth="0" className="docs-sider ant-style-sider">
-                  <div className="sider-caption">Documentation</div>
-                  <Menu mode="inline" selectedKeys={[currentRoute?.path ?? '/']} items={menuItems} onClick={onMenuClick} />
-                </Sider>
+                {isMobileNav ? (
+                  <Drawer
+                    title="Documentation"
+                    placement="left"
+                    open={navOpen}
+                    onClose={() => setNavOpen(false)}
+                    width={288}
+                    className="docs-mobile-drawer"
+                  >
+                    <Menu
+                      mode="inline"
+                      selectedKeys={[currentRoute?.path ?? '/']}
+                      items={menuItems}
+                      onClick={onMenuClick}
+                    />
+                  </Drawer>
+                ) : (
+                  <Sider width={256} breakpoint="lg" collapsedWidth="0" className="docs-sider ant-style-sider">
+                    <div className="sider-caption">Documentation</div>
+                    <Menu mode="inline" selectedKeys={[currentRoute?.path ?? '/']} items={menuItems} onClick={onMenuClick} />
+                  </Sider>
+                )}
 
                 <Layout>
                   <Content className="docs-content ant-style-content">
@@ -180,14 +228,16 @@ function App() {
 
                         <div className="docs-page-body">{currentRoute?.render()}</div>
 
-                        <Card className="docs-card docs-footer-card" size="small">
-                          <Space wrap>
-                            <Link href={`#${currentRoute?.path ?? '/'}`}>
-                              <LinkOutlined /> 当前路由: {currentRoute?.path ?? '/'}
-                            </Link>
-                            <Text type="secondary">每个示例单独成页，避免多个虚拟键盘实例并存。</Text>
-                          </Space>
-                        </Card>
+                        {showFooterRouteCard ? (
+                          <Card className="docs-card docs-footer-card" size="small">
+                            <Space wrap>
+                              <Link href={`#${currentRoute?.path ?? '/'}`}>
+                                <LinkOutlined /> 当前路由: {currentRoute?.path ?? '/'}
+                              </Link>
+                              <Text type="secondary">每个示例单独成页，避免多个虚拟键盘实例并存。</Text>
+                            </Space>
+                          </Card>
+                        ) : null}
                       </>
                     )}
                   </Content>
