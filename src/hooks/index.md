@@ -44,6 +44,8 @@ nav:
 | chinese           | 拼音转中文结果                                                                              | string[]                                                                                         |
 | activeKeyboard    | 当前活动的键盘                                                                              | string                                                                                           |
 | onClick           | 键盘的点击事件，必须实现                                                                    | (e: VKB.KeyboardAttributeType) => void                                                           |
+| onKeyDown         | 键盘按下事件，可直接传给键盘组件补齐按键生命周期                                            | (e: VKB.KeyboardAttributeType) => void                                                           |
+| onKeyUp           | 键盘抬起事件，可直接传给键盘组件补齐按键生命周期                                            | (e: VKB.KeyboardAttributeType) => void                                                           |
 | onMouseDown       | 整个键盘的鼠标按下事件，整个键盘的触摸事件，用来对虚拟键盘进行移动,防止点击其他区域造成拖动 | ( e:React.MouseEvent\<HTMLDivElement, MouseEvent\>\| React.TouchEvent\<HTMLDivElement\>) => void |
 | onSelectChinese   | 选择输入的中文                                                                              | (chinese: string)=>void                                                                          |
 | onChangeInputMode | 切换输入模式                                                                                | (mode: VKB.InputMode)=>void                                                                      |

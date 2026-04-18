@@ -68,7 +68,11 @@ export function FunctionKeyboardDemo() {
   return (
     <div className="component-demo-stack">
       <div className="component-demo-keyboard-frame component-demo-keyboard-frame-function">
-        <FunctionKeyboard onClick={(key) => setPressed(`${key.code} / ${key.key}`)} />
+        <FunctionKeyboard
+          onClick={(key) => setPressed(`click: ${key.code} / ${key.key}`)}
+          onKeyDown={(key) => setPressed(`down: ${key.code} / ${key.key}`)}
+          onKeyUp={(key) => setPressed(`up: ${key.code} / ${key.key}`)}
+        />
       </div>
       <div className="component-demo-result">最近按键：{pressed}</div>
     </div>
@@ -81,7 +85,11 @@ export function EditKeyboardDemo() {
   return (
     <div className="component-demo-stack">
       <div className="component-demo-keyboard-frame component-demo-keyboard-frame-edit">
-        <EditKeyboard onClick={(key) => setPressed(`${key.code} / ${key.key}`)} />
+        <EditKeyboard
+          onClick={(key) => setPressed(`click: ${key.code} / ${key.key}`)}
+          onKeyDown={(key) => setPressed(`down: ${key.code} / ${key.key}`)}
+          onKeyUp={(key) => setPressed(`up: ${key.code} / ${key.key}`)}
+        />
       </div>
       <div className="component-demo-result">最近动作：{pressed}</div>
     </div>
@@ -94,6 +102,8 @@ export function WriteKeyboardDemo() {
     setValue,
     chinese,
     onClick,
+    onKeyDown,
+    onKeyUp,
     onSelectChinese,
     onRecognition,
     isKeyActive,
@@ -114,6 +124,8 @@ export function WriteKeyboardDemo() {
           chinese={chinese}
           onSelectChinese={onSelectChinese}
           onClick={onClick}
+          onKeyDown={onKeyDown}
+          onKeyUp={onKeyUp}
           onRecognition={onRecognition}
           isKeyActive={isKeyActive}
         />
@@ -135,6 +147,7 @@ export function SettingKeyboardDemo() {
   const [fontSize, setFontSize] = useState('14px');
   const [fontFamily, setFontFamily] = useState("'Microsoft YaHei', 'PingFang SC', sans-serif");
   const [layoutMode, setLayoutMode] = useState<'asc' | 'desc'>('asc');
+  const [lastStage, setLastStage] = useState('尚未触发');
 
   return (
     <div className="component-demo-stack">
@@ -154,6 +167,7 @@ export function SettingKeyboardDemo() {
           onFontFamilyChange={setFontFamily}
           onNumberKeyboardLayoutModeChange={(mode) => setLayoutMode(mode)}
           onClick={(key) => {
+            setLastStage(`click: ${key.code}`);
             if (key.code === 'light' || key.code === 'dark') {
               setThemeMode(key.code);
               return;
@@ -170,11 +184,14 @@ export function SettingKeyboardDemo() {
               setAudioMode((prev) => (prev === 'Y' ? 'N' : 'Y'));
             }
           }}
+          onKeyDown={(key) => setLastStage(`down: ${key.code}`)}
+          onKeyUp={(key) => setLastStage(`up: ${key.code}`)}
         />
       </div>
       <div className="component-demo-result">
         themeMode={themeMode}，positionMode={positionMode}，audio={audioMode}，width={width}，height={height}
       </div>
+      <div className="component-demo-result">最近事件：{lastStage}</div>
     </div>
   );
 }

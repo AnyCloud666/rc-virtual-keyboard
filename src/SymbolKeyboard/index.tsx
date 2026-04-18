@@ -6,15 +6,24 @@ import './style.css';
 
 const SymbolKeyboard = ({
   onClick,
+  onKeyDown,
+  onKeyUp,
   isKeyActive,
 }: {
-  onClick: (e: VKB.KeyboardAttributeType) => void;
+  onClick?: (e: VKB.KeyboardAttributeType) => void;
+  onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
+  onKeyUp?: (e: VKB.KeyboardAttributeType) => void;
   isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
 }) => {
   const [activeSymbol, setActiveSymbol] = useState(symbolKeys[0]);
+  const triggerKey = (item: VKB.KeyboardAttributeType) => {
+    onKeyDown?.(item);
+    onClick?.(item);
+    onKeyUp?.(item);
+  };
   const { startContinuousTrigger, stopContinuousTrigger } =
     useContinuousTrigger<VKB.KeyboardAttributeType>({
-      onTrigger: onClick,
+      onTrigger: triggerKey,
     });
 
   return (

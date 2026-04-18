@@ -106,8 +106,13 @@ export const EmojiKeyboardTab: VKB.KeyboardTabItem = {
   id: 'emjo',
   label: <EmjoSvg />,
   name: 'Emoji 键',
-  Component: ({ onClick, isKeyActive }) => (
-    <EmojiKeyboard onClick={onClick ?? noop} isKeyActive={isKeyActive} />
+  Component: ({ onClick, onKeyDown, onKeyUp, isKeyActive }) => (
+    <EmojiKeyboard
+      onClick={onClick ?? noop}
+      onKeyDown={onKeyDown}
+      onKeyUp={onKeyUp}
+      isKeyActive={isKeyActive}
+    />
   ),
 };
 /** 符号键tab */
@@ -115,8 +120,13 @@ export const SymbolKeyboardTab: VKB.KeyboardTabItem = {
   id: 'symbol',
   label: <SymbolSvg />,
   name: '符号键',
-  Component: ({ onClick, isKeyActive }) => (
-    <SymbolKeyboard onClick={onClick} isKeyActive={isKeyActive} />
+  Component: ({ onClick, onKeyDown, onKeyUp, isKeyActive }) => (
+    <SymbolKeyboard
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      onKeyUp={onKeyUp}
+      isKeyActive={isKeyActive}
+    />
   ),
 };
 /** 编辑键tab */
@@ -124,8 +134,13 @@ export const EditKeyboardTab: VKB.KeyboardTabItem = {
   id: 'edit',
   label: <EditSvg />,
   name: '编辑键',
-  Component: ({ onClick, isKeyActive }) => (
-    <EditKeyboard onClick={onClick} isKeyActive={isKeyActive} />
+  Component: ({ onClick, onKeyDown, onKeyUp, isKeyActive }) => (
+    <EditKeyboard
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      onKeyUp={onKeyUp}
+      isKeyActive={isKeyActive}
+    />
   ),
 };
 /** 手写板tab */
@@ -139,11 +154,15 @@ export const WriteKeyboardTab: VKB.KeyboardTabItem = {
     onSelectChinese,
     onRecognition,
     onClick,
+    onKeyDown,
+    onKeyUp,
     isKeyActive,
   }) => (
     <WriteKeyboard
       chinese={chinese ?? []}
       onClick={onClick}
+      onKeyDown={onKeyDown}
+      onKeyUp={onKeyUp}
       onMouseDown={onMouseDown}
       onRecognition={onRecognition}
       onSelectChinese={onSelectChinese}
@@ -171,6 +190,8 @@ export const SettingKeyboardTab: VKB.KeyboardTabItem = {
     onFontFamilyChange,
     onNumberKeyboardLayoutModeChange,
     onClick,
+    onKeyDown,
+    onKeyUp,
   }) => (
     <SettingKeyBoard
       vkbKeydownAudio={vkbKeydownAudio ?? 'Y'}
@@ -189,6 +210,8 @@ export const SettingKeyboardTab: VKB.KeyboardTabItem = {
         onNumberKeyboardLayoutModeChange ?? noop
       }
       onClick={onClick}
+      onKeyDown={onKeyDown}
+      onKeyUp={onKeyUp}
     />
   ),
 };

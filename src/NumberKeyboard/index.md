@@ -23,9 +23,20 @@ export default () => {
   const onClick = (e) => {
     console.log('NumberKeyboard e: ', e);
   };
+  const onKeyDown = (e) => {
+    console.log('NumberKeyboard down: ', e.code);
+  };
+  const onKeyUp = (e) => {
+    console.log('NumberKeyboard up: ', e.code);
+  };
   return (
     <div style={{ width: 500, height: 320, margin: '0 auto' }}>
-      <NumberKeyboard numberKeyboardLayoutMode="desc" onClick={onClick} />
+      <NumberKeyboard
+        numberKeyboardLayoutMode="desc"
+        onClick={onClick}
+        onKeyDown={onKeyDown}
+        onKeyUp={onKeyUp}
+      />
     </div>
   );
 };
@@ -44,12 +55,16 @@ export default () => {
 | ------------------------ | ------------ | ---------------------------------- | ------ |
 | numberKeyboardLayoutMode | 数字键盘排列 | `'asc' \| 'desc'`                  | `asc`  |
 | onClick                  | 点击事件     | `(e: KeyboardAttributeType)=>void` | -      |
+| onKeyDown                | 按键按下事件 | `(e: KeyboardAttributeType)=>void` | -      |
+| onKeyUp                  | 按键抬起事件 | `(e: KeyboardAttributeType)=>void` | -      |
 
 ## 方法
 
-| 方法    | 说明     | 类型                                   | 默认值 |
-| ------- | -------- | -------------------------------------- | ------ |
-| onClick | 点击事件 | (e: VKB.KeyboardAttributeType) => void | -      |
+| 方法      | 说明         | 类型                                   | 默认值 |
+| --------- | ------------ | -------------------------------------- | ------ |
+| onClick   | 点击事件     | (e: VKB.KeyboardAttributeType) => void | -      |
+| onKeyDown | 按键按下事件 | (e: VKB.KeyboardAttributeType) => void | -      |
+| onKeyUp   | 按键抬起事件 | (e: VKB.KeyboardAttributeType) => void | -      |
 
 ## 支持的样式 token
 

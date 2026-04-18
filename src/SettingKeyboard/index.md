@@ -22,9 +22,19 @@ export default () => {
   const onClick = (e) => {
     console.log('SettingKeyboard e: ', e);
   };
+  const onKeyDown = (e) => {
+    console.log('SettingKeyboard down: ', e.code);
+  };
+  const onKeyUp = (e) => {
+    console.log('SettingKeyboard up: ', e.code);
+  };
   return (
     <div style={{ width: 500, height: 320, margin: '0 auto' }}>
-      <SettingKeyboard onClick={onClick} />
+      <SettingKeyboard
+        onClick={onClick}
+        onKeyDown={onKeyDown}
+        onKeyUp={onKeyUp}
+      />
     </div>
   );
 };
@@ -36,12 +46,17 @@ export default () => {
 | ------------ | -------- | ---------------------------------------------------------- | ------ |
 | themeMode    | 主题模式 | light\| dark \| 自定义                                     | light  |
 | positionMode | 位置模式 | fixedBottom\| fixedTop \| fixedLeft \| fixedRight \| float | float  |
+| onClick      | 点击事件 | (e: VKB.KeyboardAttributeType) => void                     | -      |
+| onKeyDown    | 按键按下事件 | (e: VKB.KeyboardAttributeType) => void                  | -      |
+| onKeyUp      | 按键抬起事件 | (e: VKB.KeyboardAttributeType) => void                  | -      |
 
 ## 方法
 
-| 方法    | 说明     | 类型                                   | 默认值 |
-| ------- | -------- | -------------------------------------- | ------ |
-| onClick | 点击事件 | (e: VKB.KeyboardAttributeType) => void | -      |
+| 方法      | 说明         | 类型                                   | 默认值 |
+| --------- | ------------ | -------------------------------------- | ------ |
+| onClick   | 点击事件     | (e: VKB.KeyboardAttributeType) => void | -      |
+| onKeyDown | 按键按下事件 | (e: VKB.KeyboardAttributeType) => void | -      |
+| onKeyUp   | 按键抬起事件 | (e: VKB.KeyboardAttributeType) => void | -      |
 
 ## 支持的样式 token
 

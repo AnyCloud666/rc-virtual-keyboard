@@ -130,16 +130,25 @@ const emojiGroups: EmojiGroup[] = [
  */
 const EmojiKeyboard = ({
   onClick,
+  onKeyDown,
+  onKeyUp,
   isKeyActive,
 }: {
-  onClick: (e: VKB.KeyboardAttributeType) => void;
+  onClick?: (e: VKB.KeyboardAttributeType) => void;
+  onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
+  onKeyUp?: (e: VKB.KeyboardAttributeType) => void;
   isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
 }) => {
   const [activeGroup, setActiveGroup] = useState(emojiGroups[0]);
   const { markTouchInteraction, shouldIgnoreClick } = useTouchClickGuard();
+  const triggerKey = (item: VKB.KeyboardAttributeType) => {
+    onKeyDown?.(item);
+    onClick?.(item);
+    onKeyUp?.(item);
+  };
   const { startContinuousTrigger, stopContinuousTrigger } =
     useContinuousTrigger<VKB.KeyboardAttributeType>({
-      onTrigger: onClick,
+      onTrigger: triggerKey,
     });
 
   return (

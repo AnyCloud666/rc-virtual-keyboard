@@ -25,6 +25,8 @@ export default () => {
   const [value, setValue] = useState('');
   const {
     onClick,
+    onKeyDown,
+    onKeyUp,
     inputMode,
     inputValue,
     chinese,
@@ -49,6 +51,8 @@ export default () => {
         }}
         onSelectChinese={onSelectChinese}
         onClick={onClick}
+        onKeyDown={onKeyDown}
+        onKeyUp={onKeyUp}
         onRecognition={onRecognition}
       />
     </div>
@@ -67,6 +71,8 @@ export default () => {
 | 方法            | 说明     | 类型                                   | 默认值 |
 | --------------- | -------- | -------------------------------------- | ------ |
 | onClick         | 点击事件 | (e: VKB.KeyboardAttributeType) => void | -      |
+| onKeyDown       | 按键按下事件 | (e: VKB.KeyboardAttributeType) => void | -      |
+| onKeyUp         | 按键抬起事件 | (e: VKB.KeyboardAttributeType) => void | -      |
 | onSelectChinese | 选择中文 | (chinese: string) => void              | -      |
 | onRecognition   | 识别图片 | (url: string) => void                  | -      |
 

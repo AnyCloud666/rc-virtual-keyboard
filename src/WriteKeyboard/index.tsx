@@ -43,6 +43,8 @@ const STROKE_COLOR = 'rgba(38, 38, 38, 0.94)';
 const WriteKeyboard = ({
   chinese,
   onClick,
+  onKeyDown,
+  onKeyUp,
   onSelectChinese,
   onRecognition,
   onMouseDown,
@@ -50,6 +52,8 @@ const WriteKeyboard = ({
 }: {
   chinese: string[];
   onClick?: (e: VKB.KeyboardAttributeType) => void;
+  onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
+  onKeyUp?: (e: VKB.KeyboardAttributeType) => void;
   onSelectChinese?: (chinese: string) => void;
   /** 识别图片 */
   onRecognition?: (url: string) => void;
@@ -75,6 +79,12 @@ const WriteKeyboard = ({
     drawWidth: 200,
     drawHeight: 200,
   });
+
+  const triggerKey = (item: VKB.KeyboardAttributeType) => {
+    onKeyDown?.(item);
+    onClick?.(item);
+    onKeyUp?.(item);
+  };
 
   const getTouchPoint = (touch: Touch) => {
     const rect = canvasRef.current?.getBoundingClientRect();
@@ -298,9 +308,9 @@ const WriteKeyboard = ({
         canvasSize.cssHeight,
       );
       syncDisplayCanvas();
-      onClick && onClick(Clear);
+      triggerKey(Clear);
     } else {
-      onClick && onClick(Backspace);
+      triggerKey(Backspace);
     }
   };
 
@@ -313,7 +323,7 @@ const WriteKeyboard = ({
       return;
     }
 
-    onClick && onClick(Enter);
+    triggerKey(Enter);
   };
 
   const { startContinuousTrigger, stopContinuousTrigger } =

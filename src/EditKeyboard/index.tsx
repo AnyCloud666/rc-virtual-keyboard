@@ -24,9 +24,13 @@ const cursorSvg: Record<string, JSX.Element> = {
 
 const EditKeyboard = ({
   onClick,
+  onKeyDown,
+  onKeyUp,
   isKeyActive,
 }: {
   onClick?: (e: VKB.KeyboardAttributeType) => void;
+  onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
+  onKeyUp?: (e: VKB.KeyboardAttributeType) => void;
   isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
 }) => {
   const [keys, setKeys] = useState(cursorKeys);
@@ -49,9 +53,15 @@ const EditKeyboard = ({
     onClick && onClick(e);
   };
 
+  const triggerKey = (item: VKB.KeyboardAttributeType) => {
+    onKeyDown?.(item);
+    onClickEdit(item);
+    onKeyUp?.(item);
+  };
+
   const { startContinuousTrigger, stopContinuousTrigger } =
     useContinuousTrigger<VKB.KeyboardAttributeType>({
-      onTrigger: onClickEdit,
+      onTrigger: triggerKey,
     });
 
   const isRepeatableCursorKey = (item: VKB.KeyboardAttributeType) =>
@@ -75,7 +85,7 @@ const EditKeyboard = ({
               onClick={() => {
                 if (shouldIgnoreClick()) return;
                 if (!isRepeatable) {
-                  onClickEdit(item);
+                  triggerKey(item);
                 }
               }}
               onMouseDown={(e) => {
@@ -98,7 +108,7 @@ const EditKeyboard = ({
                 e.preventDefault();
                 markTouchInteraction();
                 if (!isRepeatable) {
-                  onClickEdit(item);
+                  triggerKey(item);
                   return;
                 }
 
@@ -135,7 +145,7 @@ const EditKeyboard = ({
             onClick={() => {
               if (shouldIgnoreClick()) return;
               if (!isBackspace) {
-                onClickEdit(item);
+                triggerKey(item);
               }
             }}
             onMouseDown={(e) => {
@@ -158,7 +168,7 @@ const EditKeyboard = ({
               e.preventDefault();
               markTouchInteraction();
               if (!isBackspace) {
-                onClickEdit(item);
+                triggerKey(item);
                 return;
               }
 

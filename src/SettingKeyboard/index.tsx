@@ -168,6 +168,8 @@ const SettingKeyboard = ({
   onFontFamilyChange,
   onNumberKeyboardLayoutModeChange,
   onClick,
+  onKeyDown,
+  onKeyUp,
 }: {
   themeMode: string;
   positionMode: string;
@@ -184,8 +186,16 @@ const SettingKeyboard = ({
   onNumberKeyboardLayoutModeChange?: (
     mode: VKB.NumberKeyboardLayoutMode,
   ) => void;
-  onClick: (e: VKB.KeyboardAttributeType) => void;
+  onClick?: (e: VKB.KeyboardAttributeType) => void;
+  onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
+  onKeyUp?: (e: VKB.KeyboardAttributeType) => void;
 }) => {
+  const triggerKey = (item: VKB.KeyboardAttributeType) => {
+    onKeyDown?.(item);
+    onClick?.(item);
+    onKeyUp?.(item);
+  };
+
   const currentWidth = clampValue(
     parseFloat(width) || 500,
     WIDTH_MIN,
@@ -348,8 +358,8 @@ const SettingKeyboard = ({
                       ? 'setting-keyboard-box-item-active'
                       : ''
                   }`}
-                  onClick={() => onClick(item)}
-                  onTouchStart={(e) => stopTouchAndRun(e, () => onClick(item))}
+                  onClick={() => triggerKey(item)}
+                  onTouchStart={(e) => stopTouchAndRun(e, () => triggerKey(item))}
                   title={item.description}
                 >
                   {item.renderKey || item.key}
@@ -373,8 +383,8 @@ const SettingKeyboard = ({
                       ? 'setting-keyboard-box-item-active'
                       : ''
                   }`}
-                  onClick={() => onClick(item)}
-                  onTouchStart={(e) => stopTouchAndRun(e, () => onClick(item))}
+                  onClick={() => triggerKey(item)}
+                  onTouchStart={(e) => stopTouchAndRun(e, () => triggerKey(item))}
                   title={item.description}
                 >
                   {item.renderKey || item.key}
@@ -397,8 +407,8 @@ const SettingKeyboard = ({
                       ? 'setting-keyboard-box-item-active'
                       : ''
                   }`}
-                  onClick={() => onClick(item)}
-                  onTouchStart={(e) => stopTouchAndRun(e, () => onClick(item))}
+                  onClick={() => triggerKey(item)}
+                  onTouchStart={(e) => stopTouchAndRun(e, () => triggerKey(item))}
                   title={item.description}
                 >
                   {item.renderKey || item.key}
