@@ -748,7 +748,8 @@ const useInput = ({
         activeKeyboard === letterType &&
         e.code === Space.code
       ) {
-        commitCurrentCandidate(' ');
+        updateLetterCandidates(`${inputValue} `);
+        jumpDelete.current = false;
       } else {
         const insertedLength = e.key.length;
 
