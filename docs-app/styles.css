@@ -655,10 +655,6 @@ body {
   white-space: nowrap;
 }
 
-.docs-footer-card {
-  margin-top: 20px;
-}
-
 @media (max-width: 991px) {
   .docs-layout {
     height: auto;

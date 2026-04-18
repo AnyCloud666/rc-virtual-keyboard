@@ -1,12 +1,12 @@
-import { GithubOutlined, LinkOutlined, MenuOutlined } from '@ant-design/icons';
-import { Breadcrumb, Button, Card, ConfigProvider, Drawer, Layout, Menu, Skeleton, Space, Spin, Tag, Typography } from 'antd';
+import { GithubOutlined, MenuOutlined } from '@ant-design/icons';
+import { Breadcrumb, Button, ConfigProvider, Drawer, Layout, Menu, Skeleton, Space, Spin, Tag, Typography } from 'antd';
 import type { MenuProps } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 import { menuItems, routeMap } from './routes';
 import { normalizeHashPath } from './routes/types';
 
 const { Header, Content, Sider } = Layout;
-const { Title, Paragraph, Text, Link } = Typography;
+const { Title, Paragraph } = Typography;
 
 function App() {
   const [currentPath, setCurrentPath] = useState(() => normalizeHashPath(window.location.hash));
@@ -103,8 +103,6 @@ function App() {
 
     return [{ title: '文档' }, { title: groupLabel }, { title: currentRoute.title }];
   }, [currentRoute]);
-  const showFooterRouteCard = currentRoute?.group !== 'examples';
-
   const appLoadingNode = (
     <div className={isHomeRoute ? 'app-loading app-loading-home' : 'app-loading'}>
       <div className="app-loading-inner">
@@ -227,17 +225,6 @@ function App() {
                         </div>
 
                         <div className="docs-page-body">{currentRoute?.render()}</div>
-
-                        {showFooterRouteCard ? (
-                          <Card className="docs-card docs-footer-card" size="small">
-                            <Space wrap>
-                              <Link href={`#${currentRoute?.path ?? '/'}`}>
-                                <LinkOutlined /> 当前路由: {currentRoute?.path ?? '/'}
-                              </Link>
-                              <Text type="secondary">每个示例单独成页，避免多个虚拟键盘实例并存。</Text>
-                            </Space>
-                          </Card>
-                        ) : null}
                       </>
                     )}
                   </Content>
