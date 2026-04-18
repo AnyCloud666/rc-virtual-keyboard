@@ -251,8 +251,6 @@ const useInput = ({
   const cacheInputFocus = useRef(new WeakSet());
   /** blur 延迟定时器，避免输入框切换时闪烁 */
   const blurTimer = useRef<number>();
-  /** 键盘交互保护窗口，避免移动端长按时误判为真正失焦 */
-  const keyboardInteractionUntilRef = useRef(0);
   /** 键盘指针交互窗口，只在确实点击了虚拟键盘时用于抢回焦点 */
   const keyboardPointerUntilRef = useRef(0);
   /** 监听器引用，避免回调依赖形成循环 */
@@ -286,11 +284,11 @@ const useInput = ({
     void audio.play().catch(() => undefined);
   }, [keyboardVisible, vkbKeydownAudio]);
 
-  const markKeyboardInteraction = useCallback((duration = 1200) => {
-    keyboardInteractionUntilRef.current = Date.now() + duration;
+  const markKeyboardPointerInteraction = useCallback((duration = 180) => {
+    keyboardPointerUntilRef.current = Date.now() + duration;
   }, []);
 
-  const markKeyboardPointerInteraction = useCallback((duration = 180) => {
+  const releaseKeyboardPointerInteraction = useCallback((duration = 48) => {
     keyboardPointerUntilRef.current = Date.now() + duration;
   }, []);
 
@@ -559,6 +557,10 @@ const useInput = ({
     return [...INVALID_INPUT_TYPES, ...NEED_HANDLE_INPUT_TYPES].includes(
       inputEl.type,
     );
+  };
+
+  const canApplySelectionBasedValue = (inputEl: HTMLInputElement) => {
+    return !NEED_HANDLE_INPUT_TYPES.includes(inputEl.type);
   };
 
   const reportInvalidInputType = () => {
@@ -901,9 +903,20 @@ const useInput = ({
   const onTab = () => {
     try {
       const inputs = document.getElementsByTagName('input') || [];
-      const inputList = Array.from(inputs).filter(
-        (el) => !el.hasAttribute('disabled'),
-      );
+      const inputList = Array.from(inputs).filter((el) => {
+        if (el.hasAttribute('disabled')) return false;
+        if (el.readOnly) return false;
+        if (el.type === 'hidden') return false;
+        if (el.dataset?.vkbDisabled === 'true') return false;
+        if (el.tabIndex < 0) return false;
+
+        const style = window.getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden') {
+          return false;
+        }
+
+        return true;
+      });
       if (document.activeElement?.tagName !== 'INPUT') {
         inputList[0]?.focus();
       } else {
@@ -934,10 +947,7 @@ const useInput = ({
   ) => {
     const targetInput = activeInputRef.current ?? lastActiveInputRef.current;
 
-    if (
-      targetInput &&
-      !NEED_HANDLE_INPUT_TYPES.includes(inputType.current)
-    ) {
+    if (targetInput && canApplySelectionBasedValue(targetInput)) {
       let { value, selectionStart, selectionEnd } = getSelectionInfo(
         targetInput,
       );
@@ -993,16 +1003,23 @@ const useInput = ({
       }
       const copiedValue = value.slice(selectionStart, selectionEnd);
       if (navigator.clipboard) {
-        await navigator.clipboard.writeText(copiedValue);
-        console.log('copy success');
-      } else if (document.queryCommandSupported('copy')) {
-        activeInputRef.current.select();
-        document.execCommand('copy');
+        try {
+          await navigator.clipboard.writeText(copiedValue);
+          console.log('copy success');
+          return;
+        } catch (error) {
+          console.warn('copy fallback to execCommand', error);
+        }
+      }
+
+      if (document.queryCommandSupported('copy')) {
+        activeInputRef.current.setSelectionRange(selectionStart, selectionEnd);
+        const copied = document.execCommand('copy');
         activeInputRef.current.setSelectionRange(
-          copiedValue.length,
-          copiedValue.length,
+          selectionStart,
+          selectionEnd,
         );
-        console.log('copy success');
+        console.log(`copy ${copied ? 'success' : 'error'}`);
       } else {
         console.error('copy error');
       }
@@ -1017,17 +1034,32 @@ const useInput = ({
       );
 
       if (navigator.clipboard) {
-        const text = await navigator.clipboard.readText();
-        value =
-          value.slice(0, selectionStart) + text + value.slice(selectionEnd);
-        // 粘贴内容后走统一的原生赋值 + 事件派发逻辑。
-        applyInputValue(activeInputRef.current, value);
-        emitInputEvent();
-        console.log('paste success');
-      } else if (document.queryCommandSupported('paste')) {
+        try {
+          const text = await navigator.clipboard.readText();
+          value =
+            value.slice(0, selectionStart) + text + value.slice(selectionEnd);
+          const nextCursor = selectionStart + text.length;
+          // 粘贴内容后走统一的原生赋值 + 事件派发逻辑。
+          applyInputValue(
+            activeInputRef.current,
+            value,
+            nextCursor,
+            nextCursor,
+          );
+          emitInputEvent();
+          console.log('paste success');
+          return;
+        } catch (error) {
+          console.warn('paste fallback to execCommand', error);
+        }
+      }
+
+      if (document.queryCommandSupported('paste')) {
         activeInputRef.current.focus();
         const r = document.execCommand('paste');
-        emitInputEvent();
+        if (r) {
+          emitInputEvent();
+        }
         console.log(`paste ${r ? 'success' : 'error'}`);
       } else {
         console.error(
@@ -1123,18 +1155,6 @@ const useInput = ({
     };
 
     if (activeInputRef.current) {
-      Simulate?.keyDown?.(activeInputRef.current, {
-        key: e.key,
-        code: e.code,
-        keyCode: e.keyCode,
-        which: e.keyCode,
-      });
-      Simulate?.keyUp?.(activeInputRef.current, {
-        key: e.key,
-        code: e.code,
-        keyCode: e.keyCode,
-        which: e.keyCode,
-      });
       return;
     }
 
@@ -1150,7 +1170,6 @@ const useInput = ({
    * 让外部组件有机会监听到更接近真实键盘输入的事件流。
    */
   const onClick = (e: VKB.KeyboardAttributeType) => {
-    markKeyboardInteraction();
     if (e.keyType === controlsType) {
       onControl(e);
     } else if (e.keyType === functionType) {
@@ -1162,16 +1181,21 @@ const useInput = ({
     }
     playKeydownAudio();
 
-    if (!activeInputRef.current) return;
+    const shouldEmitKeyPress =
+      !!activeInputRef.current &&
+      e.keyType !== controlsType &&
+      e.keyType !== functionType &&
+      e.keyType !== settingType &&
+      typeof e.key === 'string' &&
+      e.key.length === 1;
+
+    if (!shouldEmitKeyPress || !activeInputRef.current) return;
     Simulate?.keyPress?.(activeInputRef.current, {
       keyCode: e.keyCode,
       which: e.keyCode,
       code: e.code,
       key: e.key,
-      charCode:
-        typeof e.key === 'string' && e.key.length === 1
-          ? e.key.charCodeAt(0)
-          : undefined,
+      charCode: e.key.charCodeAt(0),
     } as SimulateEventData);
   };
   /**
@@ -1182,7 +1206,6 @@ const useInput = ({
    * 这里补发一个模拟事件，兼容依赖键盘事件的上层组件。
    */
   const onKeyDown = (e: VKB.KeyboardAttributeType) => {
-    markKeyboardInteraction();
     activateKeyCode(e.code);
     if (!activeInputRef.current) return;
     Simulate?.keyDown?.(activeInputRef.current, {
@@ -1199,7 +1222,6 @@ const useInput = ({
    * 与 onKeyDown 配套使用，补齐完整的键盘事件链路。
    */
   const onKeyUp = (e: VKB.KeyboardAttributeType) => {
-    markKeyboardInteraction();
     releaseKeyCode(e.code, 120);
     if (!activeInputRef.current) return;
     Simulate?.keyUp?.(activeInputRef.current, {
@@ -1232,7 +1254,6 @@ const useInput = ({
       | React.MouseEvent<HTMLDivElement, MouseEvent>
       | React.TouchEvent<HTMLDivElement>,
   ) => {
-    markKeyboardInteraction();
     markKeyboardPointerInteraction();
     const isStop = checkStopPropagation(
       e.target,
@@ -1243,6 +1264,11 @@ const useInput = ({
     if (isStop) {
       e?.stopPropagation?.();
     }
+  };
+
+  /** 键盘指针抬起时快速收缩保护窗口，避免外部点击隐藏需要多次触发 */
+  const onMouseUp = () => {
+    releaseKeyboardPointerInteraction();
   };
 
   /** 创建按键背景音乐 */
@@ -1285,6 +1311,7 @@ const useInput = ({
     activeKeyboard,
     onClick,
     onMouseDown,
+    onMouseUp,
     onSelectChinese,
     onChangeInputMode,
     setActiveKeyboard,

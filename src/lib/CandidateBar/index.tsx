@@ -19,6 +19,7 @@ const CandidateBar = ({
   const tempInputAreaRef = useRef<HTMLDivElement | null>(null);
   const scrollDelayTimerRef = useRef<number>();
   const scrollFrameRef = useRef<number>();
+  const selectTimerRef = useRef<number>();
   const isContinuousScrollingRef = useRef(false);
   const scrollDirectionRef = useRef<'add' | 'minus' | null>(null);
   const lastScrollTimeRef = useRef(0);
@@ -104,6 +105,7 @@ const CandidateBar = ({
 
     return () => {
       stopContinuousScroll();
+      window.clearTimeout(selectTimerRef.current);
       window.removeEventListener('mouseup', handleWindowMouseUp);
       window.removeEventListener('touchend', handleWindowTouchEnd);
     };
@@ -127,10 +129,16 @@ const CandidateBar = ({
       className={className}
       onMouseDown={(e) => {
         e.preventDefault();
-        if (shouldIgnoreClick() || dragScroll.shouldIgnoreClick()) {
-          return;
-        }
-        handleSelect(item);
+      }}
+      onMouseUp={(e) => {
+        e.preventDefault();
+        window.clearTimeout(selectTimerRef.current);
+        selectTimerRef.current = window.setTimeout(() => {
+          if (shouldIgnoreClick() || dragScroll.shouldIgnoreClick()) {
+            return;
+          }
+          handleSelect(item);
+        }, 0);
       }}
       onClick={(e) => {
         e.preventDefault();
@@ -138,10 +146,16 @@ const CandidateBar = ({
       onTouchEnd={(e) => {
         e.preventDefault();
         markTouchInteraction();
-        if (dragScroll.shouldIgnoreClick()) {
-          return;
-        }
-        handleSelect(item);
+        window.clearTimeout(selectTimerRef.current);
+        selectTimerRef.current = window.setTimeout(() => {
+          if (dragScroll.shouldIgnoreClick()) {
+            return;
+          }
+          handleSelect(item);
+        }, 0);
+      }}
+      onTouchCancel={() => {
+        window.clearTimeout(selectTimerRef.current);
       }}
     >
       {item}

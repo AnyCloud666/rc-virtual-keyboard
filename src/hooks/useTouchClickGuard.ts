@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
 
-const TOUCH_CLICK_GUARD_MS = 800;
+const TOUCH_CLICK_GUARD_MS = 420;
 
 const useTouchClickGuard = () => {
   const lastTouchAtRef = useRef(0);

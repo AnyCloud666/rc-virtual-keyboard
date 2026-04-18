@@ -612,7 +612,17 @@ const VirtualKeyboard = ({
     </>
   );
 
-  const container = getContainer?.() ?? null;
+  let container: HTMLElement | null = null;
+
+  if (getContainer) {
+    try {
+      const resolvedContainer = getContainer();
+      container =
+        resolvedContainer instanceof HTMLElement ? resolvedContainer : null;
+    } catch (error) {
+      console.error('VirtualKeyboard getContainer error:', error);
+    }
+  }
 
   if (container) {
     return createPortal(content, container);

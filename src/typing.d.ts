@@ -20,12 +20,12 @@ declare namespace VKB {
     capsLockActive?: boolean;
     inputValue?: string;
     chinese?: string[];
-    onMouseDown: (
+    onMouseDown?: (
       e:
         | React.MouseEvent<HTMLDivElement, MouseEvent>
         | React.TouchEvent<HTMLDivElement>,
     ) => void;
-    onClick: (e: VKB.KeyboardAttributeType) => void;
+    onClick?: (e: VKB.KeyboardAttributeType) => void;
     isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
     onWidthChange?: (width: string) => void;
     onHeightChange?: (height: string) => void;

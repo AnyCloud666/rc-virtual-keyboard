@@ -15,7 +15,7 @@ import useInput from '../hooks/useInput';
 import { pinyin2ChineseV2 } from '../utils/pinyin';
 import tabs from './KeyboardTabs';
 
-const TOUCH_CLICK_GUARD_MS = 800;
+const TOUCH_CLICK_GUARD_MS = 420;
 /**
  * 组合键盘
  *
@@ -124,6 +124,7 @@ const CompositionKeyboard = ({
     setActiveKeyboard,
     onClick,
     onMouseDown,
+    onMouseUp,
     onSelectChinese,
     onChangeInputMode,
     onRecognition,
@@ -167,7 +168,7 @@ const CompositionKeyboard = ({
       return false;
     }
 
-    return !!target.closest('.write-content');
+    return !!target.closest('.write-content, .candidate-bar-list');
   };
 
   return (
@@ -178,7 +179,10 @@ const CompositionKeyboard = ({
       }}
       className={`virtual-keyboard virtual-keyboard-var virtual-keyboard-var-${vkbThemeMode}`}
       onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
       onTouchStart={onMouseDown}
+      onTouchEnd={onMouseUp}
+      onTouchCancel={onMouseUp}
       onTouchStartCapture={() => {
         markTouchInteraction();
       }}
