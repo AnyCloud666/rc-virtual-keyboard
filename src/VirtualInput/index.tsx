@@ -33,10 +33,41 @@ type SelectionState = {
   end: number;
 };
 
+const clamp = (value: number, min: number, max: number) => {
+  return Math.min(Math.max(value, min), max);
+};
+
 const getSafeValue = (value: unknown) => {
   if (typeof value === 'string') return value;
   if (typeof value === 'number') return `${value}`;
   return '';
+};
+
+const getTextOffsetFromNode = (
+  root: HTMLElement,
+  targetNode: Node,
+  targetOffset: number,
+) => {
+  const range = document.createRange();
+  range.selectNodeContents(root);
+
+  try {
+    range.setEnd(targetNode, targetOffset);
+    return clamp(range.toString().length, 0, root.textContent?.length ?? 0);
+  } catch {
+    return root.textContent?.length ?? 0;
+  }
+};
+
+const notifyInputActivated = (input: HTMLInputElement) => {
+  input.dispatchEvent(new Event('click', { bubbles: true }));
+
+  if (typeof FocusEvent === 'function') {
+    input.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    return;
+  }
+
+  input.dispatchEvent(new Event('focusin', { bubbles: true }));
 };
 
 const VirtualInput = forwardRef<HTMLInputElement, VirtualInputProps>(
@@ -61,7 +92,14 @@ const VirtualInput = forwardRef<HTMLInputElement, VirtualInputProps>(
     },
     ref,
   ) => {
+    const restInputProps = restProps as typeof restProps & {
+      'data-vkb-show'?: string;
+    };
     const inputRef = useRef<HTMLInputElement | null>(null);
+    const displayRef = useRef<HTMLDivElement | null>(null);
+    const lastTouchAtRef = useRef(0);
+    const pendingTouchFocusRef = useRef(false);
+    const pendingCaretIndexRef = useRef<number | null>(null);
     const isControlled = typeof value !== 'undefined';
     const [innerValue, setInnerValue] = useState(() =>
       getSafeValue(isControlled ? value : defaultValue),
@@ -102,35 +140,135 @@ const VirtualInput = forwardRef<HTMLInputElement, VirtualInputProps>(
       syncSelectionFromInput();
     };
 
-    const focusProxyInput = () => {
+    const resolveCaretIndexFromPoint = (clientX: number, clientY: number) => {
+      const displayEl = displayRef.current;
+      if (!displayEl) return null;
+
+      const textLength = displayEl.textContent?.length ?? 0;
+
+      const caretPositionFromPoint = (
+        document as Document & {
+          caretPositionFromPoint?: (
+            x: number,
+            y: number,
+          ) => { offsetNode: Node; offset: number } | null;
+          caretRangeFromPoint?: (
+            x: number,
+            y: number,
+          ) => Range | null;
+        }
+      ).caretPositionFromPoint;
+
+      const caretRangeFromPoint = (
+        document as Document & {
+          caretPositionFromPoint?: (
+            x: number,
+            y: number,
+          ) => { offsetNode: Node; offset: number } | null;
+          caretRangeFromPoint?: (
+            x: number,
+            y: number,
+          ) => Range | null;
+        }
+      ).caretRangeFromPoint;
+
+      const caretPosition = caretPositionFromPoint
+        ? caretPositionFromPoint.call(document, clientX, clientY)
+        : null;
+      if (
+        caretPosition?.offsetNode &&
+        displayEl.contains(caretPosition.offsetNode)
+      ) {
+        return clamp(
+          getTextOffsetFromNode(
+            displayEl,
+            caretPosition.offsetNode,
+            caretPosition.offset,
+          ),
+          0,
+          textLength,
+        );
+      }
+
+      const caretRange = caretRangeFromPoint
+        ? caretRangeFromPoint.call(document, clientX, clientY)
+        : null;
+      if (caretRange?.startContainer && displayEl.contains(caretRange.startContainer)) {
+        return clamp(
+          getTextOffsetFromNode(
+            displayEl,
+            caretRange.startContainer,
+            caretRange.startOffset,
+          ),
+          0,
+          textLength,
+        );
+      }
+
+      const rect = displayEl.getBoundingClientRect();
+      const midpoint = rect.left + rect.width / 2;
+      return clientX <= midpoint ? 0 : textLength;
+    };
+
+    const focusProxyInput = (caretIndex?: number | null) => {
       const input = inputRef.current;
       if (!input || disabled) return;
 
-      input.focus({ preventScroll: true });
+      const previousActiveElement = document.activeElement;
+      const isFocused = previousActiveElement === input;
+      const nextCaretIndex =
+        typeof caretIndex === 'number'
+          ? clamp(caretIndex, 0, input.value.length)
+          : input.value.length;
 
-      const end = input.value.length;
-      input.setSelectionRange(end, end);
+      if (!isFocused) {
+        input.focus({ preventScroll: true });
+      }
+
+      if (typeof input.setSelectionRange === 'function') {
+        input.setSelectionRange(nextCaretIndex, nextCaretIndex);
+      }
+
+      if (document.activeElement === input) {
+        notifyInputActivated(input);
+      }
+
       syncSelectionFromInput();
     };
 
     const handleWrapperMouseDown = (e: MouseEvent<HTMLDivElement>) => {
       if (disabled) return;
+      if (Date.now() - lastTouchAtRef.current < 500) return;
       e.preventDefault();
-      focusProxyInput();
+      focusProxyInput(resolveCaretIndexFromPoint(e.clientX, e.clientY));
     };
 
     const handleWrapperTouchStart = (e: TouchEvent<HTMLDivElement>) => {
       if (disabled) return;
-      e.preventDefault();
-      focusProxyInput();
+      lastTouchAtRef.current = Date.now();
+      pendingTouchFocusRef.current = true;
+      const touch = e.touches[0];
+      pendingCaretIndexRef.current = touch
+        ? resolveCaretIndexFromPoint(touch.clientX, touch.clientY)
+        : null;
     };
 
-    const handleWrapperFocus = (e: FocusEvent<HTMLDivElement>) => {
-      if (e.target !== e.currentTarget) {
-        return;
-      }
+    const handleWrapperTouchEnd = (e: TouchEvent<HTMLDivElement>) => {
+      if (disabled || !pendingTouchFocusRef.current) return;
+      pendingTouchFocusRef.current = false;
+      e.preventDefault();
+      const touch = e.changedTouches[0];
+      const caretIndex =
+        touch && pendingCaretIndexRef.current === null
+          ? resolveCaretIndexFromPoint(touch.clientX, touch.clientY)
+          : pendingCaretIndexRef.current;
+      focusProxyInput(caretIndex);
+      pendingCaretIndexRef.current = null;
+    };
 
-      focusProxyInput();
+    const handleWrapperTouchCancel = () => {
+      pendingTouchFocusRef.current = false;
+      pendingCaretIndexRef.current = null;
     };
 
     const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
@@ -203,11 +341,11 @@ const VirtualInput = forwardRef<HTMLInputElement, VirtualInputProps>(
         style={rootStyle}
         onMouseDown={handleWrapperMouseDown}
         onTouchStart={handleWrapperTouchStart}
-        onFocus={handleWrapperFocus}
-        tabIndex={disabled ? -1 : 0}
+        onTouchEnd={handleWrapperTouchEnd}
+        onTouchCancel={handleWrapperTouchCancel}
       >
         {prefix ? <span className="virtual-input-affix">{prefix}</span> : null}
-        <div className="virtual-input-display">
+        <div ref={displayRef} className="virtual-input-display">
           {displayContent}
         </div>
         {suffix ? <span className="virtual-input-affix">{suffix}</span> : null}
@@ -217,8 +355,12 @@ const VirtualInput = forwardRef<HTMLInputElement, VirtualInputProps>(
           className="virtual-input-proxy"
           type={type}
           value={displayValue}
-          readOnly
           disabled={disabled}
+          data-vkb-show={restInputProps['data-vkb-show'] ?? 'true'}
+          inputMode="none"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
           placeholder={placeholder}
           onInput={handleInput}
           onChange={handleChange}
