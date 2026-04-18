@@ -68,41 +68,59 @@ export const guideRoutes: DocRoute[] = [
     description: '组件总览与快速入口。',
     group: 'guide',
     render: () => (
-      <Card className="docs-card home-hero-card">
-        <div className="home-hero">
-          <div className="home-hero-copy">
-            <Space wrap>
-              <Tag color="blue">React</Tag>
-              <Tag color="processing">Vite</Tag>
-              <Tag color="gold">Virtual Keyboard</Tag>
-            </Space>
+      <div className="home-page">
+        <section className="home-hero-shell">
+          <div className="home-hero">
+            <div className="home-hero-copy">
+              <Space wrap>
+                <Tag color="blue">React</Tag>
+                <Tag color="processing">Vite</Tag>
+                <Tag color="gold">Virtual Keyboard</Tag>
+              </Space>
 
-            <Title className="home-hero-title" level={1}>
-              可使用的组合键盘组件
+              <Title className="home-hero-title" level={1}>
+                rc-virtual-keyboard
+              </Title>
+
+              <Paragraph className="home-hero-desc">
+                首页直接展示真实组件。你可以先在这里完成一次输入，滚动下方或进入文档页查看安装方式、接入示例和独立路由 demo。
+              </Paragraph>
+
+              <Space size={16} wrap>
+                <Button type="primary" size="large" onClick={() => { window.location.hash = '/guide/install'; }}>
+                  查看文档
+                </Button>
+                <Button
+                  size="large"
+                  href="https://github.com/AnyCloud666/rc-virtual-keyboard"
+                  target="_blank"
+                  icon={<GithubOutlined />}
+                >
+                  前往 GitHub
+                </Button>
+              </Space>
+            </div>
+
+            <HomeKeyboardShowcase />
+          </div>
+        </section>
+
+        <section className="home-next-section">
+          <div className="home-next-copy">
+            <Tag color="processing">Quick Start</Tag>
+            <Title level={2} className="home-next-title">
+              最简单使用案例
             </Title>
-
-            <Paragraph className="home-hero-desc">
-              首页直接展示真实组件，而不是占位文案。你可以先在这里完成一次输入，再进入文档页查看安装方式、接入示例和独立路由 demo。
+            <Paragraph className="home-next-desc">
+              引入样式后挂载一个 <Text code>VirtualKeyboard</Text>，再接一个普通输入框，就可以完成最基础的接入。
             </Paragraph>
-
-            <Space size={16} wrap>
-              <Button type="primary" size="large" onClick={() => { window.location.hash = '/guide/install'; }}>
-                查看文档
-              </Button>
-              <Button
-                size="large"
-                href="https://github.com/AnyCloud666/rc-virtual-keyboard"
-                target="_blank"
-                icon={<GithubOutlined />}
-              >
-                前往 GitHub
-              </Button>
-            </Space>
           </div>
 
-          <HomeKeyboardShowcase />
-        </div>
-      </Card>
+          <div className="home-next-code">
+            <CodeBlock code={codeBasicUsage} />
+          </div>
+        </section>
+      </div>
     ),
   },
   {
