@@ -175,6 +175,8 @@ declare namespace VKB {
     positionMode?: string;
     /** 按键音效 */
     useKeydownAudio?: 'Y' | 'N';
+    /** 指定虚拟键盘挂载节点，返回值为空时回退到当前渲染位置 */
+    getContainer?: () => HTMLElement | null;
   };
 
   type KeyBoardCtxType = VirtualKeyboardProps & {

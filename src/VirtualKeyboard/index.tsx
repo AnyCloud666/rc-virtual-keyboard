@@ -7,6 +7,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { createPortal } from 'react-dom';
 
 import CompositionKeyboard from '../CompositionKeyboard';
 import DragBlock from '../DragBlock';
@@ -61,6 +62,7 @@ const VirtualKeyboard = ({
   positionMode,
   pushInputIntoView = false,
   useKeydownAudio = 'Y',
+  getContainer,
 }: VKB.VirtualKeyboardProps) => {
   type VirtualKeyboardStyles = CSSProperties & {
     '--vkb-key-font-size'?: string;
@@ -525,7 +527,7 @@ const VirtualKeyboard = ({
     visible,
   ]);
 
-  return (
+  const content = (
     <>
       {showIcon && (
         <DragBlock
@@ -608,6 +610,14 @@ const VirtualKeyboard = ({
       </DragBlock>
     </>
   );
+
+  const container = getContainer?.() ?? null;
+
+  if (container) {
+    return createPortal(content, container);
+  }
+
+  return content;
 };
 
 export default VirtualKeyboard;

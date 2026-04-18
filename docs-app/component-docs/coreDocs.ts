@@ -28,6 +28,7 @@ export const coreComponentDocs: ComponentDoc[] = [
       { name: 'positionMode', type: 'string', defaultValue: '桌面 float / 移动端 fixedBottom', description: '键盘停靠模式' },
       { name: 'focusShow', type: 'boolean', defaultValue: '由内部 hook 控制', description: '输入框聚焦时是否自动弹出' },
       { name: 'numberKeyboardLayoutMode', type: "'asc' | 'desc'", defaultValue: 'asc', description: '数字键布局顺序' },
+      { name: 'getContainer', type: '() => HTMLElement | null', defaultValue: '-', description: '自定义虚拟键盘挂载节点，返回空时回退当前渲染位置' },
       { name: 'virtualKeyboardTab', type: 'KeyboardTabItem[]', defaultValue: '内置全部 tab', description: '自定义 tab 集合' },
       { name: 'theme', type: 'Partial<Theme>', defaultValue: '-', description: '通过 CSS 变量覆写主题' },
       { name: 'useKeydownAudio', type: "'Y' | 'N'", defaultValue: 'Y', description: '是否启用按键音效' },

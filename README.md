@@ -137,6 +137,7 @@ export default function Demo() {
 | `focusShow` | 输入框聚焦时是否自动显示键盘 | `boolean` | `true` |
 | `pushInputIntoView` | `fixedBottom` 模式下，将被键盘遮挡的输入框推回可视区域 | `boolean` | `false` |
 | `numberKeyboardLayoutMode` | 数字键盘排列方式 | `'asc' \| 'desc'` | `asc` |
+| `getContainer` | 指定虚拟键盘挂载节点，返回空时回退当前渲染位置 | `() => HTMLElement \| null` | - |
 | `virtualKeyboardTab` | 自定义 tab 列表 | `KeyboardTabItem[]` | 内置全部 tab |
 | `theme` | 自定义主题变量 | `Partial<Theme>` | - |
 | `useKeydownAudio` | 是否启用按键音效 | `'Y' \| 'N'` | `'Y'` |

@@ -86,6 +86,7 @@ export default () => {
 | positionMode             | 位置模式                                          | string            | float          |
 | focusShow                | 输入框获得焦点时是否自动显示键盘                  | boolean           | true           |
 | numberKeyboardLayoutMode | 数字键盘排列                                      | `'asc' \| 'desc'` | asc            |
+| getContainer             | 指定虚拟键盘挂载节点，返回空时回退当前渲染位置    | `() => HTMLElement \| null` | -      |
 
 其中：
 
