@@ -133,6 +133,7 @@
   max-height: 100%;
   overflow: visible;
   padding: var(--vkb-key-gap);
+  padding-bottom: calc(var(--vkb-key-gap) + env(safe-area-inset-bottom, 0px));
   font-size: var(--vkb-key-font-size);
   font-family: var(--vkb-key-font-family);
   color: var(--vkb-key-color);

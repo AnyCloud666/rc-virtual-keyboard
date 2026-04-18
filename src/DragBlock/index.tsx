@@ -16,6 +16,17 @@ import {
   FloatPosition,
 } from '../keys';
 import './style.css';
+
+const getVisualViewportMetrics = () => {
+  const viewport = window.visualViewport;
+
+  return {
+    width: viewport?.width ?? window.innerWidth,
+    height: viewport?.height ?? window.innerHeight,
+    offsetTop: viewport?.offsetTop ?? 0,
+    offsetLeft: viewport?.offsetLeft ?? 0,
+  };
+};
 /**
  *
  *
@@ -149,22 +160,29 @@ const DragBlock = ({
   const syncBlockPosition = useCallback(() => {
     if (!blockRef.current) return;
 
+    const viewport = getVisualViewportMetrics();
+    const blockWidth = blockRef.current.offsetWidth;
+    const blockHeight = blockRef.current.offsetHeight;
+
     switch (positionMode) {
       case FixedBottomPosition.code:
-        blockRef.current.style.left = '0px';
-        blockRef.current.style.top = `calc(100vh - ${init?.height})`;
+        blockRef.current.style.left = `${viewport.offsetLeft}px`;
+        blockRef.current.style.top = `${Math.max(
+          viewport.offsetTop,
+          viewport.offsetTop + viewport.height - blockHeight,
+        )}px`;
         break;
       case FixedTopPosition.code:
       case FixedLeftPosition.code:
-        blockRef.current.style.left = '0px';
-        blockRef.current.style.top = '0px';
+        blockRef.current.style.left = `${viewport.offsetLeft}px`;
+        blockRef.current.style.top = `${viewport.offsetTop}px`;
         break;
       case FixedRightPosition.code:
         blockRef.current.style.left =
-          parseFloat(init?.width ?? '0') > window.innerWidth
-            ? '0px'
-            : `calc(100vw - ${init?.width})`;
-        blockRef.current.style.top = '0px';
+          blockWidth > viewport.width
+            ? `${viewport.offsetLeft}px`
+            : `${viewport.offsetLeft + viewport.width - blockWidth}px`;
+        blockRef.current.style.top = `${viewport.offsetTop}px`;
         break;
       default: {
         if (resizeOverRight && hasInit && autoKeepRight) {
@@ -185,11 +203,11 @@ const DragBlock = ({
 
         const maxLeft = Math.max(
           0,
-          window.innerWidth - blockRef.current.offsetWidth,
+          viewport.width - blockRef.current.offsetWidth,
         );
         const maxTop = Math.max(
           0,
-          window.innerHeight - blockRef.current.offsetHeight,
+          viewport.height - blockRef.current.offsetHeight,
         );
         const nextLeft = Math.min(blockRef.current.offsetLeft, maxLeft);
         const nextTop = Math.min(blockRef.current.offsetTop, maxTop);
@@ -379,6 +397,27 @@ const DragBlock = ({
   useEffect(() => {
     syncBlockPosition();
   }, [syncBlockPosition]);
+
+  useEffect(() => {
+    const viewport = window.visualViewport;
+
+    if (!viewport) {
+      return;
+    }
+
+    const syncViewportPosition = () => {
+      syncBlockPosition();
+      syncFloatAnchorPosition();
+    };
+
+    viewport.addEventListener('resize', syncViewportPosition);
+    viewport.addEventListener('scroll', syncViewportPosition);
+
+    return () => {
+      viewport.removeEventListener('resize', syncViewportPosition);
+      viewport.removeEventListener('scroll', syncViewportPosition);
+    };
+  }, [syncBlockPosition, syncFloatAnchorPosition]);
 
   useEffect(() => {
     syncFloatAnchorPosition();
