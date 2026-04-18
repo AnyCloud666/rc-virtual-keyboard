@@ -515,7 +515,7 @@ import {
 pnpm install
 
 # 启动文档开发环境
-pnpm run dev
+pnpm run dev -- --host 0.0.0.0
 
 # 构建组件库
 pnpm run build
@@ -541,7 +541,7 @@ pnpm run docs:preview
 
 ## 文档站点
 
-- 本地开发：`pnpm run dev`
+- 本地开发：`pnpm run dev -- --host 0.0.0.0`
 - 生产构建：`pnpm run docs:build`
 - 线上文档：`https://anycloud666.github.io/rc-virtual-keyboard`
 

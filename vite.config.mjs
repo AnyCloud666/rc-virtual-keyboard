@@ -28,6 +28,12 @@ export default defineConfig(({ command }) => ({
       '@docs': path.resolve(__dirname, 'docs-app'),
     },
   },
+  server: {
+    host: '0.0.0.0',
+  },
+  preview: {
+    host: '0.0.0.0',
+  },
   build: {
     outDir: 'docs-dist',
     emptyOutDir: true,
