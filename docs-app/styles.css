@@ -41,6 +41,14 @@ body {
   text-align: center;
 }
 
+.app-loading-logo {
+  width: 64px;
+  height: 64px;
+  display: block;
+  object-fit: contain;
+  box-shadow: 0 12px 32px rgb(22 119 255 / 16%);
+}
+
 .app-loading-title {
   font-size: 18px;
   font-weight: 700;
@@ -134,9 +142,20 @@ body {
 }
 
 .docs-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-size: 22px;
   font-weight: 700;
   color: #262626;
+}
+
+.docs-brand-logo {
+  width: 32px;
+  height: 32px;
+  display: block;
+  object-fit: contain;
+  flex: 0 0 auto;
 }
 
 .docs-subtitle {
@@ -696,6 +715,11 @@ body {
     font-size: 20px;
   }
 
+  .docs-brand-logo {
+    width: 28px;
+    height: 28px;
+  }
+
   .docs-grid {
     grid-template-columns: 1fr;
   }
@@ -832,6 +856,11 @@ body {
   .app-loading-title,
   .content-loading-title {
     font-size: 16px;
+  }
+
+  .app-loading-logo {
+    width: 52px;
+    height: 52px;
   }
 
   .home-landing {

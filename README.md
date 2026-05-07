@@ -142,6 +142,9 @@ export default function Demo() {
 | `theme` | 自定义主题变量 | `Partial<Theme>` | - |
 | `useKeydownAudio` | 是否启用按键音效 | `'Y' \| 'N'` | `'Y'` |
 | `keydownAudioUrl` | 按键音效地址 | `string` | 内置打包音频资源 |
+| `onFunctionKey` | 功能键统一覆写入口，返回 `true` 阻止默认行为 | `(context) => boolean \| void` | - |
+| `functionKeyHandlers` | 按单个 `F1-F12` 覆写默认行为 | `Partial<Record<'F1' ... 'F12', (context) => boolean \| void>>` | - |
+| `functionKeyDefaults` | 功能键默认行为配置 | `{ helpUrl?: string; focusSelector?: string }` | - |
 
 ### 浮动模式行为
 
@@ -281,6 +284,9 @@ export default function Demo() {
 | `onChangeShow` | 键盘显示/隐藏回调 | `(show: boolean) => void` | - |
 | `onThemeModeChange` | 主题变化回调 | `(mode: string) => void` | - |
 | `onPositionModeChange` | 位置变化回调 | `(mode: string) => void` | - |
+| `onFunctionKey` | 功能键统一覆写入口，返回 `true` 阻止默认行为 | `(context) => boolean \| void` | - |
+| `functionKeyHandlers` | 按单个 `F1-F12` 覆写默认行为 | `Partial<Record<'F1' ... 'F12', (context) => boolean \| void>>` | - |
+| `functionKeyDefaults` | 功能键默认行为配置 | `{ helpUrl?: string; focusSelector?: string }` | - |
 | `onPinyin2Chinese` | 自定义拼音转中文 | `(value: string) => { pinyin: string; chinese: string[] }` | 内置实现 |
 | `onEnglishWords` | 自定义英文候选 | `(value: string) => string[]` | 内置实现 |
 | `onImageToWord` | 自定义手写识别 | `(url: string, options?) => Promise<string[]>` | 内置实现 |
@@ -338,6 +344,72 @@ export default function Demo() {
 - 想让键盘失焦后保持展示：使用 `data-vkb-blur-hidden={false}`
 - 想在浮动模式下保留当前键盘位置：使用 `data-vkb-follow-focus="false"`
 - 想接管数字输入：优先使用 `data-vkb-type="number"`，而不是原生 `type="number"`
+
+## `F1-F12` 默认行为与覆写
+
+当前版本为功能键提供了“默认浏览器行为 + 外部覆写”机制。
+
+### 默认行为
+
+| 功能键 | 默认行为 |
+| --- | --- |
+| `F1` | 打开 `functionKeyDefaults.helpUrl`，未配置时仅派发事件 |
+| `F2` | 仅派发事件，默认无副作用 |
+| `F3` | 优先用当前选中文本、输入选区或候选词执行页内查找 |
+| `F4` | 仅派发事件，默认无副作用 |
+| `F5` | 刷新当前页面 |
+| `F6` | 聚焦 `functionKeyDefaults.focusSelector` 或页面内首个可用输入框 |
+| `F7` | 切换组件内部的 `caretBrowsingEnabled` 状态 |
+| `F8` | 仅派发事件，默认无副作用 |
+| `F9` | 仅派发事件，默认无副作用 |
+| `F10` | 仅派发事件，默认无副作用 |
+| `F11` | 基于 Fullscreen API 切换全屏 |
+| `F12` | 仅派发事件，默认无副作用 |
+
+### 浏览器限制
+
+- `F6`、`F10`、`F12` 这类浏览器 chrome / 系统级行为，网页无法真正控制
+- `F3` 依赖 `window.find`，兼容性受浏览器实现影响
+- `F11` 依赖 Fullscreen API，可能被浏览器策略拦截
+- `F5` 会直接刷新页面，如有未保存数据，建议业务覆写
+
+### React 中覆写
+
+```tsx
+<VirtualKeyboard
+  functionKeyDefaults={{
+    helpUrl: '/help',
+    focusSelector: '#global-search',
+  }}
+  onFunctionKey={({ key }) => {
+    if (key.code === 'F5') {
+      reloadTableData();
+      return true;
+    }
+  }}
+  functionKeyHandlers={{
+    F12: () => {
+      setDebugDrawerOpen(true);
+      return true;
+    },
+  }}
+/>
+```
+
+### 通过全局事件覆写
+
+会在 `window` 上派发可取消事件 `vkb:function-key`。外部可通过 `preventDefault()` 阻止默认行为。
+
+```ts
+window.addEventListener('vkb:function-key', (event) => {
+  const customEvent = event as CustomEvent;
+
+  if (customEvent.detail?.key?.code === 'F11') {
+    customEvent.preventDefault();
+    openBigScreenMode();
+  }
+});
+```
 
 ## 数字键盘候选区
 

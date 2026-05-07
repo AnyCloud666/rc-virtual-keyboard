@@ -7,6 +7,42 @@ declare namespace VKB {
     inputMode?: InputMode;
   };
 
+  type FunctionKeyCode =
+    | 'F1'
+    | 'F2'
+    | 'F3'
+    | 'F4'
+    | 'F5'
+    | 'F6'
+    | 'F7'
+    | 'F8'
+    | 'F9'
+    | 'F10'
+    | 'F11'
+    | 'F12';
+
+  type FunctionKeyContext = {
+    key: KeyboardAttributeType;
+    activeInput: HTMLInputElement | null;
+    lastActiveInput: HTMLInputElement | null;
+    inputValue: string;
+    chinese: string[];
+    caretBrowsingEnabled: boolean;
+  };
+
+  type FunctionKeyHandler = (context: FunctionKeyContext) => boolean | void;
+
+  type FunctionKeyHandlerMap = Partial<
+    Record<FunctionKeyCode, FunctionKeyHandler>
+  >;
+
+  type FunctionKeyDefaults = {
+    /** F1 默认帮助链接 */
+    helpUrl?: string;
+    /** F6 默认聚焦目标，优先用于搜索框/主输入框 */
+    focusSelector?: string;
+  };
+
   type KeyboardTabComponentProps = {
     themeMode?: string;
     inputMode?: InputMode;
@@ -160,6 +196,12 @@ declare namespace VKB {
     virtualKeyboardTab?: KeyboardTabItem[];
     /** 自定义主题,当使用了主题变量时，主题变量的权重更高 */
     theme?: Partial<Theme>;
+    /** 功能键统一覆写入口，返回 true 表示阻止默认行为 */
+    onFunctionKey?: FunctionKeyHandler;
+    /** 功能键按键级覆写入口，返回 true 表示阻止默认行为 */
+    functionKeyHandlers?: FunctionKeyHandlerMap;
+    /** 功能键默认行为配置 */
+    functionKeyDefaults?: FunctionKeyDefaults;
   };
 
   type VirtualKeyboardProps = KeyBoardCtxTypBase & {

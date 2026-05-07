@@ -63,6 +63,9 @@ const VirtualKeyboard = ({
   positionMode,
   pushInputIntoView = false,
   useKeydownAudio = 'Y',
+  onFunctionKey,
+  functionKeyHandlers,
+  functionKeyDefaults,
   getContainer,
 }: VKB.VirtualKeyboardProps) => {
   type VirtualKeyboardStyles = CSSProperties & {
@@ -533,8 +536,8 @@ const VirtualKeyboard = ({
       {showIcon && (
         <DragBlock
           init={{
-            width: iconWidth,
-            height: iconHeight,
+            width: iconWidth ?? InitVirtualKeyBoardCtx.iconWidth ?? '100px',
+            height: iconHeight ?? InitVirtualKeyBoardCtx.iconHeight ?? '100px',
           }}
           resizeOverRight={true}
           defaultTopRatio={0.8}
@@ -590,6 +593,9 @@ const VirtualKeyboard = ({
           showDragHandle={showDragHandle}
           useKeydownAudio={currentUseKeydownAudio}
           keydownAudioUrl={keydownAudioUrl}
+          onFunctionKey={onFunctionKey}
+          functionKeyHandlers={functionKeyHandlers}
+          functionKeyDefaults={functionKeyDefaults}
           onChangeShow={setVisible}
           onActiveInputChange={(input) => {
             setActiveInputElement(input);

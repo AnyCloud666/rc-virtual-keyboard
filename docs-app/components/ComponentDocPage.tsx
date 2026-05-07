@@ -114,6 +114,17 @@ export default function ComponentDocPage({ doc }: { doc: ComponentDoc }) {
           scroll={{ x: 920 }}
         />
       </Card>
+
+      {doc.sections?.map((section) => (
+        <Card key={section.title} className="docs-card" title={section.title}>
+          {section.description ? (
+            <Paragraph style={{ whiteSpace: 'pre-line' }}>
+              {section.description}
+            </Paragraph>
+          ) : null}
+          {section.code ? <CodeBlock code={section.code} /> : null}
+        </Card>
+      ))}
     </Space>
   );
 }

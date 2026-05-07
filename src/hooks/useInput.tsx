@@ -54,6 +54,15 @@ import {
 
 let audio: HTMLAudioElement;
 
+const FUNCTION_KEY_EVENT = 'vkb:function-key';
+const FALLBACK_FOCUS_SELECTOR = [
+  'input[type="search"]:not([disabled]):not([readonly])',
+  '[data-vkb-function-focus="true"]',
+  'input:not([type="hidden"]):not([disabled]):not([readonly])',
+  'textarea:not([disabled]):not([readonly])',
+  '[contenteditable="true"]',
+].join(', ');
+
 const isHighSurrogate = (value: string, index: number) => {
   const code = value.charCodeAt(index);
   return code >= 0xd800 && code <= 0xdbff;
@@ -182,6 +191,9 @@ const useInput = ({
   onPositionModeChange,
   onUseKeydownAudioChange,
   onKeydownAudioUrlChange,
+  onFunctionKey,
+  functionKeyHandlers,
+  functionKeyDefaults,
   onPinyin2Chinese = pinyin2ChineseV2,
   onEnglishWords = english2WordsV1,
   onImageToWord = imgToWordV1,
@@ -213,6 +225,12 @@ const useInput = ({
   /** 开启按键音效 */
   onUseKeydownAudioChange?: (mode: 'Y' | 'N') => void;
   onKeydownAudioUrlChange?: (url: string) => void;
+  /** 功能键统一覆写入口，返回 true 表示阻止默认行为 */
+  onFunctionKey?: VKB.FunctionKeyHandler;
+  /** 功能键按键级覆写入口，返回 true 表示阻止默认行为 */
+  functionKeyHandlers?: VKB.FunctionKeyHandlerMap;
+  /** 功能键默认行为配置 */
+  functionKeyDefaults?: VKB.FunctionKeyDefaults;
   /** 拼音转汉字，自定义实现拼音转汉字，默认采用最简单的单字输入模式 */
   onPinyin2Chinese?: (value: string) => { pinyin: string; chinese: string[] };
   /** 英文字母转单词候选 */
@@ -245,6 +263,8 @@ const useInput = ({
   const [activeKeyCodes, setActiveKeyCodes] = useState<string[]>([]);
   /** 实体键盘 caps lock 状态 */
   const [capsLockActive, setCapsLockActive] = useState(false);
+  /** F7 维护的页面内光标浏览模式 */
+  const [caretBrowsingEnabled, setCaretBrowsingEnabled] = useState(false);
   /** 删除inputValue 不立马删除targetValue中的值 */
   const jumpDelete = useRef(false);
   /** 焦点状态 */
@@ -304,6 +324,152 @@ const useInput = ({
     (key: VKB.KeyboardAttributeType) => activeKeyCodes.includes(key.code),
     [activeKeyCodes],
   );
+
+  const buildFunctionKeyContext = useCallback((
+    key: VKB.KeyboardAttributeType,
+    nextCaretBrowsingEnabled = caretBrowsingEnabled,
+  ): VKB.FunctionKeyContext => {
+    return {
+      key,
+      activeInput: activeInputRef.current,
+      lastActiveInput: lastActiveInputRef.current,
+      inputValue,
+      chinese: [...chinese],
+      caretBrowsingEnabled: nextCaretBrowsingEnabled,
+    };
+  }, [caretBrowsingEnabled, chinese, inputValue]);
+
+  const dispatchWindowFunctionKeyEvent = useCallback((
+    type: 'keydown' | 'keyup',
+    key: VKB.KeyboardAttributeType,
+  ) => {
+    window.dispatchEvent(
+      new KeyboardEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        key: key.key,
+        code: key.code,
+      }),
+    );
+  }, []);
+
+  const dispatchFunctionKeyEvent = useCallback((
+    key: VKB.KeyboardAttributeType,
+    nextCaretBrowsingEnabled = caretBrowsingEnabled,
+  ) => {
+    const event = new CustomEvent(FUNCTION_KEY_EVENT, {
+      bubbles: false,
+      cancelable: true,
+      detail: buildFunctionKeyContext(key, nextCaretBrowsingEnabled),
+    });
+
+    return !window.dispatchEvent(event) || event.defaultPrevented;
+  }, [buildFunctionKeyContext, caretBrowsingEnabled]);
+
+  const getFunctionSearchText = useCallback(() => {
+    const activeInput = activeInputRef.current;
+
+    if (activeInput) {
+      const { selectionStart, selectionEnd, value } = getSelectionInfo(activeInput);
+
+      const selectedText = value.slice(selectionStart, selectionEnd).trim();
+      if (selectedText) {
+        return selectedText;
+      }
+    }
+
+    const selectionText = window.getSelection?.()?.toString().trim();
+    if (selectionText) {
+      return selectionText;
+    }
+
+    const candidateText = chinese.find((item) => item?.trim());
+    if (candidateText) {
+      return candidateText.trim();
+    }
+
+    return inputValue.trim();
+  }, [chinese, inputValue]);
+
+  const focusFunctionTarget = useCallback(() => {
+    const selectors = [
+      functionKeyDefaults?.focusSelector,
+      FALLBACK_FOCUS_SELECTOR,
+    ].filter(Boolean) as string[];
+
+    for (const selector of selectors) {
+      try {
+        const target = document.querySelector<HTMLElement>(selector);
+        if (!target) continue;
+
+        target.focus();
+        return true;
+      } catch (error) {
+        console.warn('invalid function key focus selector:', selector, error);
+      }
+    }
+
+    const fallbackTarget = activeInputRef.current ?? lastActiveInputRef.current;
+    if (fallbackTarget) {
+      fallbackTarget.focus();
+      return true;
+    }
+
+    return false;
+  }, [functionKeyDefaults?.focusSelector]);
+
+  const runDefaultFunctionKeyAction = useCallback((key: VKB.KeyboardAttributeType) => {
+    switch (key.code as VKB.FunctionKeyCode) {
+      case 'F1':
+        if (functionKeyDefaults?.helpUrl) {
+          window.open(functionKeyDefaults.helpUrl, '_blank', 'noopener,noreferrer');
+          return true;
+        }
+        return false;
+      case 'F3': {
+        const text = getFunctionSearchText();
+        const win = window as Window & {
+          find?: (searchString: string) => boolean;
+        };
+
+        if (!text || typeof win.find !== 'function') {
+          return false;
+        }
+
+        try {
+          return !!win.find(text);
+        } catch (error) {
+          console.warn('window.find failed:', error);
+          return false;
+        }
+      }
+      case 'F5':
+        window.location.reload();
+        return true;
+      case 'F6':
+        return focusFunctionTarget();
+      case 'F7': {
+        const nextValue = !caretBrowsingEnabled;
+        setCaretBrowsingEnabled(nextValue);
+        return true;
+      }
+      case 'F11':
+        if (document.fullscreenElement) {
+          void document.exitFullscreen?.().catch(() => undefined);
+          return true;
+        }
+
+        void document.documentElement.requestFullscreen?.().catch(() => undefined);
+        return true;
+      default:
+        return false;
+    }
+  }, [
+    caretBrowsingEnabled,
+    focusFunctionTarget,
+    functionKeyDefaults?.helpUrl,
+    getFunctionSearchText,
+  ]);
 
   const resolvePhysicalKeyCodes = useCallback((e: KeyboardEvent) => {
     const nextCodes = new Set<string>();
@@ -1151,19 +1317,30 @@ const useInput = ({
 
   /** 功能键 */
   const onFunction = (e: VKB.KeyboardAttributeType) => {
-    const keyboardEventInit = {
-      bubbles: true,
-      cancelable: true,
-      key: e.key,
-      code: e.code,
-    };
+    const functionKeyCode = e.code as VKB.FunctionKeyCode;
+    const nextCaretBrowsingEnabled =
+      functionKeyCode === 'F7' ? !caretBrowsingEnabled : caretBrowsingEnabled;
+    const context = buildFunctionKeyContext(e, nextCaretBrowsingEnabled);
+    const keyHandler = functionKeyHandlers?.[functionKeyCode];
 
-    if (activeInputRef.current) {
+    if (keyHandler?.(context) === true) {
       return;
     }
 
-    window.dispatchEvent(new KeyboardEvent('keydown', keyboardEventInit));
-    window.dispatchEvent(new KeyboardEvent('keyup', keyboardEventInit));
+    if (onFunctionKey?.(context) === true) {
+      return;
+    }
+
+    if (dispatchFunctionKeyEvent(e, nextCaretBrowsingEnabled)) {
+      return;
+    }
+
+    if (!activeInputRef.current) {
+      dispatchWindowFunctionKeyEvent('keydown', e);
+      dispatchWindowFunctionKeyEvent('keyup', e);
+    }
+
+    runDefaultFunctionKeyAction(e);
   };
 
   /**

@@ -63,15 +63,34 @@ export function EmojiKeyboardDemo() {
 }
 
 export function FunctionKeyboardDemo() {
+  const { onClick, onKeyDown, onKeyUp, isKeyActive } = useDemoInputController({
+    defaultActiveKeyboard: keys.functionType,
+  });
   const [pressed, setPressed] = useState('尚未触发');
+
+  const wrapOnClick = (key: (typeof keys.functionKeys)[number]) => {
+    onClick(key);
+    setPressed(`click: ${key.code} / ${key.key}`);
+  };
+
+  const wrapOnKeyDown = (key: (typeof keys.functionKeys)[number]) => {
+    onKeyDown(key);
+    setPressed(`down: ${key.code} / ${key.key}`);
+  };
+
+  const wrapOnKeyUp = (key: (typeof keys.functionKeys)[number]) => {
+    onKeyUp(key);
+    setPressed(`up: ${key.code} / ${key.key}`);
+  };
 
   return (
     <div className="component-demo-stack">
       <div className="component-demo-keyboard-frame component-demo-keyboard-frame-function">
         <FunctionKeyboard
-          onClick={(key) => setPressed(`click: ${key.code} / ${key.key}`)}
-          onKeyDown={(key) => setPressed(`down: ${key.code} / ${key.key}`)}
-          onKeyUp={(key) => setPressed(`up: ${key.code} / ${key.key}`)}
+          onClick={wrapOnClick}
+          onKeyDown={wrapOnKeyDown}
+          onKeyUp={wrapOnKeyUp}
+          isKeyActive={isKeyActive}
         />
       </div>
       <div className="component-demo-result">最近按键：{pressed}</div>

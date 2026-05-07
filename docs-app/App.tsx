@@ -106,6 +106,7 @@ function App() {
   const appLoadingNode = (
     <div className={isHomeRoute ? 'app-loading app-loading-home' : 'app-loading'}>
       <div className="app-loading-inner">
+        <img className="app-loading-logo" src="/logo.png" alt="rc-virtual-keyboard logo" />
         <Spin size="large" />
         <div className="app-loading-title">页面加载中</div>
         <div className="app-loading-desc">正在准备文档与示例，请稍候。</div>
@@ -173,7 +174,10 @@ function App() {
                       导航
                     </Button>
                   ) : null}
-                  <div className="docs-brand">rc-virtual-keyboard</div>
+                  <div className="docs-brand">
+                    <img className="docs-brand-logo" src="/logo.png" alt="rc-virtual-keyboard logo" />
+                    <span>rc-virtual-keyboard</span>
+                  </div>
                   <div className="docs-subtitle">react 虚拟键盘</div>
                 </div>
                 <Space size={12} wrap className="docs-header-actions">

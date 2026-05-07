@@ -21,6 +21,7 @@ const LetterKeyboard = ({
   inputValue,
   chinese,
   onClick,
+  onMouseDown,
   onChangeInputMode,
   onSelectChinese,
   onKeyDown,
@@ -31,6 +32,11 @@ const LetterKeyboard = ({
   chinese?: string[];
   inputValue?: string;
   inputMode: typeof ZH | typeof EN;
+  onMouseDown?: (
+    e:
+      | React.MouseEvent<HTMLDivElement, MouseEvent>
+      | React.TouchEvent<HTMLDivElement>,
+  ) => void;
   onClick?: (e: VKB.KeyboardAttributeType) => void;
   onChangeInputMode?: (mode: VKB.InputMode) => void;
   onSelectChinese?: (chinese: string) => void;
@@ -102,7 +108,11 @@ const LetterKeyboard = ({
   }, [capsLockActive, inputMode]);
 
   return (
-    <div className="letter-keyboard">
+    <div
+      className="letter-keyboard"
+      onMouseDown={onMouseDown}
+      onTouchStart={onMouseDown}
+    >
       <CandidateBar
         tempValue={inputValue}
         items={chinese}

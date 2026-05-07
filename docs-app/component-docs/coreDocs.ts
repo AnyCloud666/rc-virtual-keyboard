@@ -33,6 +33,9 @@ export const coreComponentDocs: ComponentDoc[] = [
       { name: 'theme', type: 'Partial<Theme>', defaultValue: '-', description: '通过 CSS 变量覆写主题' },
       { name: 'useKeydownAudio', type: "'Y' | 'N'", defaultValue: 'Y', description: '是否启用按键音效' },
       { name: 'keydownAudioUrl', type: 'string', defaultValue: '内置打包音频资源', description: '按键音效地址' },
+      { name: 'onFunctionKey', type: '(context) => boolean | void', defaultValue: '-', description: '统一覆写 F1-F12 默认行为，返回 true 阻止默认行为' },
+      { name: 'functionKeyHandlers', type: "Partial<Record<'F1' ... 'F12', (context) => boolean | void>>", defaultValue: '-', description: '按单个功能键覆写默认行为' },
+      { name: 'functionKeyDefaults', type: '{ helpUrl?: string; focusSelector?: string }', defaultValue: '-', description: '配置 F1 帮助链接和 F6 默认聚焦目标' },
     ],
     methods: [
       { name: 'setShow', signature: '(visible: boolean) => void', description: '通过上下文控制显示或隐藏' },
@@ -44,6 +47,25 @@ export const coreComponentDocs: ComponentDoc[] = [
       { name: 'setUseKeydownAudio / setKeydownAudioUrl', signature: "(value: 'Y' | 'N' | string) => void", description: '控制按键音效开关和资源地址' },
     ],
     tokens: sharedThemeTokens,
+    sections: [
+      {
+        title: '功能键说明',
+        description:
+          "VirtualKeyboard 是最推荐的功能键接入入口。\n当你通过这个组件接管页面输入时，F1-F12 默认行为也会一起生效。\n\nF1: 打开帮助链接，未配置时仅派发事件\nF2: 仅派发事件\nF3: 使用当前选中文本、输入选区、候选词或临时输入值执行页内查找\nF4: 仅派发事件\nF5: 刷新页面\nF6: 聚焦配置的搜索框或页面内首个可用输入框\nF7: 切换内部 caretBrowsingEnabled 状态\nF8: 仅派发事件\nF9: 仅派发事件\nF10: 仅派发事件\nF11: 切换全屏\nF12: 仅派发事件",
+      },
+      {
+        title: '功能键覆写',
+        description:
+          "如果你的业务需要接管功能键，优先在 VirtualKeyboard 这一层传入 onFunctionKey、functionKeyHandlers、functionKeyDefaults。\n\nonFunctionKey: 统一拦截所有 F1-F12\nfunctionKeyHandlers: 精确覆写单个功能键\nfunctionKeyDefaults: 配置默认帮助链接和默认聚焦目标\n\n返回 true 表示已处理当前按键，不再继续执行默认行为。",
+        code:
+          "import { VirtualKeyboard } from 'rc-virtual-keyboard';\n\nexport default function Demo() {\n  return (\n    <VirtualKeyboard\n      functionKeyDefaults={{\n        helpUrl: '/help/keyboard',\n        focusSelector: '#global-search',\n      }}\n      onFunctionKey={({ key }) => {\n        if (key.code === 'F8') {\n          togglePlayback();\n          return true;\n        }\n      }}\n      functionKeyHandlers={{\n        F5: async () => {\n          await reloadTableData();\n          return true;\n        },\n        F11: () => {\n          setBigScreenMode(true);\n          return true;\n        },\n      }}\n    />\n  );\n}",
+      },
+      {
+        title: '常见场景',
+        description:
+          "F1 常用于帮助中心或操作说明。\nF3 常用于打开搜索面板或站内搜索。\nF5 如果页面有未保存数据，建议优先业务覆写。\nF6 适合聚焦搜索框、扫码框、主录入框。\nF11 适合切换大屏展示或沉浸模式。\nF12 常用于打开调试抽屉、日志面板、诊断信息。",
+      },
+    ],
     renderDemo: VirtualKeyboardDemo,
   },
   {
@@ -67,6 +89,9 @@ export const coreComponentDocs: ComponentDoc[] = [
       { name: 'fontSize / fontFamily', type: 'string', defaultValue: '14px / 默认字体', description: '当前按键字体配置' },
       { name: 'focusShow', type: 'boolean', defaultValue: '-', description: '控制焦点联动弹出行为' },
       { name: 'useKeydownAudio / keydownAudioUrl', type: "('Y' | 'N') / string", defaultValue: 'Y / 默认 mp3', description: '控制按键音效' },
+      { name: 'onFunctionKey', type: '(context) => boolean | void', defaultValue: '-', description: '统一覆写 F1-F12 默认行为，返回 true 阻止默认行为' },
+      { name: 'functionKeyHandlers', type: "Partial<Record<'F1' ... 'F12', (context) => boolean | void>>", defaultValue: '-', description: '按单个功能键覆写默认行为' },
+      { name: 'functionKeyDefaults', type: '{ helpUrl?: string; focusSelector?: string }', defaultValue: '-', description: '配置 F1 帮助链接和 F6 默认聚焦目标' },
     ],
     methods: [
       { name: 'onChangeShow', signature: '(visible: boolean) => void', description: '收起或展开键盘时触发' },
@@ -78,6 +103,25 @@ export const coreComponentDocs: ComponentDoc[] = [
       { name: 'onUseKeydownAudioChange / onKeydownAudioUrlChange', signature: "(value: 'Y' | 'N' | string) => void", description: '音效设置变更回调' },
     ],
     tokens: sharedThemeTokens,
+    sections: [
+      {
+        title: '功能键说明',
+        description:
+          "CompositionKeyboard 也会接管 F1-F12 默认行为。\n和 VirtualKeyboard 的区别是：它只负责键盘本体，不包含外部悬浮入口和拖拽浮标，更适合嵌入到业务布局中。\n\nF1: 打开帮助链接，未配置时仅派发事件\nF2: 仅派发事件\nF3: 使用当前选中文本、输入选区、候选词或临时输入值执行页内查找\nF4: 仅派发事件\nF5: 刷新页面\nF6: 聚焦配置的搜索框或页面内首个可用输入框\nF7: 切换内部 caretBrowsingEnabled 状态\nF8: 仅派发事件\nF9: 仅派发事件\nF10: 仅派发事件\nF11: 切换全屏\nF12: 仅派发事件",
+      },
+      {
+        title: '功能键覆写',
+        description:
+          "如果你把 CompositionKeyboard 嵌入到自定义面板、弹窗或固定布局中，建议直接在这里传入功能键覆写配置。\n这样不需要额外包一层 VirtualKeyboard，也能完整接管 F1-F12。",
+        code:
+          "import { CompositionKeyboard } from 'rc-virtual-keyboard';\n\nexport default function Demo() {\n  return (\n    <CompositionKeyboard\n      width=\"100%\"\n      height=\"340px\"\n      functionKeyDefaults={{\n        helpUrl: '/help/embedded-keyboard',\n        focusSelector: '#page-search',\n      }}\n      functionKeyHandlers={{\n        F3: () => {\n          setSearchPanelOpen(true);\n          return true;\n        },\n        F12: () => {\n          setDebugDrawerOpen(true);\n          return true;\n        },\n      }}\n    />\n  );\n}",
+      },
+      {
+        title: '覆写建议',
+        description:
+          "如果只改少量按键，优先用 functionKeyHandlers。\n如果想统一打点、埋点或权限判断，优先用 onFunctionKey。\n如果需要 F1 和 F6 的默认行为但只想换目标地址或焦点元素，优先用 functionKeyDefaults。\n如果接入场景不是 React 组件树最外层，也可以用 window 上的 vkb:function-key 事件做全局拦截。",
+      },
+    ],
     renderDemo: CompositionKeyboardDemo,
   },
   {

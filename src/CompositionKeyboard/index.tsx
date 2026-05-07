@@ -40,6 +40,9 @@ const CompositionKeyboard = ({
   focusShow,
   useKeydownAudio = 'Y',
   keydownAudioUrl = DEFAULT_KEYDOWN_AUDIO_URL,
+  onFunctionKey,
+  functionKeyHandlers,
+  functionKeyDefaults,
   onChangeShow,
   onActiveInputChange,
   onThemeModeChange,
@@ -88,6 +91,12 @@ const CompositionKeyboard = ({
   useKeydownAudio?: 'Y' | 'N';
   /** 键盘按键声音地址 */
   keydownAudioUrl?: string;
+  /** 功能键统一覆写入口 */
+  onFunctionKey?: VKB.FunctionKeyHandler;
+  /** 功能键按键级覆写 */
+  functionKeyHandlers?: VKB.FunctionKeyHandlerMap;
+  /** 功能键默认行为配置 */
+  functionKeyDefaults?: VKB.FunctionKeyDefaults;
   /** 显示/隐藏虚拟键盘 */
   onChangeShow?: (b: boolean) => void;
   /** 当前激活输入框变化 */
@@ -140,6 +149,9 @@ const CompositionKeyboard = ({
     focusShow,
     useKeydownAudio,
     keydownAudioUrl,
+    onFunctionKey,
+    functionKeyHandlers,
+    functionKeyDefaults,
     onChangeShow,
     onActiveInputChange,
     onThemeModeChange,

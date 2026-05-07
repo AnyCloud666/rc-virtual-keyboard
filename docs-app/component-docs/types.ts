@@ -28,5 +28,10 @@ export type ComponentDoc = {
   props: FieldRow[];
   methods: MethodRow[];
   tokens: TokenRow[];
+  sections?: {
+    title: string;
+    description?: string;
+    code?: string;
+  }[];
   renderDemo: () => JSX.Element;
 };
