@@ -603,6 +603,58 @@ pnpm run docs:build
 pnpm run docs:preview
 ```
 
+## 本地 npm 打包命令
+
+```bash
+# 安装依赖
+npm install
+
+# 本地打包组件库
+npm run build
+
+# 监听模式下持续打包
+npm run build:watch
+
+# 打包文档站点
+npm run docs:build
+
+# 本地预览文档构建结果
+npm run docs:preview
+```
+
+## 发布命令
+
+```bash
+# 发布前建议先校验
+npm run lint:es
+npm run build
+
+# 按发版类型更新版本号
+# 小版本（补丁修复）
+npm version patch
+
+# 中版本（向下兼容的新功能）
+# npm version minor
+
+# 大版本（不兼容变更）
+# npm version major
+
+# 登录 npm（如尚未登录）
+npm login
+
+# 发布到 npm
+npm publish --access public
+```
+
+说明：
+
+- `package.json` 中已配置 `prepublishOnly`，执行 `npm publish` 前会自动再跑一次 `npm run build`
+- 小版本更新使用 `npm version patch`
+- 中版本更新使用 `npm version minor`
+- 大版本更新使用 `npm version major`
+- 当前包名为 `rc-virtual-keyboard`
+- 当前发布包只包含 `dist/` 目录下的产物
+
 ## 发布产物
 
 发布包包含：
