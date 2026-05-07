@@ -494,6 +494,32 @@ function getPartialChineseCandidates(pinyin: string) {
   };
 }
 
+/** 单字母输入时，返回更完整的单字候选 */
+function getSingleLetterChineseCandidates(pinyin: string) {
+  const normalized = normalizePinyinInput(pinyin).replace(/['\s]+/g, '');
+
+  if (normalized.length !== 1) {
+    return {
+      pinyin: normalized,
+      chinese: [],
+    };
+  }
+
+  const exactCandidates = getChineseCandidates(normalized);
+  const prefixCandidates = Object.keys(PINYIN_DICTIONARY)
+    .filter((item) => item.startsWith(normalized))
+    .slice(0, MAX_RESULT_COUNT)
+    .flatMap((item) => getChineseCandidates(item).slice(0, 6));
+
+  return {
+    pinyin: normalized,
+    chinese: [...new Set([...exactCandidates, ...prefixCandidates])].slice(
+      0,
+      MAX_RESULT_COUNT,
+    ),
+  };
+}
+
 /** 拼音转汉字 */
 export function pinyin2ChineseV1(pinyin: string) {
   let chinese = getSingleChinese(pinyin);
@@ -641,6 +667,19 @@ export function pinyin2ChineseV3(pinyin: string) {
   const commonPhraseSimpleCandidates =
     getCommonPhraseSimpleCandidates(normalized);
   const strokePhraseCandidates = getStrokePhraseCandidates(normalized);
+  const isSingleLetterInput = compactPinyin.length === 1;
+
+  if (isSingleLetterInput) {
+    const partialResult = getSingleLetterChineseCandidates(normalized);
+
+    return {
+      pinyin: partialResult.pinyin,
+      chinese: mergePrioritizedCandidates(
+        [...strokePhraseCandidates],
+        partialResult.chinese,
+      ),
+    };
+  }
 
   const chinese = getChineseCandidates(normalized);
 

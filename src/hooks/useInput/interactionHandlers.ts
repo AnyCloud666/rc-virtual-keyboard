@@ -158,13 +158,22 @@ export const createInteractionHandlers = ({
       pinyin: value,
       chinese: [],
     };
-    const baseCandidates = dedupeCandidates(transformMsg.chinese);
+    const normalizedValue = value.toLowerCase().replace(/[^a-z'\s]+/g, '').trim();
+    const compactValue = normalizedValue.replace(/['\s]+/g, '');
+    const shouldUseSingleCharCandidatesOnly = compactValue.length === 1;
+    const baseCandidates = dedupeCandidates(transformMsg.chinese).filter((item) =>
+      shouldUseSingleCharCandidatesOnly ? item.length === 1 : true,
+    );
     const requestId = ++pinyinLearningRequestIdRef.current;
 
     setInputValue(value);
     setChinese([value, ...baseCandidates]);
 
-    if (enablePinyinLearning !== true || !baseCandidates.length) {
+    if (
+      enablePinyinLearning !== true ||
+      shouldUseSingleCharCandidatesOnly ||
+      !baseCandidates.length
+    ) {
       return;
     }
 

@@ -47,7 +47,7 @@ export {
   default as VirtualKeyboard,
 } from './VirtualKeyboard';
 
-export { default as useInput } from './hooks/useInput';
+export { default as useInput } from './hooks/useInput/index';
 export { default as useContinuousTrigger } from './hooks/useContinuousTrigger';
 export { default as useHorizontalDragScroll } from './hooks/useHorizontalDragScroll';
 export { default as useTouchClickGuard } from './hooks/useTouchClickGuard';
