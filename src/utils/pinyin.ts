@@ -51,6 +51,9 @@ const MAX_CHARS_PER_SYLLABLE = 6;
 /** 最多返回的候选结果数量 */
 const MAX_RESULT_COUNT = 30;
 
+/** 简拼切分时每个首字母最多尝试的拼音数量，避免搜索空间过大 */
+const MAX_INITIALS_PER_LETTER = 12;
+
 /** 规范化输入，只保留字母和分隔符 */
 function normalizePinyinInput(pinyin: string) {
   return pinyin
@@ -140,6 +143,35 @@ function getCommonPhraseSimpleCandidates(pinyin: string) {
   return [...exactMatches, ...prefixMatches].slice(0, MAX_RESULT_COUNT);
 }
 
+/** 按首字母建立拼音索引，例如 n -> ni / neng / nian */
+const PINYIN_INITIAL_INDEX = Object.keys(PINYIN_DICTIONARY).reduce<
+  Record<string, string[]>
+>((result, item) => {
+  const initial = item[0];
+
+  if (!initial) {
+    return result;
+  }
+
+  if (!result[initial]) {
+    result[initial] = [];
+  }
+
+  result[initial].push(item);
+
+  return result;
+}, {});
+
+Object.keys(PINYIN_INITIAL_INDEX).forEach((key) => {
+  PINYIN_INITIAL_INDEX[key].sort((prev, next) => {
+    if (prev.length !== next.length) {
+      return prev.length - next.length;
+    }
+
+    return prev.localeCompare(next);
+  });
+});
+
 /** 按显式分隔符拆分，例如 ni'hao / ni hao */
 function splitExplicitPinyin(pinyin: string) {
   return pinyin.split(/['\s]+/).filter(Boolean);
@@ -197,6 +229,109 @@ function findPinyinSegments(pinyin: string) {
   result.push(...dfs(0));
 
   return result;
+}
+
+/** 查找某个前缀可能命中的拼音音节 */
+function getPinyinPrefixMatches(pinyin: string) {
+  return Object.keys(PINYIN_DICTIONARY)
+    .filter((item) => item.startsWith(pinyin))
+    .sort((prev, next) => {
+      if (prev.length !== next.length) {
+        return prev.length - next.length;
+      }
+
+      return prev.localeCompare(next);
+    })
+    .slice(0, MAX_INITIALS_PER_LETTER);
+}
+
+/**
+ * 查找简拼/混输的可行切分，例如：
+ * - nh => ni + hao
+ * - nha => ni + ha
+ * - nhao => ni + hao
+ * - bj => bei + jing
+ */
+function findAbbreviatedPinyinSegments(pinyin: string) {
+  const normalized = normalizePinyinInput(pinyin).replace(/['\s]+/g, '');
+
+  if (!normalized) return [];
+
+  const result: string[][] = [];
+  const cache = new Map<number, string[][]>();
+
+  const dfs = (start: number): string[][] => {
+    const cached = cache.get(start);
+    if (cached) {
+      return cached;
+    }
+
+    if (start >= normalized.length) {
+      return [[]];
+    }
+
+    const currentResult: string[][] = [];
+
+    const initial = normalized[start];
+    const initialCandidates =
+      PINYIN_INITIAL_INDEX[initial]?.slice(0, MAX_INITIALS_PER_LETTER) || [];
+
+    initialCandidates.forEach((segment) => {
+      const rest = dfs(start + 1);
+
+      rest.forEach((item) => {
+        if (currentResult.length >= MAX_RESULT_COUNT) return;
+
+        currentResult.push([segment, ...item]);
+      });
+    });
+
+    const end = Math.min(normalized.length, start + MAX_PINYIN_LENGTH);
+
+    for (let i = start + 1; i <= end; i++) {
+      const segment = normalized.slice(start, i);
+
+      if (getSingleChinese(segment)) {
+        const rest = dfs(i);
+
+        rest.forEach((item) => {
+          if (currentResult.length >= MAX_RESULT_COUNT) return;
+
+          currentResult.push([segment, ...item]);
+        });
+      }
+
+      if (i === normalized.length) {
+        const partialCandidates = getPinyinPrefixMatches(segment);
+
+        partialCandidates.forEach((partialSegment) => {
+          if (currentResult.length >= MAX_RESULT_COUNT) return;
+
+          currentResult.push([partialSegment]);
+        });
+      }
+    }
+
+    cache.set(start, currentResult);
+
+    return currentResult;
+  };
+
+  result.push(...dfs(0));
+
+  const dedupedGroups: string[][] = [];
+  const dedupedSet = new Set<string>();
+
+  sortSegmentGroups(result).forEach((item) => {
+    const key = item.join("'");
+
+    if (!dedupedSet.has(key) && dedupedGroups.length < MAX_RESULT_COUNT) {
+      dedupedSet.add(key);
+      dedupedGroups.push(item);
+    }
+  });
+
+  return dedupedGroups;
 }
 
 /** 生成组合拼写候选，例如 ni + hao => 你好 / 拟好 */
@@ -470,6 +605,94 @@ export function pinyin2ChineseV2(pinyin: string) {
   const phrasePrefixCandidates = getCommonPhrasePrefixCandidates(
     normalized.replace(/['\s]+/g, ''),
   );
+
+  return {
+    pinyin: partialResult.pinyin,
+    chinese: mergePrioritizedCandidates(
+      [
+        ...strokePhraseCandidates,
+        ...commonPhraseSimpleCandidates,
+        ...phrasePrefixCandidates,
+      ],
+      partialResult.chinese,
+    ),
+  };
+}
+
+/**
+ * 拼音转汉字 V3
+ *
+ * 在 V2 的基础上，额外支持：
+ * 1. 首字母简拼，如 nh => 你好
+ * 2. 简拼前缀联想，如 bj => 北京 / 背景
+ */
+export function pinyin2ChineseV3(pinyin: string) {
+  const normalized = normalizePinyinInput(pinyin);
+
+  if (!normalized) {
+    return {
+      pinyin: '',
+      chinese: [],
+    };
+  }
+
+  const compactPinyin = normalized.replace(/['\s]+/g, '');
+  const commonPhraseCandidates = getCommonPhraseCandidates(compactPinyin);
+  const commonPhraseSimpleCandidates =
+    getCommonPhraseSimpleCandidates(normalized);
+  const strokePhraseCandidates = getStrokePhraseCandidates(normalized);
+
+  const chinese = getChineseCandidates(normalized);
+
+  if (chinese.length) {
+    return {
+      pinyin: normalized,
+      chinese: mergePrioritizedCandidates(
+        [
+          ...strokePhraseCandidates,
+          ...commonPhraseCandidates,
+          ...commonPhraseSimpleCandidates,
+        ],
+        chinese,
+      ),
+    };
+  }
+
+  const segmentGroups = findPinyinSegments(normalized);
+
+  if (segmentGroups.length) {
+    const phrases = composeLayeredChineseCandidates(segmentGroups);
+
+    return {
+      pinyin: sortSegmentGroups(segmentGroups)[0]?.join("'") || normalized,
+      chinese: mergePrioritizedCandidates(
+        [
+          ...strokePhraseCandidates,
+          ...commonPhraseCandidates,
+          ...commonPhraseSimpleCandidates,
+        ],
+        phrases,
+      ),
+    };
+  }
+
+  const initialSegmentGroups = findAbbreviatedPinyinSegments(normalized);
+
+  if (initialSegmentGroups.length) {
+    const phrases = composeLayeredChineseCandidates(initialSegmentGroups);
+
+    return {
+      pinyin:
+        sortSegmentGroups(initialSegmentGroups)[0]?.join("'") || normalized,
+      chinese: mergePrioritizedCandidates(
+        [...commonPhraseSimpleCandidates, ...commonPhraseCandidates],
+        phrases,
+      ),
+    };
+  }
+
+  const partialResult = getPartialChineseCandidates(normalized);
+  const phrasePrefixCandidates = getCommonPhrasePrefixCandidates(compactPinyin);
 
   return {
     pinyin: partialResult.pinyin,

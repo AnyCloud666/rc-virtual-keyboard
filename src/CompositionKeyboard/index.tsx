@@ -13,7 +13,7 @@ import { PinyinLearningSettingContext } from '../SettingKeyboard';
 import './style.css';
 
 import useInput from '../hooks/useInput';
-import { pinyin2ChineseV2 } from '../utils/pinyin';
+import { pinyin2ChineseV3 } from '../utils/pinyin';
 import tabs from './KeyboardTabs';
 
 const TOUCH_CLICK_GUARD_MS = 420;
@@ -147,7 +147,7 @@ const CompositionKeyboard = ({
     onPositionModeChange,
     onUseKeydownAudioChange,
     onKeydownAudioUrlChange,
-    onPinyin2Chinese: pinyin2ChineseV2,
+    onPinyin2Chinese: pinyin2ChineseV3,
   };
   const {
     inputMode,

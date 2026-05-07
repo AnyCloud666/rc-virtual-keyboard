@@ -11,7 +11,7 @@ import {
 import { VKB } from '../../typing';
 import { english2WordsV1 } from '../../utils/english';
 import { imgToWordV1 } from '../../utils/imgToWord';
-import { pinyin2ChineseV2 } from '../../utils/pinyin';
+import { pinyin2ChineseV3 } from '../../utils/pinyin';
 import { getStoredVkbConfig } from '../../utils/vkbConfig';
 import {
   buildFunctionKeyContext,
@@ -102,7 +102,7 @@ const useInput = ({
   functionKeyHandlers,
   functionKeyDefaults,
   enablePinyinLearning = true,
-  onPinyin2Chinese = pinyin2ChineseV2,
+  onPinyin2Chinese = pinyin2ChineseV3,
   onEnglishWords = english2WordsV1,
   onImageToWord = imgToWordV1,
 }: UseInputOptions) => {
