@@ -1,5 +1,14 @@
 import { Simulate, SimulateEventData } from '../../utils/simulate';
-import { recordPinyinSelection, reorderCandidatesByPinyinLearning } from '../../utils/pinyinLearning';
+import {
+  getEnglishLearningPrefixCandidates,
+  recordEnglishSelection,
+  reorderCandidatesByEnglishLearning,
+} from '../../utils/englishLearning';
+import {
+  getPinyinLearningPrefixCandidates,
+  recordPinyinSelection,
+  reorderCandidatesByPinyinLearning,
+} from '../../utils/pinyinLearning';
 import {
   ArrowDown,
   ArrowLeft,
@@ -147,6 +156,18 @@ export const createInteractionHandlers = ({
   onPositionModeChange,
   onUseKeydownAudioChange,
 }: CreateInteractionHandlersArgs) => {
+  const shouldSkipLearningForActiveInput = () => {
+    const targetInput = activeInputRef.current ?? lastActiveInputRef.current;
+
+    if (!targetInput) {
+      return false;
+    }
+
+    return (
+      targetInput.type === 'password' || targetInput.dataset?.vkbType === 'password'
+    );
+  };
+
   const emitInputEvent = () => {
     if (!activeInputRef.current) return;
     Simulate?.input?.(activeInputRef.current);
@@ -171,22 +192,27 @@ export const createInteractionHandlers = ({
 
     if (
       enablePinyinLearning !== true ||
-      shouldUseSingleCharCandidatesOnly ||
-      !baseCandidates.length
+      shouldSkipLearningForActiveInput() ||
+      shouldUseSingleCharCandidatesOnly
     ) {
       return;
     }
 
-    void reorderCandidatesByPinyinLearning(
-      transformMsg.pinyin || value,
-      baseCandidates,
-    )
-      .then((sortedCandidates) => {
+    void Promise.all([
+      getPinyinLearningPrefixCandidates(transformMsg.pinyin || value),
+      reorderCandidatesByPinyinLearning(transformMsg.pinyin || value, baseCandidates),
+    ])
+      .then(([learnedPrefixCandidates, sortedCandidates]) => {
         if (pinyinLearningRequestIdRef.current !== requestId) {
           return;
         }
 
-        setChinese([value, ...dedupeCandidates(sortedCandidates)]);
+        const mergedCandidates = dedupeCandidates([
+          ...learnedPrefixCandidates,
+          ...sortedCandidates,
+        ]);
+
+        setChinese([value, ...mergedCandidates]);
       })
       .catch((error) => {
         console.warn('reorder pinyin candidates failed:', error);
@@ -206,10 +232,39 @@ export const createInteractionHandlers = ({
       return;
     }
 
-    const words = onEnglishWords(value) || [];
-    pinyinLearningRequestIdRef.current += 1;
+    const words = dedupeCandidates(onEnglishWords(value) || []).filter(
+      (word) => word !== value,
+    );
+    const requestId = ++pinyinLearningRequestIdRef.current;
     setInputValue(value);
-    setChinese([value, ...words.filter((word) => word !== value)]);
+    setChinese([value, ...words]);
+
+    if (
+      enablePinyinLearning !== true ||
+      shouldSkipLearningForActiveInput()
+    ) {
+      return;
+    }
+
+    void Promise.all([
+      getEnglishLearningPrefixCandidates(value),
+      reorderCandidatesByEnglishLearning(value, words),
+    ])
+      .then(([learnedPrefixWords, sortedWords]) => {
+        if (pinyinLearningRequestIdRef.current !== requestId) {
+          return;
+        }
+
+        const mergedWords = dedupeCandidates([
+          ...learnedPrefixWords.filter((word) => word !== value),
+          ...sortedWords,
+        ]);
+
+        setChinese([value, ...mergedWords]);
+      })
+      .catch((error) => {
+        console.warn('reorder english candidates failed:', error);
+      });
   };
 
   const shouldUseLetterComposition = (key: string) => {
@@ -263,6 +318,7 @@ export const createInteractionHandlers = ({
 
     if (
       enablePinyinLearning &&
+      !shouldSkipLearningForActiveInput() &&
       inputMode === ZH &&
       activeKeyboard === letterType &&
       currentPinyinValue &&
@@ -271,6 +327,20 @@ export const createInteractionHandlers = ({
       void recordPinyinSelection(currentPinyinValue, chineseText).catch((error) => {
         console.warn('record pinyin selection failed:', error);
       });
+    }
+
+    if (
+      enablePinyinLearning &&
+      !shouldSkipLearningForActiveInput() &&
+      inputMode === EN &&
+      activeKeyboard === letterType &&
+      currentPinyinValue
+    ) {
+      void recordEnglishSelection(currentPinyinValue, chineseText).catch(
+        (error) => {
+          console.warn('record english selection failed:', error);
+        },
+      );
     }
 
     pinyinLearningRequestIdRef.current += 1;
