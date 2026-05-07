@@ -1,4 +1,3 @@
-import { useLocalStorageState } from 'ahooks';
 import React, {
   CSSProperties,
   useCallback,
@@ -19,18 +18,10 @@ import {
   FixedRightPosition,
   FixedTopPosition,
   FloatPosition,
-  VKB_KEY_FONT_FAMILY,
-  VKB_KEY_FONT_SIZE,
-  VKB_KEYBOARD_HEIGHT,
-  VKB_KEYBOARD_WIDTH,
-  VKB_KEYDOWN_MODE,
-  VKB_NUMBER_KEYBOARD_LAYOUT_MODE,
-  VKB_PINYIN_LEARNING_MODE,
-  VKB_POSITION_MODE,
-  VKB_THEME_MODE,
 } from '../keys';
 import { ReactComponent as KeyBoardSvg } from '../svg/out-keyboard.svg';
 import { VKB } from '../typing';
+import { getStoredVkbConfig, saveStoredVkbConfig } from '../utils/vkbConfig';
 
 /** 初始的 ctx 值 */
 export const InitVirtualKeyBoardCtx: VKB.KeyBoardCtxTypBase = {
@@ -45,11 +36,11 @@ export const InitVirtualKeyBoardCtx: VKB.KeyBoardCtxTypBase = {
 };
 
 const VirtualKeyboard = ({
-  width = InitVirtualKeyBoardCtx.width,
-  height = InitVirtualKeyBoardCtx.height,
-  fontSize = InitVirtualKeyBoardCtx.fontSize,
-  fontFamily = InitVirtualKeyBoardCtx.fontFamily,
-  numberKeyboardLayoutMode = 'asc',
+  width,
+  height,
+  fontSize,
+  fontFamily,
+  numberKeyboardLayoutMode,
   iconWidth = InitVirtualKeyBoardCtx.iconWidth,
   iconHeight = InitVirtualKeyBoardCtx.iconHeight,
   zIndex = InitVirtualKeyBoardCtx.zIndex,
@@ -60,11 +51,11 @@ const VirtualKeyboard = ({
   showDragHandle,
   showIcon = true,
   show = false,
-  themeMode = 'light',
+  themeMode,
   positionMode,
   pushInputIntoView = false,
-  useKeydownAudio = 'Y',
-  usePinyinLearning = 'Y',
+  useKeydownAudio,
+  usePinyinLearning,
   onFunctionKey,
   functionKeyHandlers,
   functionKeyDefaults,
@@ -96,67 +87,42 @@ const VirtualKeyboard = ({
     ? FixedBottomPosition.code
     : FloatPosition.code;
   const resolvedPositionMode = positionMode ?? defaultPositionMode;
-
-  const [currentThemeMode, setCurrentThemeMode] = useLocalStorageState(
-    VKB_THEME_MODE,
-    {
-      defaultValue: themeMode,
-    },
+  const [currentConfig, setCurrentConfig] = useState<VKB.StoredConfig>(() =>
+    getStoredVkbConfig({
+      themeMode,
+      positionMode: resolvedPositionMode,
+      width,
+      height,
+      fontSize,
+      fontFamily,
+      useKeydownAudio,
+      numberKeyboardLayoutMode,
+      usePinyinLearning,
+    }),
   );
-
-  const [currentPositionMode, setCurrentPositionMode] = useLocalStorageState(
-    VKB_POSITION_MODE,
-    {
-      defaultValue: resolvedPositionMode,
+  const currentThemeMode = currentConfig.themeMode;
+  const currentPositionMode = currentConfig.positionMode;
+  const currentWidth = currentConfig.width;
+  const currentHeight = currentConfig.height;
+  const currentFontSize = currentConfig.fontSize;
+  const currentFontFamily = currentConfig.fontFamily;
+  const currentUseKeydownAudio = currentConfig.useKeydownAudio;
+  const currentNumberKeyboardLayoutMode =
+    currentConfig.numberKeyboardLayoutMode;
+  const currentUsePinyinLearning = currentConfig.usePinyinLearning;
+  const updateCurrentConfig = useCallback(
+    (partial: Partial<VKB.StoredConfig>) => {
+      setCurrentConfig((prev) => {
+        const nextConfig = {
+          ...prev,
+          ...partial,
+        };
+        saveStoredVkbConfig(nextConfig);
+        return nextConfig;
+      });
     },
+    [],
   );
-
-  const [currentWidth, setCurrentWidth] = useLocalStorageState(
-    VKB_KEYBOARD_WIDTH,
-    {
-      defaultValue: width,
-    },
-  );
-
-  const [currentHeight, setCurrentHeight] = useLocalStorageState(
-    VKB_KEYBOARD_HEIGHT,
-    {
-      defaultValue: height,
-    },
-  );
-
-  const [currentFontSize, setCurrentFontSize] = useLocalStorageState(
-    VKB_KEY_FONT_SIZE,
-    {
-      defaultValue: fontSize,
-    },
-  );
-
-  const [currentFontFamily, setCurrentFontFamily] = useLocalStorageState(
-    VKB_KEY_FONT_FAMILY,
-    {
-      defaultValue: fontFamily,
-    },
-  );
-
-  const [currentUseKeydownAudio, setCurrentUseKeydownAudio] =
-    useLocalStorageState<'Y' | 'N' | undefined>(VKB_KEYDOWN_MODE, {
-      defaultValue: useKeydownAudio,
-    });
-  const [currentNumberKeyboardLayoutMode, setCurrentNumberKeyboardLayoutMode] =
-    useLocalStorageState<VKB.NumberKeyboardLayoutMode | undefined>(
-      VKB_NUMBER_KEYBOARD_LAYOUT_MODE,
-      {
-        defaultValue: numberKeyboardLayoutMode,
-      },
-    );
-  const [currentUsePinyinLearning, setCurrentUsePinyinLearning] =
-    useLocalStorageState<VKB.PinyinLearningMode | undefined>(
-      VKB_PINYIN_LEARNING_MODE,
-      {
-        defaultValue: usePinyinLearning,
-      },
-    );
   const shouldPushInputIntoView =
     visible &&
     currentPositionMode === FixedBottomPosition.code &&
@@ -340,61 +306,81 @@ const VirtualKeyboard = ({
   }, [show]);
 
   useEffect(() => {
-    if (themeMode) {
-      setCurrentThemeMode(themeMode);
+    if (themeMode !== undefined) {
+      updateCurrentConfig({
+        themeMode,
+      });
     }
-  }, [setCurrentThemeMode, themeMode]);
+  }, [themeMode, updateCurrentConfig]);
 
   useEffect(() => {
-    if (positionMode) {
-      setCurrentPositionMode(positionMode);
+    if (positionMode !== undefined) {
+      updateCurrentConfig({
+        positionMode,
+      });
       return;
     }
 
-    setCurrentPositionMode(defaultPositionMode);
-  }, [defaultPositionMode, positionMode, setCurrentPositionMode]);
+    updateCurrentConfig({
+      positionMode: defaultPositionMode,
+    });
+  }, [defaultPositionMode, positionMode, updateCurrentConfig]);
 
   useEffect(() => {
-    if (width) {
-      setCurrentWidth(width);
+    if (width !== undefined) {
+      updateCurrentConfig({
+        width,
+      });
     }
-  }, [setCurrentWidth, width]);
+  }, [updateCurrentConfig, width]);
 
   useEffect(() => {
-    if (height) {
-      setCurrentHeight(height);
+    if (height !== undefined) {
+      updateCurrentConfig({
+        height,
+      });
     }
-  }, [height, setCurrentHeight]);
+  }, [height, updateCurrentConfig]);
 
   useEffect(() => {
-    if (fontSize) {
-      setCurrentFontSize(fontSize);
+    if (fontSize !== undefined) {
+      updateCurrentConfig({
+        fontSize,
+      });
     }
-  }, [fontSize, setCurrentFontSize]);
+  }, [fontSize, updateCurrentConfig]);
 
   useEffect(() => {
-    if (fontFamily) {
-      setCurrentFontFamily(fontFamily);
+    if (fontFamily !== undefined) {
+      updateCurrentConfig({
+        fontFamily,
+      });
     }
-  }, [fontFamily, setCurrentFontFamily]);
+  }, [fontFamily, updateCurrentConfig]);
 
   useEffect(() => {
-    if (useKeydownAudio) {
-      setCurrentUseKeydownAudio(useKeydownAudio);
+    if (useKeydownAudio !== undefined) {
+      updateCurrentConfig({
+        useKeydownAudio,
+      });
     }
-  }, [setCurrentUseKeydownAudio, useKeydownAudio]);
+  }, [updateCurrentConfig, useKeydownAudio]);
 
   useEffect(() => {
-    if (numberKeyboardLayoutMode) {
-      setCurrentNumberKeyboardLayoutMode(numberKeyboardLayoutMode);
+    if (numberKeyboardLayoutMode !== undefined) {
+      updateCurrentConfig({
+        numberKeyboardLayoutMode,
+      });
     }
-  }, [numberKeyboardLayoutMode, setCurrentNumberKeyboardLayoutMode]);
+  }, [numberKeyboardLayoutMode, updateCurrentConfig]);
 
   useEffect(() => {
-    if (usePinyinLearning) {
-      setCurrentUsePinyinLearning(usePinyinLearning);
+    if (usePinyinLearning !== undefined) {
+      updateCurrentConfig({
+        usePinyinLearning,
+      });
     }
-  }, [setCurrentUsePinyinLearning, usePinyinLearning]);
+  }, [updateCurrentConfig, usePinyinLearning]);
 
   const updateFloatAnchorRect = useCallback((input: HTMLInputElement | null) => {
     if (!input) {
@@ -620,16 +606,52 @@ const VirtualKeyboard = ({
             }
             updateFloatAnchorRect(input);
           }}
-          onThemeModeChange={setCurrentThemeMode}
-          onPositionModeChange={setCurrentPositionMode}
-          onWidthChange={setCurrentWidth}
-          onHeightChange={setCurrentHeight}
-          onFontSizeChange={setCurrentFontSize}
-          onFontFamilyChange={setCurrentFontFamily}
-          onNumberKeyboardLayoutModeChange={setCurrentNumberKeyboardLayoutMode}
-          onUsePinyinLearningChange={setCurrentUsePinyinLearning}
+          onThemeModeChange={(value) =>
+            updateCurrentConfig({
+              themeMode: value,
+            })
+          }
+          onPositionModeChange={(value) =>
+            updateCurrentConfig({
+              positionMode: value,
+            })
+          }
+          onWidthChange={(value) =>
+            updateCurrentConfig({
+              width: value,
+            })
+          }
+          onHeightChange={(value) =>
+            updateCurrentConfig({
+              height: value,
+            })
+          }
+          onFontSizeChange={(value) =>
+            updateCurrentConfig({
+              fontSize: value,
+            })
+          }
+          onFontFamilyChange={(value) =>
+            updateCurrentConfig({
+              fontFamily: value,
+            })
+          }
+          onNumberKeyboardLayoutModeChange={(value) =>
+            updateCurrentConfig({
+              numberKeyboardLayoutMode: value,
+            })
+          }
+          onUsePinyinLearningChange={(value) =>
+            updateCurrentConfig({
+              usePinyinLearning: value,
+            })
+          }
           onKeydownAudioUrlChange={() => undefined}
-          onUseKeydownAudioChange={setCurrentUseKeydownAudio}
+          onUseKeydownAudioChange={(value) =>
+            updateCurrentConfig({
+              useKeydownAudio: value,
+            })
+          }
         />
       </DragBlock>
     </>

@@ -38,6 +38,8 @@ export const EN = 'en';
 
 /** 主题模式key */
 export const VKB_THEME_MODE = 'VKB_THEME_MODE';
+/** 统一配置key */
+export const VKB_CONFIG = 'VKB_CONFIG';
 /** 位置模式key */
 export const VKB_POSITION_MODE = 'VKB_POSITION_MODE';
 /** 按键音效key */

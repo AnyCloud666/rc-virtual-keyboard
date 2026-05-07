@@ -28,8 +28,6 @@ import {
   Space,
   StartSelect,
   Tab,
-  VKB_POSITION_MODE,
-  VKB_THEME_MODE,
   ZH,
   controlsType,
   functionType,
@@ -50,6 +48,7 @@ import {
   SimulateEventData,
   setNativeInputValue,
 } from '../utils/simulate';
+import { getStoredVkbConfig } from '../utils/vkbConfig';
 import {
   EFFECTIVE_INPUT_TYPES,
   INVALID_INPUT_TYPES,
@@ -289,14 +288,15 @@ const useInput = ({
   const pinyinLearningRequestIdRef = useRef(0);
   /** focus 弹出配置，autoPopup 作为兼容别名保留 */
   const enableFocusShow = focusShow ?? autoPopup;
+  const storedConfig = getStoredVkbConfig();
 
   /** 颜色主题 */
   const [vkbThemeMode, setVkbThemeMode] = useState(
-    themeMode ?? localStorage?.getItem(VKB_THEME_MODE) ?? 'float',
+    themeMode ?? storedConfig.themeMode,
   );
   /** 键盘位置 */
   const [vkbPositionMode, setVkbPositionMode] = useState(
-    positionMode ?? localStorage?.getItem(VKB_POSITION_MODE) ?? 'float',
+    positionMode ?? storedConfig.positionMode,
   );
   /** 按键音效 */
   const [vkbKeydownAudio, setVkbKeydownAudio] = useState(useKeydownAudio);

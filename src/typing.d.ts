@@ -7,6 +7,17 @@ declare namespace VKB {
   type ImageRecognitionOptions = {
     inputMode?: InputMode;
   };
+  type StoredConfig = {
+    themeMode: string;
+    positionMode: string;
+    width: string;
+    height: string;
+    fontSize: string;
+    fontFamily: string;
+    useKeydownAudio: 'Y' | 'N';
+    numberKeyboardLayoutMode: NumberKeyboardLayoutMode;
+    usePinyinLearning: PinyinLearningMode;
+  };
 
   type FunctionKeyCode =
     | 'F1'
