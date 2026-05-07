@@ -29,6 +29,7 @@ export const hookDocs: ComponentDoc[] = [
       { name: 'onFunctionKey', type: '(context) => boolean | void', defaultValue: '-', description: '统一覆写 F1-F12 默认行为，返回 true 阻止默认行为' },
       { name: 'functionKeyHandlers', type: "Partial<Record<'F1' ... 'F12', (context) => boolean | void>>", defaultValue: '-', description: '按键级覆写 F1-F12 默认行为' },
       { name: 'functionKeyDefaults', type: '{ helpUrl?: string; focusSelector?: string }', defaultValue: '-', description: '配置 F1 帮助链接和 F6 默认聚焦目标' },
+      { name: 'enablePinyinLearning', type: 'boolean', defaultValue: 'true', description: '是否启用本地拼音学习记录和候选重排' },
       { name: 'onPinyin2Chinese', type: '(value: string) => { pinyin: string; chinese: string[] }', defaultValue: '内置实现', description: '自定义拼音转汉字逻辑' },
       { name: 'onEnglishWords', type: '(value: string) => string[]', defaultValue: '内置实现', description: '自定义英文候选联想' },
       { name: 'onImageToWord', type: '(url: string, options?) => Promise<string[]>', defaultValue: '内置 tesseract.js', description: '自定义手写识别逻辑' },
@@ -42,6 +43,20 @@ export const hookDocs: ComponentDoc[] = [
       { name: 'isKeyActive', signature: '(key: KeyboardAttributeType) => boolean', description: '用于给按键渲染激活态' },
     ],
     tokens: noTokens,
+    sections: [
+      {
+        title: '拼音学习',
+        description:
+          "useInput 内部已经接入了“同步静态候选 + 异步本地学习重排”的两阶段策略。\n这意味着拼音输入时会先立即展示静态候选，再根据当前浏览器本地的学习记录，异步把更常用的候选提前。\n快速连续输入时，内部会自动丢弃过期查询，避免旧结果覆盖新输入。",
+      },
+      {
+        title: '开关示例',
+        description:
+          "如果你不希望当前实例记录用户选择历史，或者不希望使用已有本地学习数据参与排序，可以直接关闭 enablePinyinLearning。",
+        code:
+          "const keyboard = useInput({\n  defaultActiveKeyboard: keys.letterType,\n  enablePinyinLearning: false,\n});",
+      },
+    ],
     renderDemo: UseInputDemo,
   },
   {

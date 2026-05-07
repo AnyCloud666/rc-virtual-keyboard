@@ -40,6 +40,10 @@ import {
 import { VKB } from '../typing';
 import { english2WordsV1 } from '../utils/english';
 import { imgToWordV1 } from '../utils/imgToWord';
+import {
+  recordPinyinSelection,
+  reorderCandidatesByPinyinLearning,
+} from '../utils/pinyinLearning';
 import { pinyin2ChineseV2 } from '../utils/pinyin';
 import {
   Simulate,
@@ -194,6 +198,7 @@ const useInput = ({
   onFunctionKey,
   functionKeyHandlers,
   functionKeyDefaults,
+  enablePinyinLearning = true,
   onPinyin2Chinese = pinyin2ChineseV2,
   onEnglishWords = english2WordsV1,
   onImageToWord = imgToWordV1,
@@ -231,6 +236,8 @@ const useInput = ({
   functionKeyHandlers?: VKB.FunctionKeyHandlerMap;
   /** 功能键默认行为配置 */
   functionKeyDefaults?: VKB.FunctionKeyDefaults;
+  /** 是否开启拼音学习 */
+  enablePinyinLearning?: boolean;
   /** 拼音转汉字，自定义实现拼音转汉字，默认采用最简单的单字输入模式 */
   onPinyin2Chinese?: (value: string) => { pinyin: string; chinese: string[] };
   /** 英文字母转单词候选 */
@@ -278,6 +285,8 @@ const useInput = ({
   /** 监听器引用，避免回调依赖形成循环 */
   const onBlurHandlerRef = useRef<(e: FocusEvent) => void>();
   const onFocusHandlerRef = useRef<(e: FocusEvent) => void>();
+  /** 异步拼音学习重排请求序号，避免旧请求覆盖当前输入 */
+  const pinyinLearningRequestIdRef = useRef(0);
   /** focus 弹出配置，autoPopup 作为兼容别名保留 */
   const enableFocusShow = focusShow ?? autoPopup;
 
@@ -596,6 +605,7 @@ const useInput = ({
       !!activeInputRef.current && activeInputRef.current !== inputEl;
 
     if (hasSwitchedInput) {
+      pinyinLearningRequestIdRef.current += 1;
       setInputValue('');
       setChinese([]);
       jumpDelete.current = false;
@@ -640,6 +650,7 @@ const useInput = ({
 
         // 输入框一旦真正失焦，就清空当前中英文组合输入的待选区，
         // 避免候选内容残留到下一次输入或切换到其他输入框时产生干扰。
+        pinyinLearningRequestIdRef.current += 1;
         setInputValue('');
         setChinese([]);
 
@@ -771,14 +782,51 @@ const useInput = ({
     }
   };
 
+  const dedupeCandidates = useCallback((candidates: string[]) => {
+    const nextCandidates: string[] = [];
+    const cache = new Set<string>();
+
+    candidates.forEach((item) => {
+      if (!item || cache.has(item)) {
+        return;
+      }
+
+      cache.add(item);
+      nextCandidates.push(item);
+    });
+
+    return nextCandidates;
+  }, []);
+
   const updateChineseCandidates = (value: string) => {
     const transformMsg = (onPinyin2Chinese && onPinyin2Chinese(value)) || {
       pinyin: value,
       chinese: [],
     };
+    const baseCandidates = dedupeCandidates(transformMsg.chinese);
+    const requestId = ++pinyinLearningRequestIdRef.current;
 
     setInputValue(value);
-    setChinese([value, ...transformMsg.chinese]);
+    setChinese([value, ...baseCandidates]);
+
+    if (enablePinyinLearning !== true || !baseCandidates.length) {
+      return;
+    }
+
+    void reorderCandidatesByPinyinLearning(
+      transformMsg.pinyin || value,
+      baseCandidates,
+    )
+      .then((sortedCandidates) => {
+        if (pinyinLearningRequestIdRef.current !== requestId) {
+          return;
+        }
+
+        setChinese([value, ...dedupeCandidates(sortedCandidates)]);
+      })
+      .catch((error) => {
+        console.warn('reorder pinyin candidates failed:', error);
+      });
   };
 
   /**
@@ -790,6 +838,7 @@ const useInput = ({
    */
   const updateLetterCandidates = (value: string) => {
     if (!value) {
+      pinyinLearningRequestIdRef.current += 1;
       setInputValue('');
       setChinese([]);
       return;
@@ -801,6 +850,7 @@ const useInput = ({
     }
 
     const words = onEnglishWords?.(value) || [];
+    pinyinLearningRequestIdRef.current += 1;
     setInputValue(value);
     setChinese([value, ...words.filter((word) => word !== value)]);
   };
@@ -1105,6 +1155,7 @@ const useInput = ({
   /** 切换输入模式 */
   const onChangeInputMode = (mode: VKB.InputMode) => {
     setInputMode(mode);
+    pinyinLearningRequestIdRef.current += 1;
     setInputValue('');
     setChinese([]);
   };
@@ -1115,6 +1166,7 @@ const useInput = ({
     appendText = '',
     options?: { replaceText?: string },
   ) => {
+    const currentPinyinValue = inputValue;
     const targetInput = activeInputRef.current ?? lastActiveInputRef.current;
 
     if (targetInput && canApplySelectionBasedValue(targetInput)) {
@@ -1157,6 +1209,20 @@ const useInput = ({
       Simulate?.input?.(targetInput);
       Simulate?.change?.(targetInput);
     }
+
+    if (
+      enablePinyinLearning &&
+      inputMode === ZH &&
+      activeKeyboard === letterType &&
+      currentPinyinValue &&
+      chinese !== currentPinyinValue
+    ) {
+      void recordPinyinSelection(currentPinyinValue, chinese).catch((error) => {
+        console.warn('record pinyin selection failed:', error);
+      });
+    }
+
+    pinyinLearningRequestIdRef.current += 1;
     setInputValue('');
     setChinese([]);
   };
@@ -1241,6 +1307,7 @@ const useInput = ({
 
   /** 清空临时输入区域 */
   const onClear = () => {
+    pinyinLearningRequestIdRef.current += 1;
     setInputValue('');
     setChinese([]);
   };

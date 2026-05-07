@@ -1,5 +1,5 @@
 import { useDebounceFn } from 'ahooks';
-import React, { useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 import {
   FixedBottomPosition,
@@ -153,6 +153,13 @@ const stopTouchAndRun = (
   callback();
 };
 
+export const PinyinLearningSettingContext = createContext<{
+  enablePinyinLearning: boolean;
+  onUsePinyinLearningChange?: (mode: VKB.PinyinLearningMode) => void;
+}>({
+  enablePinyinLearning: true,
+});
+
 const SettingKeyboard = ({
   themeMode,
   positionMode,
@@ -190,6 +197,9 @@ const SettingKeyboard = ({
   onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
   onKeyUp?: (e: VKB.KeyboardAttributeType) => void;
 }) => {
+  const pinyinLearningSetting = useContext(PinyinLearningSettingContext);
+  const enablePinyinLearning = pinyinLearningSetting.enablePinyinLearning;
+
   const triggerKey = (item: VKB.KeyboardAttributeType) => {
     onKeyDown?.(item);
     onClick?.(item);
@@ -450,6 +460,43 @@ const SettingKeyboard = ({
               </div>
             );
           })}
+        </div>
+      </div>
+      <div className="setting-keyboard-item">
+        <div>拼音学习：</div>
+        <div className="setting-keyboard-box">
+          {(['Y', 'N'] as VKB.PinyinLearningMode[]).map((item) => {
+            const isActive =
+              (enablePinyinLearning ? 'Y' : 'N') === item;
+
+            return (
+              <div className="setting-keyboard-wrapper" key={item}>
+                <button
+                  type="button"
+                  className={`setting-keyboard-box-item ${
+                    isActive ? 'setting-keyboard-box-item-active' : ''
+                  }`}
+                  onMouseDown={keepFocusAndBubble}
+                  onTouchStart={(e) =>
+                    stopTouchAndRun(e, () =>
+                      pinyinLearningSetting.onUsePinyinLearningChange?.(item),
+                    )
+                  }
+                  onPointerDown={keepFocusAndBubble}
+                  onClick={() =>
+                    pinyinLearningSetting.onUsePinyinLearningChange?.(item)
+                  }
+                  title={item === 'Y' ? '开启拼音学习' : '关闭拼音学习'}
+                >
+                  {item === 'Y' ? '开' : '关'}
+                </button>
+                <div>{item === 'Y' ? '开启' : '关闭'}</div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="setting-keyboard-size-tips">
+          关闭后仍可输入拼音，但不会记录新的选择历史，也不会使用本地学习数据调整候选排序。
         </div>
       </div>
       <div className="setting-keyboard-item">

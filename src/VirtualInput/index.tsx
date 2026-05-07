@@ -16,7 +16,7 @@ import './style.css';
 
 type VirtualInputProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
-  'readOnly' | 'size'
+  'readOnly' | 'size' | 'prefix'
 > & {
   /** 根节点 className */
   wrapperClassName?: string;

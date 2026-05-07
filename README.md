@@ -142,6 +142,7 @@ export default function Demo() {
 | `theme` | 自定义主题变量 | `Partial<Theme>` | - |
 | `useKeydownAudio` | 是否启用按键音效 | `'Y' \| 'N'` | `'Y'` |
 | `keydownAudioUrl` | 按键音效地址 | `string` | 内置打包音频资源 |
+| `usePinyinLearning` | 是否启用本地拼音学习 | `'Y' \| 'N'` | `'Y'` |
 | `onFunctionKey` | 功能键统一覆写入口，返回 `true` 阻止默认行为 | `(context) => boolean \| void` | - |
 | `functionKeyHandlers` | 按单个 `F1-F12` 覆写默认行为 | `Partial<Record<'F1' ... 'F12', (context) => boolean \| void>>` | - |
 | `functionKeyDefaults` | 功能键默认行为配置 | `{ helpUrl?: string; focusSelector?: string }` | - |
@@ -194,6 +195,7 @@ export default function Demo() {
         style={{ width: '100%', height: 340 }}
         width="100%"
         height="340px"
+        enablePinyinLearning
         showDragHandle={false}
         showHiddenHandle={false}
       />
@@ -207,6 +209,7 @@ export default function Demo() {
 - 你希望把键盘直接渲染在页面中的某个固定区域
 - 你不需要外部唤起图标
 - 你想自己决定布局、显示和隐藏时机
+- 你想显式控制拼音学习开关并接入自己的设置状态
 
 ## 结合 `useInput` 使用独立键盘组件
 
@@ -287,6 +290,7 @@ export default function Demo() {
 | `onFunctionKey` | 功能键统一覆写入口，返回 `true` 阻止默认行为 | `(context) => boolean \| void` | - |
 | `functionKeyHandlers` | 按单个 `F1-F12` 覆写默认行为 | `Partial<Record<'F1' ... 'F12', (context) => boolean \| void>>` | - |
 | `functionKeyDefaults` | 功能键默认行为配置 | `{ helpUrl?: string; focusSelector?: string }` | - |
+| `enablePinyinLearning` | 是否启用本地拼音学习重排 | `boolean` | `true` |
 | `onPinyin2Chinese` | 自定义拼音转中文 | `(value: string) => { pinyin: string; chinese: string[] }` | 内置实现 |
 | `onEnglishWords` | 自定义英文候选 | `(value: string) => string[]` | 内置实现 |
 | `onImageToWord` | 自定义手写识别 | `(url: string, options?) => Promise<string[]>` | 内置实现 |
@@ -311,6 +315,59 @@ export default function Demo() {
 | `onKeyUp` | 模拟键盘抬起 |
 | `isKeyActive` | 当前键位高亮判断 |
 | `capsLockActive` | Caps Lock 状态 |
+
+## 拼音学习
+
+当前版本支持“静态词典兜底 + 本地学习重排”的拼音联想增强。
+
+- 默认开启
+- 仅保存在当前浏览器本地
+- 不依赖扩充静态字典
+- 关闭后不再记录新的候选选择，也不再使用本地学习数据重排候选
+
+### 行为说明
+
+当你在中文拼音模式下多次输入同一拼音，并反复选择同一个候选词时，后续这个候选的排序会逐渐提前。
+
+例如：
+
+1. 连续多次输入 `nihao`
+2. 每次都选择 `你好`
+3. 后续再次输入 `nihao` 时，`你好` 会比默认静态排序更靠前
+
+### `VirtualKeyboard` 中控制
+
+```tsx
+<VirtualKeyboard usePinyinLearning="Y" />
+```
+
+也可以在设置面板里直接关闭，关闭后会立即停止学习和重排。
+
+### `CompositionKeyboard` 中控制
+
+```tsx
+<CompositionKeyboard
+  enablePinyinLearning={enabled}
+  onUsePinyinLearningChange={(mode) => {
+    setEnabled(mode === 'Y');
+  }}
+/>
+```
+
+### `useInput` 中控制
+
+```tsx
+const keyboard = useInput({
+  enablePinyinLearning: true,
+});
+```
+
+### 适用边界
+
+- 只作用于字母键盘下的中文拼音候选
+- 不作用于英文候选排序
+- 不作用于手写识别、OCR、数字计算候选
+- 浏览器禁用 `IndexedDB` 时会自动降级回静态词典排序，不影响正常输入
 
 ## `data-vkb-*` 输入框属性
 

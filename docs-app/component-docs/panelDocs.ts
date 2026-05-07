@@ -239,6 +239,7 @@ export const panelComponentDocs: ComponentDoc[] = [
       { name: 'onWidthChange / onHeightChange', type: '(value: string) => void', defaultValue: '必填', description: '尺寸变化回调' },
       { name: 'onFontSizeChange / onFontFamilyChange', type: '(value: string) => void', defaultValue: '必填', description: '字体变化回调' },
       { name: 'onNumberKeyboardLayoutModeChange', type: "(mode: 'asc' | 'desc') => void", defaultValue: '-', description: '数字键布局切换回调' },
+      { name: 'onUsePinyinLearningChange', type: "(mode: 'Y' | 'N') => void", defaultValue: '-', description: '拼音学习开关切换回调，通常由 CompositionKeyboard / VirtualKeyboard 透传' },
       { name: 'onClick', type: '(key) => void', defaultValue: '必填', description: '主题、位置、音效项点击回调' },
       { name: 'onKeyDown / onKeyUp', type: '(key) => void', defaultValue: '-', description: '按下与抬起阶段回调，仅作用于主题、位置、音效键项' },
     ],
@@ -246,10 +247,25 @@ export const panelComponentDocs: ComponentDoc[] = [
       { name: 'onWidthChange / onHeightChange', signature: '(value: string) => void', description: '拖动滑块或点击尺寸步进按钮时触发' },
       { name: 'onFontSizeChange / onFontFamilyChange', signature: '(value: string) => void', description: '修改字体参数时触发' },
       { name: 'onNumberKeyboardLayoutModeChange', signature: "(mode: 'asc' | 'desc') => void", description: '数字键顺序切换回调' },
+      { name: 'onUsePinyinLearningChange', signature: "(mode: 'Y' | 'N') => void", description: '切换拼音学习设置时触发' },
       { name: 'onClick', signature: '(key: KeyboardAttributeType) => void', description: '主题、位置、音效功能项点击回调' },
       { name: 'onKeyDown / onKeyUp', signature: '(key: KeyboardAttributeType) => void', description: '主题、位置、音效键项的按键生命周期回调' },
     ],
     tokens: sharedThemeTokens,
+    sections: [
+      {
+        title: '拼音学习开关',
+        description:
+          "SettingKeyboard 里新增了“拼音学习”设置项。\n默认开启时，会根据用户在中文拼音模式下选择过的候选词，动态调整后续候选排序；关闭后仍保留静态拼音候选，但不再记录新的学习历史，也不再使用本地学习数据重排。",
+      },
+      {
+        title: '接入方式',
+        description:
+          "SettingKeyboard 本身只负责展示开关和触发回调，真正的状态通常由 CompositionKeyboard 或 VirtualKeyboard 托管。\n如果你是单独使用 SettingKeyboard，需要自行处理 onUsePinyinLearningChange 并把状态同步回上层。",
+        code:
+          "const [enabled, setEnabled] = useState<'Y' | 'N'>('Y');\n\n<SettingKeyboard\n  themeMode=\"light\"\n  positionMode=\"float\"\n  vkbKeydownAudio=\"Y\"\n  width=\"500px\"\n  height=\"320px\"\n  fontSize=\"14px\"\n  fontFamily=\"'Microsoft YaHei', 'PingFang SC', sans-serif\"\n  numberKeyboardLayoutMode=\"asc\"\n  onWidthChange={() => undefined}\n  onHeightChange={() => undefined}\n  onFontSizeChange={() => undefined}\n  onFontFamilyChange={() => undefined}\n  onUsePinyinLearningChange={setEnabled}\n  onClick={() => undefined}\n/>",
+      },
+    ],
     renderDemo: SettingKeyboardDemo,
   },
 ];

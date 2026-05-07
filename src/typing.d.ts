@@ -3,6 +3,7 @@ import { CSSProperties, InputHTMLAttributes, ReactNode } from 'react';
 declare namespace VKB {
   type InputMode = 'zh' | 'en';
   type NumberKeyboardLayoutMode = 'asc' | 'desc';
+  type PinyinLearningMode = 'Y' | 'N';
   type ImageRecognitionOptions = {
     inputMode?: InputMode;
   };
@@ -53,6 +54,7 @@ declare namespace VKB {
     fontSize?: string;
     fontFamily?: string;
     numberKeyboardLayoutMode?: NumberKeyboardLayoutMode;
+    enablePinyinLearning?: boolean;
     capsLockActive?: boolean;
     inputValue?: string;
     chinese?: string[];
@@ -68,6 +70,7 @@ declare namespace VKB {
     onFontSizeChange?: (fontSize: string) => void;
     onFontFamilyChange?: (fontFamily: string) => void;
     onNumberKeyboardLayoutModeChange?: (mode: NumberKeyboardLayoutMode) => void;
+    onUsePinyinLearningChange?: (mode: PinyinLearningMode) => void;
     onChangeInputMode?: (mode: VKB.InputMode) => void;
     onSelectChinese?: (
       chinese: string,
@@ -192,6 +195,8 @@ declare namespace VKB {
     pushInputIntoView?: boolean;
     /** 数字键盘排列 */
     numberKeyboardLayoutMode?: NumberKeyboardLayoutMode;
+    /** 是否开启拼音学习 */
+    enablePinyinLearning?: boolean;
     /** 自定义键盘内容 */
     virtualKeyboardTab?: KeyboardTabItem[];
     /** 自定义主题,当使用了主题变量时，主题变量的权重更高 */
@@ -217,13 +222,15 @@ declare namespace VKB {
     positionMode?: string;
     /** 按键音效 */
     useKeydownAudio?: 'Y' | 'N';
+    /** 是否开启拼音学习 */
+    usePinyinLearning?: PinyinLearningMode;
     /** 指定虚拟键盘挂载节点，返回值为空时回退到当前渲染位置 */
     getContainer?: () => HTMLElement | null;
   };
 
   type VirtualInputProps = Omit<
     InputHTMLAttributes<HTMLInputElement>,
-    'readOnly' | 'size'
+    'readOnly' | 'size' | 'prefix'
   > & {
     wrapperClassName?: string;
     wrapperStyle?: CSSProperties;
@@ -252,6 +259,8 @@ declare namespace VKB {
     setFontFamily?: (fontFamily: string) => void;
     /** 设置数字键盘排列 */
     setNumberKeyboardLayoutMode?: (mode: NumberKeyboardLayoutMode) => void;
+    /** 设置是否开启拼音学习 */
+    setUsePinyinLearning?: (use: PinyinLearningMode) => void;
     /** 设置是否使用按键音效 */
     setUseKeydownAudio?: (use: 'Y' | 'N') => void;
     /** 设置按键音效 url */

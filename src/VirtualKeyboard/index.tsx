@@ -25,6 +25,7 @@ import {
   VKB_KEYBOARD_WIDTH,
   VKB_KEYDOWN_MODE,
   VKB_NUMBER_KEYBOARD_LAYOUT_MODE,
+  VKB_PINYIN_LEARNING_MODE,
   VKB_POSITION_MODE,
   VKB_THEME_MODE,
 } from '../keys';
@@ -63,6 +64,7 @@ const VirtualKeyboard = ({
   positionMode,
   pushInputIntoView = false,
   useKeydownAudio = 'Y',
+  usePinyinLearning = 'Y',
   onFunctionKey,
   functionKeyHandlers,
   functionKeyDefaults,
@@ -146,6 +148,13 @@ const VirtualKeyboard = ({
       VKB_NUMBER_KEYBOARD_LAYOUT_MODE,
       {
         defaultValue: numberKeyboardLayoutMode,
+      },
+    );
+  const [currentUsePinyinLearning, setCurrentUsePinyinLearning] =
+    useLocalStorageState<VKB.PinyinLearningMode | undefined>(
+      VKB_PINYIN_LEARNING_MODE,
+      {
+        defaultValue: usePinyinLearning,
       },
     );
   const shouldPushInputIntoView =
@@ -381,6 +390,12 @@ const VirtualKeyboard = ({
     }
   }, [numberKeyboardLayoutMode, setCurrentNumberKeyboardLayoutMode]);
 
+  useEffect(() => {
+    if (usePinyinLearning) {
+      setCurrentUsePinyinLearning(usePinyinLearning);
+    }
+  }, [setCurrentUsePinyinLearning, usePinyinLearning]);
+
   const updateFloatAnchorRect = useCallback((input: HTMLInputElement | null) => {
     if (!input) {
       setFloatAnchorRect(null);
@@ -588,6 +603,7 @@ const VirtualKeyboard = ({
             "'Microsoft YaHei', 'PingFang SC', sans-serif"
           }
           numberKeyboardLayoutMode={currentNumberKeyboardLayoutMode ?? 'asc'}
+          enablePinyinLearning={currentUsePinyinLearning !== 'N'}
           focusShow={focusShow}
           virtualKeyboardTab={virtualKeyboardTab}
           showDragHandle={showDragHandle}
@@ -611,6 +627,7 @@ const VirtualKeyboard = ({
           onFontSizeChange={setCurrentFontSize}
           onFontFamilyChange={setCurrentFontFamily}
           onNumberKeyboardLayoutModeChange={setCurrentNumberKeyboardLayoutMode}
+          onUsePinyinLearningChange={setCurrentUsePinyinLearning}
           onKeydownAudioUrlChange={() => undefined}
           onUseKeydownAudioChange={setCurrentUseKeydownAudio}
         />

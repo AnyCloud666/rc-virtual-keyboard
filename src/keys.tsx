@@ -53,6 +53,8 @@ export const VKB_KEY_FONT_FAMILY = 'VKB_KEY_FONT_FAMILY';
 /** 数字键盘排列 */
 export const VKB_NUMBER_KEYBOARD_LAYOUT_MODE =
   'VKB_NUMBER_KEYBOARD_LAYOUT_MODE';
+/** 拼音学习 */
+export const VKB_PINYIN_LEARNING_MODE = 'VKB_PINYIN_LEARNING_MODE';
 
 /** ---------------------------功能控制类--------------------------- */
 /** 删除 */

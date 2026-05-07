@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import type { FormEvent, RefObject } from 'react';
+import type { ElementRef, FormEvent, RefObject } from 'react';
 import { Button, Input, InputNumber, Space, Typography } from 'antd';
 import type { InputRef } from 'antd';
 import { ProForm, ProFormDigit, ProFormText } from '@ant-design/pro-components';
@@ -21,12 +21,29 @@ type MaybeInputEvent =
     }
   | undefined;
 
+const getEventValue = (target: unknown) => {
+  if (
+    typeof target === 'object' &&
+    target !== null &&
+    'value' in target
+  ) {
+    const value = (target as { value?: string | number | null }).value;
+
+    if (value !== undefined && value !== null) {
+      return String(value);
+    }
+  }
+
+  return undefined;
+};
+
 export default function RefInputDemo() {
+  type InputNumberElement = ElementRef<typeof InputNumber>;
   const nativeInputRef = useRef<HTMLInputElement | null>(null);
   const antdInputRef = useRef<InputRef>(null);
-  const inputNumberRef = useRef<unknown>(null);
+  const inputNumberRef = useRef<InputNumberElement | null>(null);
   const proFormInputRef = useRef<InputRef>(null);
-  const proFormDigitRef = useRef<unknown>(null);
+  const proFormDigitRef = useRef<InputNumberElement | null>(null);
   const nativeValueTextRef = useRef<HTMLSpanElement | null>(null);
   const antdValueTextRef = useRef<HTMLSpanElement | null>(null);
   const inputNumberValueTextRef = useRef<HTMLSpanElement | null>(null);
@@ -105,9 +122,14 @@ export default function RefInputDemo() {
       return event;
     }
 
-    const eventValue = event?.currentTarget?.value ?? event?.target?.value;
-    if (eventValue !== undefined && eventValue !== null) {
-      return String(eventValue);
+    const currentTargetValue = getEventValue(event?.currentTarget);
+    if (currentTargetValue !== undefined) {
+      return currentTargetValue;
+    }
+
+    const targetValue = getEventValue(event?.target);
+    if (targetValue !== undefined) {
+      return targetValue;
     }
 
     return fallbackInput?.value ?? '';

@@ -9,6 +9,7 @@ import { ReactComponent as BottomSvg } from '../svg/bottom.svg';
 import { VKB } from '../typing';
 
 import { FloatPosition, LightTheme, numberType } from '../keys';
+import { PinyinLearningSettingContext } from '../SettingKeyboard';
 import './style.css';
 
 import useInput from '../hooks/useInput';
@@ -37,6 +38,7 @@ const CompositionKeyboard = ({
   fontSize = '14px',
   fontFamily = "'Microsoft YaHei', 'PingFang SC', sans-serif",
   numberKeyboardLayoutMode = 'asc',
+  enablePinyinLearning = true,
   focusShow,
   useKeydownAudio = 'Y',
   keydownAudioUrl = DEFAULT_KEYDOWN_AUDIO_URL,
@@ -52,6 +54,7 @@ const CompositionKeyboard = ({
   onFontSizeChange,
   onFontFamilyChange,
   onNumberKeyboardLayoutModeChange,
+  onUsePinyinLearningChange,
   onUseKeydownAudioChange,
   onKeydownAudioUrlChange,
 }: {
@@ -85,6 +88,8 @@ const CompositionKeyboard = ({
   fontFamily?: string;
   /** 数字键盘排列 */
   numberKeyboardLayoutMode?: VKB.NumberKeyboardLayoutMode;
+  /** 是否开启拼音学习 */
+  enablePinyinLearning?: boolean;
   /** 输入框 focus 时是否自动显示键盘 */
   focusShow?: boolean;
   /** 是否使用键盘按键声音 */
@@ -117,11 +122,33 @@ const CompositionKeyboard = ({
   onNumberKeyboardLayoutModeChange?: (
     mode: VKB.NumberKeyboardLayoutMode,
   ) => void;
+  /** 拼音学习开关改变 */
+  onUsePinyinLearningChange?: (mode: VKB.PinyinLearningMode) => void;
   /** 使用改变 */
   onUseKeydownAudioChange?: (mode: 'Y' | 'N') => void;
   /** 地址改变 */
   onKeydownAudioUrlChange?: (url: string) => void;
 }) => {
+  const inputOptions = {
+    themeMode,
+    positionMode,
+    defaultActiveKeyboard,
+    keyboardVisible,
+    focusShow,
+    useKeydownAudio,
+    keydownAudioUrl,
+    enablePinyinLearning,
+    onFunctionKey,
+    functionKeyHandlers,
+    functionKeyDefaults,
+    onChangeShow,
+    onActiveInputChange,
+    onThemeModeChange,
+    onPositionModeChange,
+    onUseKeydownAudioChange,
+    onKeydownAudioUrlChange,
+    onPinyin2Chinese: pinyin2ChineseV2,
+  };
   const {
     inputMode,
     inputValue,
@@ -141,25 +168,7 @@ const CompositionKeyboard = ({
     onKeyUp,
     isKeyActive,
     capsLockActive,
-  } = useInput({
-    themeMode,
-    positionMode,
-    defaultActiveKeyboard,
-    keyboardVisible,
-    focusShow,
-    useKeydownAudio,
-    keydownAudioUrl,
-    onFunctionKey,
-    functionKeyHandlers,
-    functionKeyDefaults,
-    onChangeShow,
-    onActiveInputChange,
-    onThemeModeChange,
-    onPositionModeChange,
-    onUseKeydownAudioChange,
-    onKeydownAudioUrlChange,
-    onPinyin2Chinese: pinyin2ChineseV2,
-  });
+  } = useInput(inputOptions);
   const lastTouchAtRef = useRef(0);
 
   const markTouchInteraction = useCallback(() => {
@@ -184,125 +193,136 @@ const CompositionKeyboard = ({
   };
 
   return (
-    <div
-      style={{
-        touchAction: 'none',
-        ...style,
-      }}
-      className={`virtual-keyboard virtual-keyboard-var virtual-keyboard-var-${vkbThemeMode}`}
-      onMouseDown={onMouseDown}
-      onMouseUp={(e) => onMouseUp(e)}
-      onTouchStart={onMouseDown}
-      onTouchEnd={(e) => onMouseUp(e)}
-      onTouchCancel={(e) => onMouseUp(e)}
-      onTouchStartCapture={() => {
-        markTouchInteraction();
-      }}
-      onTouchMoveCapture={(e) => {
-        if (shouldAllowTouchMove(e.target)) {
-          return;
-        }
-
-        e.preventDefault();
-      }}
-      onClickCapture={(e) => {
-        if (!shouldIgnoreCompatClick()) return;
-
-        e.preventDefault();
-        e.stopPropagation();
+    <PinyinLearningSettingContext.Provider
+      value={{
+        enablePinyinLearning,
+        onUsePinyinLearningChange,
       }}
     >
-      <div className="virtual-keyboard-tab" id="keyboard-tab">
-        {showDragHandle && vkbPositionMode === FloatPosition.code ? (
-          <div id="keyboard-tab-move" className="keyboard-tab-move">
-            {moveLabel ? moveLabel : <MoveSvg id="move" />}
-          </div>
-        ) : (
-          ''
-        )}
+      <div
+        style={{
+          touchAction: 'none',
+          ...style,
+        }}
+        className={`virtual-keyboard virtual-keyboard-var virtual-keyboard-var-${vkbThemeMode}`}
+        onMouseDown={onMouseDown}
+        onMouseUp={(e) => onMouseUp(e)}
+        onTouchStart={onMouseDown}
+        onTouchEnd={(e) => onMouseUp(e)}
+        onTouchCancel={(e) => onMouseUp(e)}
+        onTouchStartCapture={() => {
+          markTouchInteraction();
+        }}
+        onTouchMoveCapture={(e) => {
+          if (shouldAllowTouchMove(e.target)) {
+            return;
+          }
 
-        {virtualKeyboardTab.map((item) => {
-          return (
+          e.preventDefault();
+        }}
+        onClickCapture={(e) => {
+          if (!shouldIgnoreCompatClick()) return;
+
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
+        <div className="virtual-keyboard-tab" id="keyboard-tab">
+          {showDragHandle && vkbPositionMode === FloatPosition.code ? (
+            <div id="keyboard-tab-move" className="keyboard-tab-move">
+              {moveLabel ? moveLabel : <MoveSvg id="move" />}
+            </div>
+          ) : (
+            ''
+          )}
+
+          {virtualKeyboardTab.map((item) => {
+            return (
+              <div
+                className={`keyboard-tab ${
+                  activeKeyboard === item.id ? 'keyboard-tab-active' : ''
+                }`}
+                key={item.id}
+                onClick={() => {
+                  setActiveKeyboard(item.id);
+                }}
+                onTouchStart={(e) => {
+                  stopTouchEvent(e);
+                  setActiveKeyboard(item.id);
+                }}
+              >
+                {item.label}
+              </div>
+            );
+          })}
+          {showHiddenHandle && (
             <div
-              className={`keyboard-tab ${
-                activeKeyboard === item.id ? 'keyboard-tab-active' : ''
-              }`}
-              key={item.id}
-              onClick={() => {
-                setActiveKeyboard(item.id);
+              className="keyboard-tab-down "
+              onClick={(e) => {
+                e.stopPropagation();
+                onChangeShow && onChangeShow(false);
               }}
               onTouchStart={(e) => {
                 stopTouchEvent(e);
-                setActiveKeyboard(item.id);
+                onChangeShow && onChangeShow(false);
               }}
             >
-              {item.label}
+              {hiddenLabel ? hiddenLabel : <BottomSvg />}
             </div>
-          );
-        })}
-        {showHiddenHandle && (
-          <div
-            className="keyboard-tab-down "
-            onClick={(e) => {
-              e.stopPropagation();
-              onChangeShow && onChangeShow(false);
-            }}
-            onTouchStart={(e) => {
-              stopTouchEvent(e);
-              onChangeShow && onChangeShow(false);
-            }}
-          >
-            {hiddenLabel ? hiddenLabel : <BottomSvg />}
-          </div>
-        )}
-      </div>
-      <div className="virtual-keyboard-content">
-        {virtualKeyboardTab.map((item) => {
-          const isActive = activeKeyboard === item.id;
+          )}
+        </div>
+        <div className="virtual-keyboard-content">
+          {virtualKeyboardTab.map((item) => {
+            const isActive = activeKeyboard === item.id;
 
-          return (
-            <div
-              key={item.id}
-              className={`virtual-keyboard-pane ${
-                isActive
-                  ? 'virtual-keyboard-pane-active'
-                  : 'virtual-keyboard-pane-hidden'
-              }`}
-            >
-              <item.Component
-                inputMode={inputMode}
-                themeMode={vkbThemeMode}
-                positionMode={vkbPositionMode}
-                vkbKeydownAudio={vkbKeydownAudio}
-                width={width}
-                height={height}
-                fontSize={fontSize}
-                fontFamily={fontFamily}
-                numberKeyboardLayoutMode={numberKeyboardLayoutMode}
-                capsLockActive={capsLockActive}
-                chinese={chinese}
-                onClick={onClick}
-                isKeyActive={isKeyActive}
-                onWidthChange={onWidthChange ?? (() => {})}
-                onHeightChange={onHeightChange ?? (() => {})}
-                onFontSizeChange={onFontSizeChange ?? (() => {})}
-                onFontFamilyChange={onFontFamilyChange ?? (() => {})}
-                onNumberKeyboardLayoutModeChange={
-                  onNumberKeyboardLayoutModeChange ?? (() => {})
-                }
-                onChangeInputMode={onChangeInputMode}
-                inputValue={inputValue}
-                onSelectChinese={onSelectChinese}
-                onMouseDown={onMouseDown}
-                onRecognition={onRecognition}
-                onKeyDown={onKeyDown}
-                onKeyUp={onKeyUp}
-              />
-            </div>
-          );
-        })}
+            return (
+              <div
+                key={item.id}
+                className={`virtual-keyboard-pane ${
+                  isActive
+                    ? 'virtual-keyboard-pane-active'
+                    : 'virtual-keyboard-pane-hidden'
+                }`}
+              >
+                <item.Component
+                  inputMode={inputMode}
+                  themeMode={vkbThemeMode}
+                  positionMode={vkbPositionMode}
+                  vkbKeydownAudio={vkbKeydownAudio}
+                  width={width}
+                  height={height}
+                  fontSize={fontSize}
+                  fontFamily={fontFamily}
+                  numberKeyboardLayoutMode={numberKeyboardLayoutMode}
+                  enablePinyinLearning={enablePinyinLearning}
+                  capsLockActive={capsLockActive}
+                  chinese={chinese}
+                  onClick={onClick}
+                  isKeyActive={isKeyActive}
+                  onWidthChange={onWidthChange ?? (() => {})}
+                  onHeightChange={onHeightChange ?? (() => {})}
+                  onFontSizeChange={onFontSizeChange ?? (() => {})}
+                  onFontFamilyChange={onFontFamilyChange ?? (() => {})}
+                  onNumberKeyboardLayoutModeChange={
+                    onNumberKeyboardLayoutModeChange ?? (() => {})
+                  }
+                  onUsePinyinLearningChange={
+                    onUsePinyinLearningChange ?? (() => {})
+                  }
+                  onChangeInputMode={onChangeInputMode}
+                  inputValue={inputValue}
+                  onSelectChinese={onSelectChinese}
+                  onMouseDown={onMouseDown}
+                  onRecognition={onRecognition}
+                  onKeyDown={onKeyDown}
+                  onKeyUp={onKeyUp}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </PinyinLearningSettingContext.Provider>
   );
 };
 export default CompositionKeyboard;

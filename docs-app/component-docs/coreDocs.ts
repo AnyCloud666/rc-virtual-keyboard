@@ -33,6 +33,7 @@ export const coreComponentDocs: ComponentDoc[] = [
       { name: 'theme', type: 'Partial<Theme>', defaultValue: '-', description: '通过 CSS 变量覆写主题' },
       { name: 'useKeydownAudio', type: "'Y' | 'N'", defaultValue: 'Y', description: '是否启用按键音效' },
       { name: 'keydownAudioUrl', type: 'string', defaultValue: '内置打包音频资源', description: '按键音效地址' },
+      { name: 'usePinyinLearning', type: "'Y' | 'N'", defaultValue: 'Y', description: '是否启用本地拼音学习，控制学习记录写入和候选重排' },
       { name: 'onFunctionKey', type: '(context) => boolean | void', defaultValue: '-', description: '统一覆写 F1-F12 默认行为，返回 true 阻止默认行为' },
       { name: 'functionKeyHandlers', type: "Partial<Record<'F1' ... 'F12', (context) => boolean | void>>", defaultValue: '-', description: '按单个功能键覆写默认行为' },
       { name: 'functionKeyDefaults', type: '{ helpUrl?: string; focusSelector?: string }', defaultValue: '-', description: '配置 F1 帮助链接和 F6 默认聚焦目标' },
@@ -44,6 +45,7 @@ export const coreComponentDocs: ComponentDoc[] = [
       { name: 'setWidth / setHeight', signature: '(value: string) => void', description: '动态修改尺寸' },
       { name: 'setFontSize / setFontFamily', signature: '(value: string) => void', description: '动态修改按键字号和字体' },
       { name: 'setNumberKeyboardLayoutMode', signature: "(mode: 'asc' | 'desc') => void", description: '切换数字键顺序' },
+      { name: 'setUsePinyinLearning', signature: "(value: 'Y' | 'N') => void", description: '动态切换本地拼音学习开关' },
       { name: 'setUseKeydownAudio / setKeydownAudioUrl', signature: "(value: 'Y' | 'N' | string) => void", description: '控制按键音效开关和资源地址' },
     ],
     tokens: sharedThemeTokens,
@@ -64,6 +66,20 @@ export const coreComponentDocs: ComponentDoc[] = [
         title: '常见场景',
         description:
           "F1 常用于帮助中心或操作说明。\nF3 常用于打开搜索面板或站内搜索。\nF5 如果页面有未保存数据，建议优先业务覆写。\nF6 适合聚焦搜索框、扫码框、主录入框。\nF11 适合切换大屏展示或沉浸模式。\nF12 常用于打开调试抽屉、日志面板、诊断信息。",
+      },
+      {
+        title: '拼音学习',
+        description:
+          "VirtualKeyboard 默认开启本地拼音学习。\n当用户在中文拼音模式下多次选择同一候选词时，后续同拼音候选会根据本地学习记录做重排。\n学习数据仅保存在当前浏览器本地，浏览器不支持 IndexedDB 时会自动降级为静态词典排序。",
+        code:
+          "import { VirtualKeyboard } from 'rc-virtual-keyboard';\n\nexport default function Demo() {\n  return (\n    <VirtualKeyboard\n      usePinyinLearning=\"Y\"\n      functionKeyDefaults={{\n        helpUrl: '/help/keyboard',\n      }}\n    />\n  );\n}",
+      },
+      {
+        title: '学习开关接入',
+        description:
+          "如果你希望把拼音学习状态交给业务统一管理，可以显式传入 usePinyinLearning。\n设置面板切换后会同步更新本地缓存状态，重新打开页面仍会沿用上一次选择。",
+        code:
+          "const [usePinyinLearning, setUsePinyinLearning] = useState<'Y' | 'N'>('Y');\n\n<VirtualKeyboard\n  usePinyinLearning={usePinyinLearning}\n/>",
       },
     ],
     renderDemo: VirtualKeyboardDemo,
@@ -89,6 +105,7 @@ export const coreComponentDocs: ComponentDoc[] = [
       { name: 'fontSize / fontFamily', type: 'string', defaultValue: '14px / 默认字体', description: '当前按键字体配置' },
       { name: 'focusShow', type: 'boolean', defaultValue: '-', description: '控制焦点联动弹出行为' },
       { name: 'useKeydownAudio / keydownAudioUrl', type: "('Y' | 'N') / string", defaultValue: 'Y / 默认 mp3', description: '控制按键音效' },
+      { name: 'enablePinyinLearning', type: 'boolean', defaultValue: 'true', description: '是否启用本地拼音学习重排' },
       { name: 'onFunctionKey', type: '(context) => boolean | void', defaultValue: '-', description: '统一覆写 F1-F12 默认行为，返回 true 阻止默认行为' },
       { name: 'functionKeyHandlers', type: "Partial<Record<'F1' ... 'F12', (context) => boolean | void>>", defaultValue: '-', description: '按单个功能键覆写默认行为' },
       { name: 'functionKeyDefaults', type: '{ helpUrl?: string; focusSelector?: string }', defaultValue: '-', description: '配置 F1 帮助链接和 F6 默认聚焦目标' },
@@ -100,6 +117,7 @@ export const coreComponentDocs: ComponentDoc[] = [
       { name: 'onWidthChange / onHeightChange', signature: '(value: string) => void', description: '尺寸变化回调' },
       { name: 'onFontSizeChange / onFontFamilyChange', signature: '(value: string) => void', description: '字体配置变化回调' },
       { name: 'onNumberKeyboardLayoutModeChange', signature: "(mode: 'asc' | 'desc') => void", description: '数字键顺序切换回调' },
+      { name: 'onUsePinyinLearningChange', signature: "(value: 'Y' | 'N') => void", description: '设置面板中的拼音学习开关切换回调' },
       { name: 'onUseKeydownAudioChange / onKeydownAudioUrlChange', signature: "(value: 'Y' | 'N' | string) => void", description: '音效设置变更回调' },
     ],
     tokens: sharedThemeTokens,
@@ -120,6 +138,13 @@ export const coreComponentDocs: ComponentDoc[] = [
         title: '覆写建议',
         description:
           "如果只改少量按键，优先用 functionKeyHandlers。\n如果想统一打点、埋点或权限判断，优先用 onFunctionKey。\n如果需要 F1 和 F6 的默认行为但只想换目标地址或焦点元素，优先用 functionKeyDefaults。\n如果接入场景不是 React 组件树最外层，也可以用 window 上的 vkb:function-key 事件做全局拦截。",
+      },
+      {
+        title: '拼音学习',
+        description:
+          "CompositionKeyboard 适合把拼音学习状态交给业务自己管理。\n你可以通过 enablePinyinLearning 控制是否启用学习重排，再通过 onUsePinyinLearningChange 接收设置面板的切换结果。\n关闭后仍然保留原有静态拼音候选，只是不再写入学习记录，也不再按照本地学习历史重新排序。",
+        code:
+          "const [enabled, setEnabled] = useState(true);\n\n<CompositionKeyboard\n  enablePinyinLearning={enabled}\n  onUsePinyinLearningChange={(mode) => {\n    setEnabled(mode === 'Y');\n  }}\n/>",
       },
     ],
     renderDemo: CompositionKeyboardDemo,

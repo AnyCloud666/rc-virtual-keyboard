@@ -30,7 +30,7 @@ export function queryLetterCandidates(input: string) {
 
 export function useDemoInputController(options?: Parameters<typeof useInput>[0]) {
   const [value, setValue] = useState('');
-  const keyboard = useInput(options);
+  const keyboard = useInput(options ?? {});
 
   return {
     ...keyboard,
