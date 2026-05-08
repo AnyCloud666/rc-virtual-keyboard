@@ -2,6 +2,7 @@ import { GithubOutlined } from '@ant-design/icons';
 import { Button, Space, Tag, Typography } from 'antd';
 import { useState } from 'react';
 import { VirtualKeyboard } from 'rc-virtual-keyboard';
+import pkg from '../../../package.json';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -166,6 +167,7 @@ export function HomeHeroIntro() {
         <Tag color="blue">React</Tag>
         <Tag color="processing">Vite</Tag>
         <Tag color="gold">Virtual Keyboard</Tag>
+        <Tag color="green">v{pkg.version}</Tag>
       </Space>
 
       <Title className="home-hero-title" level={1}>
