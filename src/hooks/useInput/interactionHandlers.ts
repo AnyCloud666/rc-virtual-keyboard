@@ -399,7 +399,10 @@ export const createInteractionHandlers = ({
         shouldUseLetterComposition(e.key) &&
         ((inputMode === ZH && e.key !== Space.code) || inputMode === EN)
       ) {
-        updateLetterCandidates(inputValue + e.key.toLowerCase());
+        const nextLetterValue =
+          inputMode === ZH ? e.key.toLowerCase() : e.key;
+
+        updateLetterCandidates(inputValue + nextLetterValue);
         jumpDelete.current = false;
       } else if (
         inputMode === EN &&
