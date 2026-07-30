@@ -782,15 +782,35 @@ export const createInteractionHandlers = ({
     } as SimulateEventData);
   };
 
+  const shouldDelayKeyUpForInput = (inputEl: HTMLInputElement) => {
+    return !!inputEl.closest('.ant-input-number, .rc-input-number');
+  };
+
   const onKeyUp = (e: VKB.KeyboardAttributeType) => {
-    releaseKeyCode(e.code, 120);
-    if (!activeInputRef.current) return;
-    Simulate?.keyUp?.(activeInputRef.current, {
-      keyCode: e.keyCode,
-      which: e.keyCode,
-      code: e.code,
-      key: e.key,
-    } as SimulateEventData);
+    const activeInput = activeInputRef.current;
+    const dispatchKeyUp = (targetInput: HTMLInputElement) => {
+      releaseKeyCode(e.code, 120);
+      Simulate?.keyUp?.(targetInput, {
+        keyCode: e.keyCode,
+        which: e.keyCode,
+        code: e.code,
+        key: e.key,
+      } as SimulateEventData);
+    };
+
+    if (!activeInput) {
+      releaseKeyCode(e.code, 120);
+      return;
+    }
+
+    if (shouldDelayKeyUpForInput(activeInput)) {
+      window.setTimeout(() => {
+        dispatchKeyUp(activeInput);
+      }, 0);
+      return;
+    }
+
+    dispatchKeyUp(activeInput);
   };
 
   const checkStopPropagation = (

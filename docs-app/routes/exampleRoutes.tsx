@@ -71,6 +71,7 @@ export const exampleRoutes: DocRoute[] = [
         points={[
           '分别验证原生 input、antd Input、InputNumber、ProFormText、ProFormDigit 的 ref 聚焦能力',
           '通过 ref 把光标移动到末尾或直接全选，观察虚拟键盘是否还能继续输入',
+          '补充了 InputNumber precision={2} 的特殊示例，验证输入过程中不会提前补成 1.00',
           'onInput 中不使用 state，而是直接通过 ref 回写 value，方便排查 ref 接管场景',
           '页面会记录 focus / input / change 事件，方便判断是否存在丢事件或值不同步',
         ]}

@@ -42,11 +42,13 @@ export default function RefInputDemo() {
   const nativeInputRef = useRef<HTMLInputElement | null>(null);
   const antdInputRef = useRef<InputRef>(null);
   const inputNumberRef = useRef<InputNumberElement | null>(null);
+  const precisionInputNumberRef = useRef<InputNumberElement | null>(null);
   const proFormInputRef = useRef<InputRef>(null);
   const proFormDigitRef = useRef<InputNumberElement | null>(null);
   const nativeValueTextRef = useRef<HTMLSpanElement | null>(null);
   const antdValueTextRef = useRef<HTMLSpanElement | null>(null);
   const inputNumberValueTextRef = useRef<HTMLSpanElement | null>(null);
+  const precisionInputNumberValueTextRef = useRef<HTMLSpanElement | null>(null);
   const proFormValueTextRef = useRef<HTMLSpanElement | null>(null);
   const proFormDigitValueTextRef = useRef<HTMLSpanElement | null>(null);
   const logIdRef = useRef(0);
@@ -86,6 +88,8 @@ export default function RefInputDemo() {
 
     return null;
   };
+  const getPrecisionInputNumberNativeInput = () =>
+    resolveNativeInput(precisionInputNumberRef.current);
   const getInputNumberNativeInput = () => resolveNativeInput(inputNumberRef.current);
   const getProFormDigitNativeInput = () => resolveNativeInput(proFormDigitRef.current);
 
@@ -162,6 +166,16 @@ export default function RefInputDemo() {
       syncValuePreview(input, inputNumberValueTextRef);
     }
     appendLog(`InputNumber input -> ${nextValue || '(empty)'}`);
+  };
+
+  const handlePrecisionInputNumberInput = (e: MaybeInputEvent) => {
+    const input = getPrecisionInputNumberNativeInput();
+    const nextValue = resolveEventValue(e, input);
+    if (input) {
+      input.value = nextValue;
+      syncValuePreview(input, precisionInputNumberValueTextRef);
+    }
+    appendLog(`InputNumber precision=2 input -> ${nextValue || '(empty)'}`);
   };
 
   const handleProFormInput = (e: FormEvent<HTMLInputElement>) => {
@@ -258,6 +272,50 @@ export default function RefInputDemo() {
           </Space>
           <Paragraph type="secondary" style={{ marginBottom: 0 }}>
             当前值：<span ref={inputNumberValueTextRef}>未输入</span>
+          </Paragraph>
+        </div>
+
+        <div style={{ display: 'grid', gap: 12, maxWidth: 720 }}>
+          <Text strong>Ant Design InputNumber + precision=2 特殊示例</Text>
+          <InputNumber
+            ref={precisionInputNumberRef}
+            precision={2}
+            controls={false}
+            style={{ width: '100%' }}
+            placeholder="输入 1 后不要立刻变成 1.00，继续输入"
+            onFocus={() => appendLog('InputNumber precision=2 focus')}
+            onInput={handlePrecisionInputNumberInput}
+            onChange={(value) => {
+              appendLog(`InputNumber precision=2 change -> ${value ?? '(empty)'}`);
+            }}
+          />
+          <Space wrap>
+            <Button
+              onClick={() =>
+                moveCaretToEnd(
+                  getPrecisionInputNumberNativeInput(),
+                  'InputNumber precision=2',
+                )
+              }
+            >
+              ref 聚焦到末尾
+            </Button>
+            <Button
+              onClick={() =>
+                selectAll(
+                  getPrecisionInputNumberNativeInput(),
+                  'InputNumber precision=2',
+                )
+              }
+            >
+              ref 全选
+            </Button>
+          </Space>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            当前值：<span ref={precisionInputNumberValueTextRef}>未输入</span>
+          </Paragraph>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            验证点：输入过程中不应提前补成两位小数，失焦后再按 precision 格式化。
           </Paragraph>
         </div>
 
