@@ -17,7 +17,7 @@ const external = [
 export default defineConfig({
   publicDir: false,
   plugins: [
-    react(),
+    react({ jsxRuntime: 'classic' }),
     svgr({
       include: '**/*.svg',
       svgrOptions: {
@@ -33,6 +33,24 @@ export default defineConfig({
       insertTypesEntry: true,
       copyDtsFiles: true,
       tsconfigPath: path.resolve(__dirname, 'tsconfig.json'),
+      beforeWriteFile(filePath, content) {
+        const compatibleContent = content
+          .replace(
+            /import \{ default as React(?:, ([^}]+))? \} from 'react';/g,
+            (_, namedImports) =>
+              `import * as React from 'react';${
+                namedImports
+                  ? `\nimport { ${namedImports} } from 'react';`
+                  : ''
+              }`,
+          )
+          .replaceAll('React.JSX.Element', 'React.ReactElement');
+
+        return {
+          filePath,
+          content: compatibleContent,
+        };
+      },
     }),
   ],
   build: {

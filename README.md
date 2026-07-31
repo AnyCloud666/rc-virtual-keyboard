@@ -26,8 +26,8 @@ yarn add rc-virtual-keyboard
 ## 环境要求
 
 - Node.js: 建议 `18.x`、`20.x`、`22.x`，当前仓库也已兼容 `24.x`
-- React: `>=16.9.0`
-- ReactDOM: `>=16.9.0`
+- React: `>=16.8.0`
+- ReactDOM: `>=16.8.0`
 
 ## 最小使用示例
 

@@ -8,7 +8,7 @@
     "lib": ["DOM", "DOM.Iterable", "ES2020"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "jsx": "react-jsx",
+    "jsx": "react",
     "baseUrl": "./",
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
