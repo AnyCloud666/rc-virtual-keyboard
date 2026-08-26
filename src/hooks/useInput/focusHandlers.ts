@@ -50,6 +50,21 @@ export const createFocusHandlers = ({
   onChangeShow,
   onActiveInputChange,
 }: CreateFocusHandlersArgs) => {
+  const getInputDataAttribute = (
+    inputEl: HTMLInputElement,
+    attribute: string,
+  ) => {
+    let current: HTMLElement | null = inputEl;
+
+    while (current) {
+      const value = current.getAttribute(attribute);
+      if (value !== null) return value;
+      current = current.parentElement;
+    }
+
+    return undefined;
+  };
+
   const isSupportedInput = (
     target: EventTarget | null,
   ): target is HTMLInputElement => {
@@ -60,13 +75,16 @@ export const createFocusHandlers = ({
       [...EFFECTIVE_INPUT_TYPES, ...NEED_HANDLE_INPUT_TYPES].includes(
         activeElement?.type ?? '',
       ) &&
-      activeElement.dataset?.vkbDisabled !== 'true'
+      getInputDataAttribute(activeElement, 'data-vkb-disabled') !== 'true'
     );
   };
 
   const shouldShowOnFocus = (inputEl: HTMLInputElement) => {
-    const vkbShow = inputEl.dataset?.vkbShow;
-    const vkbAutoPopup = inputEl.dataset?.vkbAutoPopup;
+    const vkbShow = getInputDataAttribute(inputEl, 'data-vkb-show');
+    const vkbAutoPopup = getInputDataAttribute(
+      inputEl,
+      'data-vkb-auto-popup',
+    );
 
     if (vkbShow === 'true') return true;
     if (vkbShow === 'false') return false;
@@ -79,7 +97,7 @@ export const createFocusHandlers = ({
   const shouldHideOnBlur = (inputEl: HTMLInputElement | null) => {
     if (!inputEl) return true;
 
-    return inputEl.dataset?.vkbBlurHidden !== 'false';
+    return getInputDataAttribute(inputEl, 'data-vkb-blur-hidden') !== 'false';
   };
 
   const bindInputListener = (inputEl: HTMLInputElement) => {
@@ -108,7 +126,8 @@ export const createFocusHandlers = ({
       jumpDelete.current = false;
     }
 
-    inputType.current = inputEl.dataset?.vkbType ?? '';
+    inputType.current =
+      getInputDataAttribute(inputEl, 'data-vkb-type') ?? '';
     activeInputRef.current = inputEl;
     lastActiveInputRef.current = inputEl;
     onActiveInputChange?.(inputEl);

@@ -1,8 +1,13 @@
 import { useRef, useState } from 'react';
 import type { ElementRef, FormEvent, RefObject } from 'react';
-import { Button, Input, InputNumber, Space, Typography } from 'antd';
+import { Button, Input, InputNumber, Select, Space, Typography } from 'antd';
 import type { InputRef } from 'antd';
-import { ProForm, ProFormDigit, ProFormText } from '@ant-design/pro-components';
+import {
+  ProForm,
+  ProFormDigit,
+  ProFormSelect,
+  ProFormText,
+} from '@ant-design/pro-components';
 import { VirtualKeyboard } from 'rc-virtual-keyboard';
 
 const { Paragraph, Text } = Typography;
@@ -386,6 +391,53 @@ export default function RefInputDemo() {
           </Space>
           <Paragraph type="secondary" style={{ marginBottom: 0 }}>
             当前值：<span ref={proFormDigitValueTextRef}>未输入</span>
+          </Paragraph>
+        </div>
+
+        <div style={{ display: 'grid', gap: 12, maxWidth: 720 }}>
+          <Text strong>Ant Design Select + data-vkb-auto-popup=false</Text>
+          <Select
+            style={{ width: '100%' }}
+            placeholder="聚焦这里，验证 Select 不自动弹出虚拟键盘"
+            data-vkb-auto-popup="false"
+            options={[
+              { label: '选项一', value: 'one' },
+              { label: '选项二', value: 'two' },
+              { label: '选项三', value: 'three' },
+            ]}
+            onFocus={() => appendLog('Ant Design Select focus')}
+            onChange={(value) => appendLog(`Ant Design Select change -> ${value}`)}
+          />
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            验证点：Select 内部搜索 input 聚焦时，不应自动弹出虚拟键盘。
+          </Paragraph>
+        </div>
+
+        <div style={{ display: 'grid', gap: 12, maxWidth: 720 }}>
+          <Text strong>ProFormSelect + data-vkb-auto-popup=false</Text>
+          <ProForm
+            submitter={false}
+            layout="vertical"
+            style={{ maxWidth: 720 }}
+          >
+            <ProFormSelect
+              name="proFormSelectDemo"
+              label="ProFormSelect"
+              fieldProps={{
+                placeholder: '聚焦这里，验证 ProFormSelect 不自动弹出虚拟键盘',
+                'data-vkb-auto-popup': 'false',
+                onFocus: () => appendLog('ProFormSelect focus'),
+                onChange: (value) => appendLog(`ProFormSelect change -> ${value}`),
+                options: [
+                  { label: '选项一', value: 'one' },
+                  { label: '选项二', value: 'two' },
+                  { label: '选项三', value: 'three' },
+                ],
+              }}
+            />
+          </ProForm>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            验证点：ProFormSelect 内部搜索 input 聚焦时，不应自动弹出虚拟键盘。
           </Paragraph>
         </div>
 

@@ -62,14 +62,15 @@ export const exampleRoutes: DocRoute[] = [
     path: '/examples/ref-input',
     title: 'Ref 输入联调',
     menuLabel: 'Ref 输入联调',
-    description: '对比原生 input、antd Input、InputNumber、ProFormText、ProFormDigit 在 ref 控制下接入虚拟键盘后的行为。',
+    description: '对比原生 input、antd Input、InputNumber、Select、ProFormText、ProFormDigit、ProFormSelect 接入虚拟键盘后的行为。',
     group: 'examples',
     render: () => (
       <DemoPage
-        title="原生 input / antd Input / InputNumber / ProFormText / ProFormDigit ref 联调"
+        title="原生 input / antd Input / InputNumber / Select / ProFormText / ProFormDigit / ProFormSelect 联调"
         description="这个页面用于检查虚拟键盘在 ref 聚焦、选区调整、ref 回写 value 和事件派发上的兼容性。"
         points={[
-          '分别验证原生 input、antd Input、InputNumber、ProFormText、ProFormDigit 的 ref 聚焦能力',
+          '分别验证原生 input、antd Input、InputNumber、Select、ProFormText、ProFormDigit、ProFormSelect 的接入行为',
+          '验证 Select 和 ProFormSelect 设置 data-vkb-auto-popup=false 后不会自动弹出虚拟键盘',
           '通过 ref 把光标移动到末尾或直接全选，观察虚拟键盘是否还能继续输入',
           '补充了 InputNumber precision={2} 的特殊示例，验证输入过程中不会提前补成 1.00',
           'onInput 中不使用 state，而是直接通过 ref 回写 value，方便排查 ref 接管场景',
@@ -131,6 +132,12 @@ const resolveNativeInput = (target: unknown) => {
       if (input) input.value = String(value ?? '');
     },
   }}
+/>
+<Select data-vkb-auto-popup="false" options={options} />
+<ProFormSelect
+  name="proFormSelectDemo"
+  fieldProps={{ 'data-vkb-auto-popup': 'false' }}
+  options={options}
 />
 <VirtualKeyboard showIcon={false} />`}
       >
