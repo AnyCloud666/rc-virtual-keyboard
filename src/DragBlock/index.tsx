@@ -55,6 +55,7 @@ const DragBlock = ({
   defaultHiddenWidthRatio,
   defaultRightOffset,
   defaultBottomOffset,
+  preventFocusLoss = false,
 }: {
   init?: { width: string; height: string };
   resizeOverRight?: boolean;
@@ -84,6 +85,8 @@ const DragBlock = ({
   defaultHiddenWidthRatio?: number;
   defaultRightOffset?: number;
   defaultBottomOffset?: number;
+  /** 鼠标按下时阻止浏览器切换焦点 */
+  preventFocusLoss?: boolean;
 }) => {
   const hasInit = !!init;
   const initWidth = init?.width;
@@ -437,6 +440,10 @@ const DragBlock = ({
 
   /** 鼠标按下 */
   const onMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (preventFocusLoss) {
+      e.preventDefault();
+    }
+
     allowMove.current = true;
     manualMoveNotified.current = false;
     showBlock.cancel();

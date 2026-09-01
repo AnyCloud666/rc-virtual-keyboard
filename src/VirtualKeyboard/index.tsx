@@ -543,6 +543,7 @@ const VirtualKeyboard = ({
           resizeOverRight={true}
           defaultTopRatio={0.8}
           defaultHiddenWidthRatio={0.5}
+          preventFocusLoss
           onClick={() => {
             setVisible(true);
           }}
