@@ -16,14 +16,21 @@ function App() {
   const [navOpen, setNavOpen] = useState(false);
 
   useEffect(() => {
-    let frameId = 0;
-    let loadingTimer = 0;
-    let hasMounted = false;
+    let appFrameId = 0;
+    let contentFrameId = 0;
+    let appLoadingTimer = 0;
+    let contentLoadingTimer = 0;
 
     const finishLoading = (type: 'app' | 'content') => {
+      const isApp = type === 'app';
+      const loadingTimer = isApp ? appLoadingTimer : contentLoadingTimer;
+      const frameId = isApp ? appFrameId : contentFrameId;
+
       window.clearTimeout(loadingTimer);
-      loadingTimer = window.setTimeout(() => {
-        frameId = window.requestAnimationFrame(() => {
+      window.cancelAnimationFrame(frameId);
+
+      const nextLoadingTimer = window.setTimeout(() => {
+        const nextFrameId = window.requestAnimationFrame(() => {
           if (type === 'app') {
             setIsAppLoading(false);
             return;
@@ -31,7 +38,19 @@ function App() {
 
           setIsContentLoading(false);
         });
+
+        if (isApp) {
+          appFrameId = nextFrameId;
+        } else {
+          contentFrameId = nextFrameId;
+        }
       }, 80);
+
+      if (isApp) {
+        appLoadingTimer = nextLoadingTimer;
+      } else {
+        contentLoadingTimer = nextLoadingTimer;
+      }
     };
 
     const syncRoute = (type: 'app' | 'content') => {
@@ -45,21 +64,26 @@ function App() {
     };
 
     if (!window.location.hash) {
-      window.location.hash = '/';
+      window.history.replaceState(
+        window.history.state,
+        '',
+        `${window.location.pathname}${window.location.search}#/`,
+      );
     }
 
     syncRoute('app');
 
     const handleHashChange = () => {
-      syncRoute(hasMounted ? 'content' : 'app');
+      syncRoute('content');
     };
 
-    hasMounted = true;
     window.addEventListener('hashchange', handleHashChange);
 
     return () => {
-      window.clearTimeout(loadingTimer);
-      window.cancelAnimationFrame(frameId);
+      window.clearTimeout(appLoadingTimer);
+      window.clearTimeout(contentLoadingTimer);
+      window.cancelAnimationFrame(appFrameId);
+      window.cancelAnimationFrame(contentFrameId);
       window.removeEventListener('hashchange', handleHashChange);
     };
   }, []);
