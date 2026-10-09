@@ -24,6 +24,8 @@ export default () => {
   const [value, setValue] = useState('');
   const {
     onClick,
+    onKeyDown,
+    onKeyUp,
     inputMode,
     inputValue,
     chinese,
@@ -56,6 +58,8 @@ export default () => {
           chinese={chinese}
           inputMode={inputMode}
           onClick={onClick}
+          onKeyDown={onKeyDown}
+          onKeyUp={onKeyUp}
           onChangeInputMode={onChangeInputMode}
           onSelectChinese={onSelectChinese}
           onMouseDown={(e) => {
@@ -71,17 +75,21 @@ export default () => {
 
 ## 属性
 
-| 属性       | 说明                   | 类型       | 默认值 |
-| ---------- | ---------------------- | ---------- | ------ |
-| inputMode  | 输入模式               | zh\| en    | en     |
-| inputValue | 输入的值               | string     | ''     |
-| chinese    | 中文输入状态获得的结果 | string\[\] | \[\]   |
+| 属性       | 说明                   | 类型                                      | 默认值 |
+| ---------- | ---------------------- | ----------------------------------------- | ------ |
+| inputMode  | 输入模式               | zh\| en                                   | en     |
+| inputValue | 输入的值               | string                                    | ''     |
+| chinese    | 中文输入状态获得的结果 | string\[\]                                | \[\]   |
+| onKeyDown  | 按键按下事件           | (e: VKB.KeyboardAttributeType) => void    | -      |
+| onKeyUp    | 按键抬起事件           | (e: VKB.KeyboardAttributeType) => void    | -      |
 
 ## 方法
 
 | 方法              | 说明                                                                  | 类型                                                        | 默认值 |
 | ----------------- | --------------------------------------------------------------------- | ----------------------------------------------------------- | ------ |
 | onClick           | 点击事件                                                              | (e: VKB.KeyboardAttributeType) => void                      | -      |
+| onKeyDown         | 按键按下事件                                                          | (e: VKB.KeyboardAttributeType) => void                      | -      |
+| onKeyUp           | 按键抬起事件                                                          | (e: VKB.KeyboardAttributeType) => void                      | -      |
 | onChangeInputMode | 改变输入模式                                                          | (mode:'zh'\| 'en')=>void                                    | -      |
 | onMouseDown       | 鼠标按下事件,如果不想失去输入框的焦点，应该实现该方法，并阻止默认事件 | (e: React.MouseEvent\<HTMLDivElement, MouseEvent\>) => void | -      |
 | onChangeInputMode | 改变输入模式                                                          | (mode:'zh'\|'en')=>void                                     | -      |

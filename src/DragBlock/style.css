@@ -1,7 +1,12 @@
 .virtual-drag-block {
   position: fixed;
   top: -10000px;
+  transition:
+    left 0.18s ease,
+    top 0.18s ease,
+    transform 0.18s ease;
   user-select: none;
+  will-change: left, top, transform;
   -webkit-user-select: none
     /* cursor: grab; */
 }

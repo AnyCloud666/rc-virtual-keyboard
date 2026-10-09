@@ -1,5 +1,13 @@
 @import url('../var.css');
 
+.number-keyboard-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  color: var(--vkb-key-color);
+  background-color: var(--vkb-background);
+}
+
 .number-keyboard {
   display: grid;
   grid-template-columns: repeat(5, calc((100% - var(--vkb-key-gap) * 4) / 5));
@@ -23,6 +31,13 @@
 }
 
 .number-key-item:active {
+  color: var(--vkb-key-active-font-color);
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+
+.number-key-item-active {
   color: var(--vkb-key-active-font-color);
   background-color: var(--vkb-key-active-background);
   box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);

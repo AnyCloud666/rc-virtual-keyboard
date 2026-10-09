@@ -1,0 +1,229 @@
+import React, { useCallback, useEffect, useRef } from 'react';
+import useHorizontalDragScroll from '../../hooks/useHorizontalDragScroll';
+import useTouchClickGuard from '../../hooks/useTouchClickGuard';
+import { ReactComponent as LeftSvg } from '../../svg/left.svg';
+import { ReactComponent as RightSvg } from '../../svg/right.svg';
+import './style.css';
+
+type CandidateBarProps = {
+  items?: string[];
+  tempValue?: string;
+  tempDisplay?: React.ReactNode;
+  onSelectItem?: (item: string) => void;
+};
+
+const CandidateBar = ({
+  items = [],
+  tempValue,
+  tempDisplay,
+  onSelectItem,
+}: CandidateBarProps) => {
+  const tempInputAreaRef = useRef<HTMLDivElement | null>(null);
+  const scrollDelayTimerRef = useRef<number>();
+  const scrollFrameRef = useRef<number>();
+  const selectTimerRef = useRef<number>();
+  const isContinuousScrollingRef = useRef(false);
+  const scrollDirectionRef = useRef<'add' | 'minus' | null>(null);
+  const lastScrollTimeRef = useRef(0);
+  const { markTouchInteraction, shouldIgnoreClick } = useTouchClickGuard();
+  const dragScroll = useHorizontalDragScroll(tempInputAreaRef);
+  const dedupedItems = items.filter((item) => item !== tempValue);
+
+  const onMore = useCallback(
+    (
+      type: 'add' | 'minus',
+      behavior: ScrollBehavior = 'smooth',
+      distance?: number,
+    ) => {
+      if (!tempInputAreaRef.current) return;
+
+      const width = tempInputAreaRef.current.offsetWidth;
+      const offset = distance ?? width / 10;
+      tempInputAreaRef.current.scrollTo({
+        left:
+          tempInputAreaRef.current.scrollLeft +
+          (type === 'add' ? offset : -offset),
+        behavior,
+      });
+    },
+    [],
+  );
+
+  const stopContinuousScroll = useCallback((shouldKeepSingleStep = true) => {
+    window.clearTimeout(scrollDelayTimerRef.current);
+    if (typeof scrollFrameRef.current === 'number') {
+      window.cancelAnimationFrame(scrollFrameRef.current);
+    }
+
+    if (shouldKeepSingleStep && !isContinuousScrollingRef.current) {
+      const direction = scrollDirectionRef.current;
+      if (direction) {
+        onMore(direction, 'smooth');
+      }
+    }
+
+    isContinuousScrollingRef.current = false;
+    scrollDirectionRef.current = null;
+    lastScrollTimeRef.current = 0;
+  }, [onMore]);
+
+  const startContinuousScroll = useCallback((type: 'add' | 'minus') => {
+    stopContinuousScroll(false);
+    scrollDirectionRef.current = type;
+
+    scrollDelayTimerRef.current = window.setTimeout(() => {
+      isContinuousScrollingRef.current = true;
+      lastScrollTimeRef.current = 0;
+
+      const step = (timestamp: number) => {
+        if (!lastScrollTimeRef.current) {
+          lastScrollTimeRef.current = timestamp;
+        }
+
+        const delta = timestamp - lastScrollTimeRef.current;
+        if (delta > 0) {
+          const distance = Math.max(1, Math.round((delta / 16) * 1.8));
+          onMore(type, 'auto', distance);
+          lastScrollTimeRef.current = timestamp;
+        }
+
+        scrollFrameRef.current = window.requestAnimationFrame(step);
+      };
+
+      scrollFrameRef.current = window.requestAnimationFrame(step);
+    }, 180);
+  }, [onMore, stopContinuousScroll]);
+
+  useEffect(() => {
+    const handleWindowMouseUp = () => {
+      stopContinuousScroll();
+    };
+    const handleWindowTouchEnd = () => {
+      stopContinuousScroll();
+    };
+
+    window.addEventListener('mouseup', handleWindowMouseUp);
+    window.addEventListener('touchend', handleWindowTouchEnd);
+
+    return () => {
+      stopContinuousScroll();
+      window.clearTimeout(selectTimerRef.current);
+      window.removeEventListener('mouseup', handleWindowMouseUp);
+      window.removeEventListener('touchend', handleWindowTouchEnd);
+    };
+  }, [stopContinuousScroll]);
+
+  if (!tempValue && items.length === 0) {
+    return null;
+  }
+
+  const handleSelect = (item: string) => {
+    onSelectItem?.(item);
+  };
+
+  const renderCandidateItem = (
+    item: string,
+    key: string,
+    className = 'candidate-bar-item',
+    content: React.ReactNode = item,
+  ) => (
+    <div
+      key={key}
+      className={className}
+      onMouseDown={(e) => {
+        e.preventDefault();
+      }}
+      onMouseUp={(e) => {
+        e.preventDefault();
+        window.clearTimeout(selectTimerRef.current);
+        selectTimerRef.current = window.setTimeout(() => {
+          if (shouldIgnoreClick() || dragScroll.shouldIgnoreClick()) {
+            return;
+          }
+          handleSelect(item);
+        }, 0);
+      }}
+      onClick={(e) => {
+        e.preventDefault();
+      }}
+      onTouchEnd={(e) => {
+        e.preventDefault();
+        markTouchInteraction();
+        window.clearTimeout(selectTimerRef.current);
+        selectTimerRef.current = window.setTimeout(() => {
+          if (dragScroll.shouldIgnoreClick()) {
+            return;
+          }
+          handleSelect(item);
+        }, 0);
+      }}
+      onTouchCancel={() => {
+        window.clearTimeout(selectTimerRef.current);
+      }}
+    >
+      {content}
+    </div>
+  );
+
+  return (
+    <div className="candidate-bar">
+      <div
+        className="candidate-bar-arrow"
+        onMouseDown={(e) => {
+          e.preventDefault();
+          startContinuousScroll('minus');
+        }}
+        onMouseUp={() => stopContinuousScroll()}
+        onMouseLeave={() => stopContinuousScroll(false)}
+        onTouchStart={(e) => {
+          e.preventDefault();
+          startContinuousScroll('minus');
+        }}
+        onTouchEnd={() => stopContinuousScroll()}
+        onTouchCancel={() => stopContinuousScroll(false)}
+      >
+        <LeftSvg />
+      </div>
+
+      <div
+        className="candidate-bar-list"
+        ref={tempInputAreaRef}
+        onMouseDown={dragScroll.onMouseDown}
+        onTouchStart={dragScroll.onTouchStart}
+      >
+        {tempValue
+          ? renderCandidateItem(
+            tempValue,
+            `temp-${tempValue}`,
+            'candidate-bar-item candidate-bar-item-input',
+            tempDisplay ?? tempValue,
+          )
+          : null}
+
+        {dedupedItems.map((item, index) =>
+          renderCandidateItem(item, `${item}-${index}`),
+        )}
+      </div>
+
+      <div
+        className="candidate-bar-arrow"
+        onMouseDown={(e) => {
+          e.preventDefault();
+          startContinuousScroll('add');
+        }}
+        onMouseUp={() => stopContinuousScroll()}
+        onMouseLeave={() => stopContinuousScroll(false)}
+        onTouchStart={(e) => {
+          e.preventDefault();
+          startContinuousScroll('add');
+        }}
+        onTouchEnd={() => stopContinuousScroll()}
+        onTouchCancel={() => stopContinuousScroll(false)}
+      >
+        <RightSvg />
+      </div>
+    </div>
+  );
+};
+
+export default CandidateBar;

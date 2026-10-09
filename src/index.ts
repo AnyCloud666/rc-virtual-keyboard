@@ -1,22 +1,28 @@
 import {
   EditKeyboardTab,
+  EmojiKeyboardTab,
+  FunctionKeyboardTab,
   LetterKeyboardTab,
   NumberKeyboardTab,
   SettingKeyboardTab,
+  StrokeKeyboardTab,
   SymbolKeyboardTab,
-  WriteKeyboardTab,
 } from './CompositionKeyboard/KeyboardTabs';
 import * as keys from './keys';
 export {
   EditKeyboardTab,
+  EmojiKeyboardTab,
+  FunctionKeyboardTab,
+  keys,
   LetterKeyboardTab,
   NumberKeyboardTab,
   SettingKeyboardTab,
+  StrokeKeyboardTab,
   SymbolKeyboardTab,
-  WriteKeyboardTab,
-  keys,
 };
 
+export { default as EmojiKeyboard } from './EmojiKeyboard';
+export { default as FunctionKeyboard } from './FunctionKeyboard';
 export { default as NumberKeyboard } from './NumberKeyboard';
 
 export { default as LetterKeyboard } from './LetterKeyboard';
@@ -27,15 +33,22 @@ export { default as SymbolKeyboard } from './SymbolKeyboard';
 
 export { default as SettingKeyboard } from './SettingKeyboard';
 
-export { default as WriteKeyboard } from './WriteKeyboard';
+export { default as StrokeKeyboard } from './StrokeKeyboard';
 
 export { default as DragBlock } from './DragBlock';
 
 export { default as CompositionKeyboard } from './CompositionKeyboard';
 
+export { default as WordTempList } from './WordTempList';
+export { default as VirtualInput } from './VirtualInput';
+
 export {
   InitVirtualKeyBoardCtx,
-  default as useVirtualKeyboard,
+  default as VirtualKeyboard,
 } from './VirtualKeyboard';
 
-export { default as useInput } from './hooks/useInput';
+export { default as useInput } from './hooks/useInput/index';
+export { default as useContinuousTrigger } from './hooks/useContinuousTrigger';
+export { default as useHorizontalDragScroll } from './hooks/useHorizontalDragScroll';
+export { default as useTouchClickGuard } from './hooks/useTouchClickGuard';
+export { default as useIsMobile } from './hooks/useIsMobile';

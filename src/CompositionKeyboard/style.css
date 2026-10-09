@@ -52,6 +52,9 @@
   /** 按键文字大小 */
   --vkb-key-font-size: 14px;
 
+  /** 按键字体 */
+  --vkb-key-font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+
   /** tab 高度 */
   --vkb-keyboard-tab: 40px;
 
@@ -111,6 +114,9 @@
   /** 按键文字大小 */
   --vkb-key-font-size: 14px;
 
+  /** 按键字体 */
+  --vkb-key-font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+
   /** tab 高度 */
   --vkb-keyboard-tab: 40px;
 
@@ -120,9 +126,16 @@
 
 .virtual-keyboard {
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
+  max-height: 100%;
+  overflow: visible;
+  padding: var(--vkb-key-gap);
+  padding-bottom: calc(var(--vkb-key-gap) + env(safe-area-inset-bottom, 0px));
   font-size: var(--vkb-key-font-size);
+  font-family: var(--vkb-key-font-family);
   color: var(--vkb-key-color);
   background-color: var(--vkb-background);
   border-radius: var(--vkb-key-borer-radius);
@@ -137,9 +150,10 @@
   align-items: center;
   justify-content: space-around;
   gap: var(--vkb-key-gap);
-  width: calc(100% - var(--vkb-key-gap) * 2);
+  width: 100%;
   height: var(--vkb-keyboard-tab);
-  padding: var(--vkb-key-gap);
+  margin-bottom: var(--vkb-key-gap);
+  flex-shrink: 0;
 }
 
 .keyboard-tab,
@@ -181,15 +195,41 @@
 }
 
 .virtual-keyboard-content {
-  height: calc(100% - var(--vkb-keyboard-tab) - var(--vkb-key-gap) * 2);
-  padding: 0 var(--vkb-key-gap) var(--vkb-key-gap);
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+  overflow: visible;
   box-sizing: border-box;
+}
+
+.virtual-keyboard-pane {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.virtual-keyboard-pane-active {
+  z-index: 1;
+  opacity: 1;
+  visibility: visible;
+  transform: translate3d(0, 0, 0);
+  pointer-events: auto;
+}
+
+.virtual-keyboard-pane-hidden {
+  z-index: -1;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate3d(-200vw, 0, 0);
+  pointer-events: none;
 }
 
 .virtual-drag-block {
   position: fixed;
   top: -10000px;
-  user-select: none;
   user-select: none;
 
   /* cursor: grab; */

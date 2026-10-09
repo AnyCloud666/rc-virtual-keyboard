@@ -1,0 +1,103 @@
+.word-keyboard-temp {
+  position: absolute;
+  top: calc((var(--vkb-keyboard-tab) + var(--vkb-key-gap) * 2) * -1);
+  display: flex;
+  gap: var(--vkb-key-gap);
+  width: 100%;
+  height: calc(var(--vkb-keyboard-tab) + var(--vkb-key-gap) * 2);
+  background-color: var(--vkb-background);
+  box-sizing: border-box;
+  padding: var(--vkb-key-gap) 0;
+}
+
+.word-keyboard-temp-value {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: calc(10% + var(--vkb-key-gap));
+  padding: 0 var(--vkb-key-gap);
+  display: flex;
+  align-items: center;
+  height: 100%;
+  max-width: calc(80% - var(--vkb-key-gap) * 2);
+  background-color: var(--vkb-background);
+  box-sizing: border-box;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.word-keyboard-temp-list {
+  display: flex;
+  gap: var(--vkb-key-gap);
+  width: 80%;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.word-keyboard-temp-char {
+  display: flex;
+  align-items: center;
+  width: min-content;
+  padding: 0 10px;
+  height: 100%;
+  background-color: var(--vkb-key-background);
+  cursor: pointer;
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  box-sizing: border-box;
+}
+
+.word-keyboard-temp-right,
+.word-keyboard-temp-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(10% - var(--vkb-key-gap));
+  height: 100%;
+  color: var(--vkb-key-color);
+  fill: var(--vkb-key-color);
+  background-color: var(--vkb-key-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  box-sizing: border-box;
+  border-radius: var(--vkb-key-borer-radius);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.word-keyboard-temp-right svg,
+.word-keyboard-temp-left svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+  transition: fill 0.2s ease;
+}
+
+.word-keyboard-temp-right:hover,
+.word-keyboard-temp-left:hover {
+  background-color: var(--vkb-key-active-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+}
+
+.word-keyboard-temp-right:hover svg,
+.word-keyboard-temp-left:hover svg {
+  fill: var(--vkb-key-active-font-color);
+}
+
+.word-keyboard-temp-char:active,
+.word-keyboard-temp-right:active,
+.word-keyboard-temp-left:active {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+
+.word-keyboard-temp-right:active svg,
+.word-keyboard-temp-left:active svg {
+  fill: var(--vkb-key-active-font-color);
+}

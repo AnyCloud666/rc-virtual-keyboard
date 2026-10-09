@@ -14,9 +14,38 @@ nav:
 
 # 组合虚拟键盘
 
-## 简单案例
+## 当前版本用法
+
+当前版本开始，支持直接使用 `VirtualKeyboard` 组件，不再需要额外包一层 `useVirtualKeyboard` 和 `VirtualKeyboardProvider`。
 
 ```jsx
+import { useState } from 'react';
+import { VirtualKeyboard } from 'rc-virtual-keyboard';
+
+export default () => {
+  const [value, setValue] = useState('');
+
+  return (
+    <>
+      <input
+        placeholder="可使用右侧虚拟键盘"
+        onInput={(e) => {
+          setValue(e.target.value);
+          console.log('value', e.target.value);
+        }}
+      />
+      <div>value：{value}</div>
+      <VirtualKeyboard numberKeyboardLayoutMode="desc" />
+    </>
+  );
+};
+```
+
+## 历史版本用法
+
+如果你使用的是旧版本，仍然可以参考下面这种写法：
+
+```js
 import { useState } from 'react';
 import { useVirtualKeyboard } from 'rc-virtual-keyboard';
 
@@ -26,12 +55,10 @@ export default () => {
 
   return (
     <>
-      {/* <div>可使用右侧虚拟键盘</div> */}
       <input
         placeholder="可使用右侧虚拟键盘"
         onInput={(e) => {
           setValue(e.target.value);
-          console.log('value', e.target.value);
         }}
       />
       <div>value：{value}</div>
@@ -45,28 +72,39 @@ export default () => {
 
 ## 属性
 
-| 属性               | 说明                                              | 类型              | 默认值         |
-| ------------------ | ------------------------------------------------- | ----------------- | -------------- |
-| width              | 宽度                                              | string            | 500px          |
-| height             | 高度                                              | string            | 320px          |
-| zIndex             | 层级                                              | string\| number   | 9999           |
-| showDragHandle     | 显示移动句柄 & 允许移动                           | boolean           | true           |
-| show               | 是否显示                                          | boolean           | false          |
-| virtualKeyboardTab | 自定义键盘 tab 内容                               | KeyboardTabItem[] | all            |
-| theme              | 自定义主题,当使用了主题变量时，主题变量的权重更高 | Partial\<Theme\>  | 参考默认 token |
-| themeMode          | 主题模式                                          | string            | light          |
-| positionMode       | 位置模式                                          | string            | float          |
-| focusShow          | 输入框获得焦点时是否自动显示键盘                  | boolean           | true           |
+| 属性                     | 说明                                              | 类型              | 默认值         |
+| ------------------------ | ------------------------------------------------- | ----------------- | -------------- |
+| width                    | 宽度                                              | string            | 500px          |
+| height                   | 高度                                              | string            | 320px          |
+| zIndex                   | 层级                                              | string\| number   | 9999           |
+| showDragHandle           | 显示移动句柄 & 允许移动                           | boolean           | true           |
+| showIcon                 | 是否显示外部唤起 icon                             | boolean           | true           |
+| show                     | 是否显示                                          | boolean           | false          |
+| virtualKeyboardTab       | 自定义键盘 tab 内容                               | KeyboardTabItem[] | all            |
+| theme                    | 自定义主题,当使用了主题变量时，主题变量的权重更高 | Partial\<Theme\>  | 参考默认 token |
+| themeMode                | 主题模式                                          | string            | light          |
+| positionMode             | 位置模式                                          | string            | float          |
+| focusShow                | 输入框获得焦点时是否自动显示键盘                  | boolean           | true           |
+| numberKeyboardLayoutMode | 数字键盘排列                                      | `'asc' \| 'desc'` | asc            |
+| getContainer             | 指定虚拟键盘挂载节点，返回空时回退当前渲染位置    | `() => HTMLElement \| null` | -      |
+
+其中：
+
+- `asc`
+  - `123 / 456 / 789`
+- `desc`
+  - `789 / 456 / 123`
 
 ## 方法
 
-| 方法            | 说明                                     | 类型                               | 默认值 |
-| --------------- | ---------------------------------------- | ---------------------------------- | ------ |
-| setShow         | 显示 ,传入的必须是 setStatus 重新 render | (show: boolean) => void            | -      |
-| setThemeMode    | 设置主题模式                             | (mode:string)=>void                | -      |
-| setPositionMode | 设置位置模式                             | (mode:string)=>void                | -      |
-| onChange        | 操作时的回调,通过 ctx 重写 onChange 实现 | onChange?: (value: string) => void | -      |
-| onEnter         | 回车 通过 ctx 重写 onEnter 实现          | onEnter?: () => void               | -      |
+| 方法            | 说明                                                   | 类型                      | 默认值 |
+| --------------- | ------------------------------------------------------ | ------------------------- | ------ |
+| setShow         | 显示 ,传入的必须是 setStatus 重新 render               | (show: boolean) => void   | -      |
+| setThemeMode    | 设置主题模式                                           | (mode:string)=>void       | -      |
+| setPositionMode | 设置位置模式                                           | (mode:string)=>void       | -      |
+| onChange        | 操作时的回调,通过 ctx 重写 onChange 实现               | (value: string) => void   | -      |
+| onEnter         | 回车 通过 ctx 重写 onEnter 实现                        | () => void                | -      |
+| onPinyin2Word   | 默认实现了最简单的转换方式，可以自定义实现             | (pinyin:string)=>string[] | -      |
 
 ## 支持的样式 token
 
@@ -100,6 +138,11 @@ const tabs: VKB.KeyboardTabItem[] = [
   SymbolKeyboardTab,
   EditKeyboardTab,
   SettingKeyboardTab,
-  WriteKeyboardTab,
 ];
+```
+
+## 数字键盘排列测试
+
+```tsx
+<code src="../../docs/number-keyboard-layout-demo.tsx"></code>
 ```

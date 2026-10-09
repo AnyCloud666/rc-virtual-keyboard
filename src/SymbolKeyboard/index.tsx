@@ -6,13 +6,24 @@ import './style.css';
 
 const SymbolKeyboard = ({
   onClick,
+  onKeyDown,
+  onKeyUp,
+  isKeyActive,
 }: {
-  onClick: (e: VKB.KeyboardAttributeType) => void;
+  onClick?: (e: VKB.KeyboardAttributeType) => void;
+  onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
+  onKeyUp?: (e: VKB.KeyboardAttributeType) => void;
+  isKeyActive?: (key: VKB.KeyboardAttributeType) => boolean;
 }) => {
   const [activeSymbol, setActiveSymbol] = useState(symbolKeys[0]);
+  const triggerKey = (item: VKB.KeyboardAttributeType) => {
+    onKeyDown?.(item);
+    onClick?.(item);
+    onKeyUp?.(item);
+  };
   const { startContinuousTrigger, stopContinuousTrigger } =
     useContinuousTrigger<VKB.KeyboardAttributeType>({
-      onTrigger: onClick,
+      onTrigger: triggerKey,
     });
 
   return (
@@ -26,6 +37,10 @@ const SymbolKeyboard = ({
               }`}
               key={item.id}
               onClick={() => setActiveSymbol(item)}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                setActiveSymbol(item);
+              }}
             >
               {item.label}
             </div>
@@ -36,21 +51,23 @@ const SymbolKeyboard = ({
         {activeSymbol.value.map((item) => {
           return (
             <div
-              className="symbol-key-item"
+              className={`symbol-key-item ${
+                isKeyActive?.(item) ? 'symbol-key-item-active' : ''
+              }`}
               key={item.keyCode}
               onClick={(e) => e.preventDefault()}
               onMouseDown={(e) => {
                 e.preventDefault();
-                startContinuousTrigger(item);
+                startContinuousTrigger(item, 'mouse');
               }}
-              onMouseUp={stopContinuousTrigger}
-              onMouseLeave={stopContinuousTrigger}
+              onMouseUp={() => stopContinuousTrigger('mouse')}
+              onMouseLeave={() => stopContinuousTrigger('mouse')}
               onTouchStart={(e) => {
                 e.preventDefault();
-                startContinuousTrigger(item);
+                startContinuousTrigger(item, 'touch');
               }}
-              onTouchEnd={stopContinuousTrigger}
-              onTouchCancel={stopContinuousTrigger}
+              onTouchEnd={() => stopContinuousTrigger('touch')}
+              onTouchCancel={() => stopContinuousTrigger('touch')}
             >
               {item.key}
               <span className="symbol-key-item-tips">

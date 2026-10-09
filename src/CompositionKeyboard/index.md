@@ -23,7 +23,7 @@ import {
   SymbolKeyboardTab,
   EditKeyboardTab,
   SettingKeyboardTab,
-  WriteKeyboardTab,
+  StrokeKeyboardTab,
 } from 'rc-virtual-keyboard';
 export default () => {
   const { themeMode, setThemeMode } = useState('light');
@@ -47,7 +47,7 @@ export default () => {
             LetterKeyboardTab,
             NumberKeyboardTab,
             SymbolKeyboardTab,
-            WriteKeyboardTab,
+            StrokeKeyboardTab,
             EditKeyboardTab,
             SettingKeyboardTab,
           ]}

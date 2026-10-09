@@ -1,0 +1,78 @@
+.stroke-keyboard-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vkb-key-gap);
+  width: 100%;
+  height: 100%;
+  color: var(--vkb-key-color);
+  background: var(--vkb-background);
+}
+
+.stroke-keyboard-keys {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: var(--vkb-key-gap);
+}
+
+.stroke-keyboard-row {
+  display: grid;
+  flex: 1;
+  min-height: 0;
+  gap: var(--vkb-key-gap);
+}
+
+.stroke-keyboard-row-top {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stroke-keyboard-row-bottom {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stroke-keyboard-key {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 2px;
+  color: var(--vkb-key-color);
+  font: inherit;
+  background: var(--vkb-key-background);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-border-color);
+  border-radius: var(--vkb-key-borer-radius);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-shadow-color);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.stroke-keyboard-key span {
+  font-size: 11px;
+}
+
+.stroke-keyboard-key svg {
+  width: var(--vkb-keyboard-svg-size);
+  height: var(--vkb-keyboard-svg-size);
+}
+
+.stroke-keyboard-key .stroke-keyboard-glyph {
+  width: 36px;
+  height: 36px;
+}
+
+.stroke-keyboard-strokes {
+  display: flex;
+  align-items: center;
+}
+
+.stroke-keyboard-strokes .stroke-keyboard-glyph {
+  width: 23px;
+  height: 23px;
+}
+
+.stroke-keyboard-key:active {
+  color: var(--vkb-key-active-font-color);
+  background: var(--vkb-key-active-background);
+}

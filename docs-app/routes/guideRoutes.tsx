@@ -1,0 +1,1 @@
+export { guideRoutes } from './guide';

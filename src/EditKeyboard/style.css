@@ -65,6 +65,12 @@
   border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
 }
 
+.cursor-item-pressed {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+
 .cursor-item:nth-child(1) {
   grid-column: 2;
 }
@@ -90,6 +96,12 @@
 }
 
 .edit-key-control:active {
+  background-color: var(--vkb-key-active-background);
+  box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
+  border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);
+}
+
+.edit-key-control-active {
   background-color: var(--vkb-key-active-background);
   box-shadow: 0 0 var(--vkb-key-shadow-width) var(--vkb-key-active-shadow-color);
   border: var(--vkb-key-border-width) solid var(--vkb-key-active-border-color);

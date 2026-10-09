@@ -1,0 +1,476 @@
+import { useRef, useState } from 'react';
+import type { ElementRef, FormEvent, RefObject } from 'react';
+import { Button, Input, InputNumber, Select, Space, Typography } from 'antd';
+import type { InputRef } from 'antd';
+import {
+  ProForm,
+  ProFormDigit,
+  ProFormSelect,
+  ProFormText,
+} from '@ant-design/pro-components';
+import { VirtualKeyboard } from 'rc-virtual-keyboard';
+
+const { Paragraph, Text } = Typography;
+
+type LogEntry = {
+  id: number;
+  message: string;
+};
+
+type MaybeInputEvent =
+  | string
+  | FormEvent<HTMLInputElement>
+  | {
+      currentTarget?: { value?: string | number | null };
+      target?: { value?: string | number | null };
+    }
+  | undefined;
+
+const getEventValue = (target: unknown) => {
+  if (
+    typeof target === 'object' &&
+    target !== null &&
+    'value' in target
+  ) {
+    const value = (target as { value?: string | number | null }).value;
+
+    if (value !== undefined && value !== null) {
+      return String(value);
+    }
+  }
+
+  return undefined;
+};
+
+export default function RefInputDemo() {
+  type InputNumberElement = ElementRef<typeof InputNumber>;
+  const nativeInputRef = useRef<HTMLInputElement | null>(null);
+  const antdInputRef = useRef<InputRef>(null);
+  const inputNumberRef = useRef<InputNumberElement | null>(null);
+  const precisionInputNumberRef = useRef<InputNumberElement | null>(null);
+  const proFormInputRef = useRef<InputRef>(null);
+  const proFormDigitRef = useRef<InputNumberElement | null>(null);
+  const nativeValueTextRef = useRef<HTMLSpanElement | null>(null);
+  const antdValueTextRef = useRef<HTMLSpanElement | null>(null);
+  const inputNumberValueTextRef = useRef<HTMLSpanElement | null>(null);
+  const precisionInputNumberValueTextRef = useRef<HTMLSpanElement | null>(null);
+  const proFormValueTextRef = useRef<HTMLSpanElement | null>(null);
+  const proFormDigitValueTextRef = useRef<HTMLSpanElement | null>(null);
+  const logIdRef = useRef(0);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+
+  const appendLog = (message: string) => {
+    logIdRef.current += 1;
+    setLogs((prev) => [{ id: logIdRef.current, message }, ...prev].slice(0, 12));
+  };
+
+  const getAntdNativeInput = () => antdInputRef.current?.input ?? null;
+  const getProFormNativeInput = () => proFormInputRef.current?.input ?? null;
+  const resolveNativeInput = (target: unknown): HTMLInputElement | null => {
+    if (!target) return null;
+
+    if (typeof target === 'object') {
+      const nativeElement = (target as { nativeElement?: unknown }).nativeElement;
+      if (typeof HTMLElement !== 'undefined' && nativeElement instanceof HTMLElement) {
+        return nativeElement.tagName === 'INPUT'
+          ? (nativeElement as HTMLInputElement)
+          : nativeElement.querySelector('input');
+      }
+
+      const inputCandidate = (target as { input?: unknown }).input;
+      if (typeof HTMLInputElement !== 'undefined' && inputCandidate instanceof HTMLInputElement) {
+        return inputCandidate;
+      }
+    }
+
+    if (typeof HTMLInputElement !== 'undefined' && target instanceof HTMLInputElement) {
+      return target;
+    }
+
+    if (typeof HTMLElement !== 'undefined' && target instanceof HTMLElement) {
+      return target.tagName === 'INPUT' ? (target as HTMLInputElement) : target.querySelector('input');
+    }
+
+    return null;
+  };
+  const getPrecisionInputNumberNativeInput = () =>
+    resolveNativeInput(precisionInputNumberRef.current);
+  const getInputNumberNativeInput = () => resolveNativeInput(inputNumberRef.current);
+  const getProFormDigitNativeInput = () => resolveNativeInput(proFormDigitRef.current);
+
+  const moveCaretToEnd = (input: HTMLInputElement | null, label: string) => {
+    if (!input) {
+      appendLog(`${label} ref 未拿到真实 input`);
+      return;
+    }
+
+    input.focus();
+    const end = input.value.length;
+    input.setSelectionRange(end, end);
+    appendLog(`${label} ref 聚焦成功，光标已移动到末尾`);
+  };
+
+  const selectAll = (input: HTMLInputElement | null, label: string) => {
+    if (!input) {
+      appendLog(`${label} ref 未拿到真实 input`);
+      return;
+    }
+
+    input.focus();
+    input.select();
+    appendLog(`${label} ref 选中了全部内容`);
+  };
+
+  const syncValuePreview = (target: HTMLInputElement | null, textRef: RefObject<HTMLSpanElement | null>) => {
+    if (!textRef.current) return;
+    textRef.current.textContent = target?.value || '未输入';
+  };
+
+  const resolveEventValue = (event: MaybeInputEvent, fallbackInput: HTMLInputElement | null) => {
+    if (typeof event === 'string') {
+      return event;
+    }
+
+    const currentTargetValue = getEventValue(event?.currentTarget);
+    if (currentTargetValue !== undefined) {
+      return currentTargetValue;
+    }
+
+    const targetValue = getEventValue(event?.target);
+    if (targetValue !== undefined) {
+      return targetValue;
+    }
+
+    return fallbackInput?.value ?? '';
+  };
+
+  const handleNativeInput = (e: FormEvent<HTMLInputElement>) => {
+    const nextValue = e.currentTarget.value;
+    if (nativeInputRef.current) {
+      nativeInputRef.current.value = nextValue;
+      syncValuePreview(nativeInputRef.current, nativeValueTextRef);
+    }
+    appendLog(`原生 input input -> ${nextValue || '(empty)'}`);
+  };
+
+  const handleAntdInput = (e: FormEvent<HTMLInputElement>) => {
+    const nextValue = e.currentTarget.value;
+    const input = getAntdNativeInput();
+    if (input) {
+      input.value = nextValue;
+      syncValuePreview(input, antdValueTextRef);
+    }
+    appendLog(`antd Input input -> ${nextValue || '(empty)'}`);
+  };
+
+  const handleInputNumberInput = (e: MaybeInputEvent) => {
+    const input = getInputNumberNativeInput();
+    const nextValue = resolveEventValue(e, input);
+    if (input) {
+      input.value = nextValue;
+      syncValuePreview(input, inputNumberValueTextRef);
+    }
+    appendLog(`InputNumber input -> ${nextValue || '(empty)'}`);
+  };
+
+  const handlePrecisionInputNumberInput = (e: MaybeInputEvent) => {
+    const input = getPrecisionInputNumberNativeInput();
+    const nextValue = resolveEventValue(e, input);
+    if (input) {
+      input.value = nextValue;
+      syncValuePreview(input, precisionInputNumberValueTextRef);
+    }
+    appendLog(`InputNumber precision=2 input -> ${nextValue || '(empty)'}`);
+  };
+
+  const handleProFormInput = (e: FormEvent<HTMLInputElement>) => {
+    const nextValue = e.currentTarget.value;
+    const input = getProFormNativeInput();
+    if (input) {
+      input.value = nextValue;
+      syncValuePreview(input, proFormValueTextRef);
+    }
+    appendLog(`ProFormText input -> ${nextValue || '(empty)'}`);
+  };
+
+  const handleProFormDigitInput = (e: MaybeInputEvent) => {
+    const input = getProFormDigitNativeInput();
+    const nextValue = resolveEventValue(e, input);
+    if (input) {
+      input.value = nextValue;
+      syncValuePreview(input, proFormDigitValueTextRef);
+    }
+    appendLog(`ProFormDigit input -> ${nextValue || '(empty)'}`);
+  };
+
+  return (
+    <>
+      <div style={{ display: 'grid', gap: 20 }}>
+        <div style={{ display: 'grid', gap: 12, maxWidth: 720 }}>
+          <Text strong>原生 input + ref</Text>
+          <input
+            ref={nativeInputRef}
+            placeholder="聚焦这里，使用虚拟键盘输入"
+            onFocus={() => appendLog('原生 input focus')}
+            onInput={handleNativeInput}
+            onChange={(e) => {
+              appendLog(`原生 input change -> ${(e.target as HTMLInputElement).value || '(empty)'}`);
+            }}
+          />
+          <Space wrap>
+            <Button onClick={() => moveCaretToEnd(nativeInputRef.current, '原生 input')}>
+              ref 聚焦到末尾
+            </Button>
+            <Button onClick={() => selectAll(nativeInputRef.current, '原生 input')}>
+              ref 全选
+            </Button>
+          </Space>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            当前值：<span ref={nativeValueTextRef}>未输入</span>
+          </Paragraph>
+        </div>
+
+        <div style={{ display: 'grid', gap: 12, maxWidth: 720 }}>
+          <Text strong>Ant Design Input + ref</Text>
+          <Input
+            ref={antdInputRef}
+            placeholder="聚焦这里，观察 antd Input 是否正常响应"
+            onFocus={() => appendLog('antd Input focus')}
+            onInput={handleAntdInput}
+            onChange={(e) => {
+              appendLog(`antd Input change -> ${e.target.value || '(empty)'}`);
+            }}
+          />
+          <Space wrap>
+            <Button onClick={() => moveCaretToEnd(getAntdNativeInput(), 'antd Input')}>
+              ref 聚焦到末尾
+            </Button>
+            <Button onClick={() => selectAll(getAntdNativeInput(), 'antd Input')}>
+              ref 全选
+            </Button>
+          </Space>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            当前值：<span ref={antdValueTextRef}>未输入</span>
+          </Paragraph>
+        </div>
+
+        <div style={{ display: 'grid', gap: 12, maxWidth: 720 }}>
+          <Text strong>Ant Design InputNumber + ref</Text>
+          <InputNumber
+            ref={inputNumberRef}
+            controls={false}
+            style={{ width: '100%' }}
+            placeholder="聚焦这里，观察 InputNumber 是否正常响应"
+            onFocus={() => appendLog('InputNumber focus')}
+            onInput={handleInputNumberInput}
+            onChange={(value) => {
+              appendLog(`InputNumber change -> ${value ?? '(empty)'}`);
+            }}
+          />
+          <Space wrap>
+            <Button onClick={() => moveCaretToEnd(getInputNumberNativeInput(), 'InputNumber')}>
+              ref 聚焦到末尾
+            </Button>
+            <Button onClick={() => selectAll(getInputNumberNativeInput(), 'InputNumber')}>
+              ref 全选
+            </Button>
+          </Space>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            当前值：<span ref={inputNumberValueTextRef}>未输入</span>
+          </Paragraph>
+        </div>
+
+        <div style={{ display: 'grid', gap: 12, maxWidth: 720 }}>
+          <Text strong>Ant Design InputNumber + precision=2 特殊示例</Text>
+          <InputNumber
+            ref={precisionInputNumberRef}
+            precision={2}
+            controls={false}
+            style={{ width: '100%' }}
+            placeholder="输入 1 后不要立刻变成 1.00，继续输入"
+            onFocus={() => appendLog('InputNumber precision=2 focus')}
+            onInput={handlePrecisionInputNumberInput}
+            onChange={(value) => {
+              appendLog(`InputNumber precision=2 change -> ${value ?? '(empty)'}`);
+            }}
+          />
+          <Space wrap>
+            <Button
+              onClick={() =>
+                moveCaretToEnd(
+                  getPrecisionInputNumberNativeInput(),
+                  'InputNumber precision=2',
+                )
+              }
+            >
+              ref 聚焦到末尾
+            </Button>
+            <Button
+              onClick={() =>
+                selectAll(
+                  getPrecisionInputNumberNativeInput(),
+                  'InputNumber precision=2',
+                )
+              }
+            >
+              ref 全选
+            </Button>
+          </Space>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            当前值：<span ref={precisionInputNumberValueTextRef}>未输入</span>
+          </Paragraph>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            验证点：输入过程中不应提前补成两位小数，失焦后再按 precision 格式化。
+          </Paragraph>
+        </div>
+
+        <div style={{ display: 'grid', gap: 12, maxWidth: 720 }}>
+          <Text strong>ProFormText + ref</Text>
+          <ProForm
+            submitter={false}
+            layout="vertical"
+            style={{ maxWidth: 720 }}
+          >
+            <ProFormText
+              name="proFormTextDemo"
+              label="ProFormText"
+              fieldProps={{
+                ref: proFormInputRef,
+                placeholder: '聚焦这里，观察 ProFormText 是否正常响应',
+                onFocus: () => appendLog('ProFormText focus'),
+                onInput: handleProFormInput,
+                onChange: (e) => {
+                  appendLog(`ProFormText change -> ${e.target.value || '(empty)'}`);
+                },
+              }}
+            />
+          </ProForm>
+          <Space wrap>
+            <Button onClick={() => moveCaretToEnd(getProFormNativeInput(), 'ProFormText')}>
+              ref 聚焦到末尾
+            </Button>
+            <Button onClick={() => selectAll(getProFormNativeInput(), 'ProFormText')}>
+              ref 全选
+            </Button>
+          </Space>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            当前值：<span ref={proFormValueTextRef}>未输入</span>
+          </Paragraph>
+        </div>
+
+        <div style={{ display: 'grid', gap: 12, maxWidth: 720 }}>
+          <Text strong>ProFormDigit + ref</Text>
+          <ProForm
+            submitter={false}
+            layout="vertical"
+            style={{ maxWidth: 720 }}
+          >
+            <ProFormDigit
+              name="proFormDigitDemo"
+              label="ProFormDigit"
+              fieldProps={{
+                ref: proFormDigitRef,
+                controls: false,
+                style: { width: '100%' },
+                placeholder: '聚焦这里，观察 ProFormDigit 是否正常响应',
+                onFocus: () => appendLog('ProFormDigit focus'),
+                onInput: handleProFormDigitInput,
+                onChange: (value) => {
+                  appendLog(`ProFormDigit change -> ${value ?? '(empty)'}`);
+                },
+              }}
+            />
+          </ProForm>
+          <Space wrap>
+            <Button onClick={() => moveCaretToEnd(getProFormDigitNativeInput(), 'ProFormDigit')}>
+              ref 聚焦到末尾
+            </Button>
+            <Button onClick={() => selectAll(getProFormDigitNativeInput(), 'ProFormDigit')}>
+              ref 全选
+            </Button>
+          </Space>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            当前值：<span ref={proFormDigitValueTextRef}>未输入</span>
+          </Paragraph>
+        </div>
+
+        <div style={{ display: 'grid', gap: 12, maxWidth: 720 }}>
+          <Text strong>Ant Design Select + data-vkb-auto-popup=false</Text>
+          <Select
+            style={{ width: '100%' }}
+            placeholder="聚焦这里，验证 Select 不自动弹出虚拟键盘"
+            data-vkb-auto-popup="false"
+            options={[
+              { label: '选项一', value: 'one' },
+              { label: '选项二', value: 'two' },
+              { label: '选项三', value: 'three' },
+            ]}
+            onFocus={() => appendLog('Ant Design Select focus')}
+            onChange={(value) => appendLog(`Ant Design Select change -> ${value}`)}
+          />
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            验证点：Select 内部搜索 input 聚焦时，不应自动弹出虚拟键盘。
+          </Paragraph>
+        </div>
+
+        <div style={{ display: 'grid', gap: 12, maxWidth: 720 }}>
+          <Text strong>ProFormSelect + data-vkb-auto-popup=false</Text>
+          <ProForm
+            submitter={false}
+            layout="vertical"
+            style={{ maxWidth: 720 }}
+          >
+            <ProFormSelect
+              name="proFormSelectDemo"
+              label="ProFormSelect"
+              fieldProps={{
+                placeholder: '聚焦这里，验证 ProFormSelect 不自动弹出虚拟键盘',
+                'data-vkb-auto-popup': 'false',
+                onFocus: () => appendLog('ProFormSelect focus'),
+                onChange: (value) => appendLog(`ProFormSelect change -> ${value}`),
+                options: [
+                  { label: '选项一', value: 'one' },
+                  { label: '选项二', value: 'two' },
+                  { label: '选项三', value: 'three' },
+                ],
+              }}
+            />
+          </ProForm>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            验证点：ProFormSelect 内部搜索 input 聚焦时，不应自动弹出虚拟键盘。
+          </Paragraph>
+        </div>
+
+        <div
+          style={{
+            maxWidth: 720,
+            border: '1px solid #f0f0f0',
+            borderRadius: 12,
+            padding: 16,
+            background: '#fafafa',
+          }}
+        >
+          <Text strong>最近事件</Text>
+          <div style={{ display: 'grid', gap: 8, marginTop: 12 }}>
+            {logs.length > 0 ? logs.map((item) => (
+              <div
+                key={item.id}
+                style={{
+                  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                  fontSize: 12,
+                  lineHeight: 1.5,
+                }}
+              >
+                {item.message}
+              </div>
+            )) : (
+              <Text type="secondary">先点击 ref 按钮或直接输入，观察事件顺序。</Text>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <VirtualKeyboard showIcon={false} />
+    </>
+  );
+}
