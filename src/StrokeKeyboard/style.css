@@ -9,12 +9,26 @@
 }
 
 .stroke-keyboard-keys {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: var(--vkb-key-gap);
+}
+
+.stroke-keyboard-row {
   display: grid;
   flex: 1;
   min-height: 0;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: var(--vkb-key-gap);
+}
+
+.stroke-keyboard-row-top {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stroke-keyboard-row-bottom {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .stroke-keyboard-key {
@@ -61,18 +75,4 @@
 .stroke-keyboard-key:active {
   color: var(--vkb-key-active-font-color);
   background: var(--vkb-key-active-background);
-}
-
-.stroke-keyboard-key-space {
-  grid-column: span 2;
-}
-
-.stroke-keyboard-key-backspace {
-  grid-column: 5;
-  grid-row: 1;
-}
-
-.stroke-keyboard-key-5 {
-  grid-column: 1 / span 2;
-  grid-row: 2;
 }

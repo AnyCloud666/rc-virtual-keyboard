@@ -90,6 +90,24 @@ const StrokeKeyboard = ({
     { id: 'space', content: <>空格</>, action: space },
     { id: 'enter', content: Enter.renderKey, action: enter },
   ];
+  const topActions = [...actions.slice(0, 3), actions[5]];
+  const bottomActions = [actions[3], actions[4], actions[6], actions[7]];
+
+  const renderAction = ({ id, content, action }: (typeof actions)[number]) => (
+    <div
+      key={id}
+      aria-label={id === 'backspace' ? '退格' : id === 'enter' ? '确认' : undefined}
+      className={`stroke-keyboard-key stroke-keyboard-key-${id}`}
+      onMouseDown={(event) => event.preventDefault()}
+      onTouchStart={(event) => {
+        event.preventDefault();
+        action();
+      }}
+      onClick={action}
+    >
+      {content}
+    </div>
+  );
 
   return (
     <div className="stroke-keyboard-shell">
@@ -102,22 +120,12 @@ const StrokeKeyboard = ({
         }}
       />
       <div className="stroke-keyboard-keys">
-        {actions.map(({ id, content, action }) => (
-          <button
-            key={id}
-            type="button"
-            aria-label={id === 'backspace' ? '退格' : id === 'enter' ? '确认' : undefined}
-            className={`stroke-keyboard-key stroke-keyboard-key-${id}`}
-            onMouseDown={(event) => event.preventDefault()}
-            onTouchStart={(event) => {
-              event.preventDefault();
-              action();
-            }}
-            onClick={action}
-          >
-            {content}
-          </button>
-        ))}
+        <div className="stroke-keyboard-row stroke-keyboard-row-top">
+          {topActions.map(renderAction)}
+        </div>
+        <div className="stroke-keyboard-row stroke-keyboard-row-bottom">
+          {bottomActions.map(renderAction)}
+        </div>
       </div>
     </div>
   );
