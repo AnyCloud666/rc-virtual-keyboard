@@ -112,6 +112,7 @@ declare namespace VKB {
     | 'edit'
     | 'emjo'
     | 'write'
+    | 'stroke'
     | 'setting'
     | 'chinese';
 

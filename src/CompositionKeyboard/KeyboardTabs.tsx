@@ -12,6 +12,7 @@ import { ReactComponent as WriteSvg } from '../svg/write.svg';
 // import EmjoSvg from './svg/emjo.svg?react'
 
 import { ReactComponent as SettingSvg } from '../svg/setting.svg';
+import { ReactComponent as StrokeSvg } from '../svg/stroke.svg';
 
 import EditKeyboard from '../EditKeyboard';
 import LetterKeyboard from '../LetterKeyboard';
@@ -19,6 +20,7 @@ import NumberKeyboard from '../NumberKeyboard';
 import SettingKeyBoard from '../SettingKeyboard';
 import SymbolKeyboard from '../SymbolKeyboard';
 import WriteKeyboard from '../WriteKeyboard';
+import StrokeKeyboard from '../StrokeKeyboard';
 import { EN } from '../keys';
 import { VKB } from '../typing';
 import './style.css';
@@ -170,6 +172,20 @@ export const WriteKeyboardTab: VKB.KeyboardTabItem = {
     />
   ),
 };
+/** 五笔画输入 tab */
+export const StrokeKeyboardTab: VKB.KeyboardTabItem = {
+  id: 'stroke',
+  label: <StrokeSvg aria-label="笔画输入" />,
+  name: '笔画输入',
+  Component: ({ onClick, onSelectChinese, onKeyDown, onKeyUp }) => (
+    <StrokeKeyboard
+      onClick={onClick}
+      onSelectChinese={onSelectChinese}
+      onKeyDown={onKeyDown}
+      onKeyUp={onKeyUp}
+    />
+  ),
+};
 /** 设置tab */
 export const SettingKeyboardTab: VKB.KeyboardTabItem = {
   id: 'setting',
@@ -224,6 +240,7 @@ const tabs: VKB.KeyboardTabItem[] = [
   SymbolKeyboardTab,
   EditKeyboardTab,
   WriteKeyboardTab,
+  StrokeKeyboardTab,
   SettingKeyboardTab,
 ];
 

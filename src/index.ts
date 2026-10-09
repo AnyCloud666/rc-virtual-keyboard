@@ -5,6 +5,7 @@ import {
   LetterKeyboardTab,
   NumberKeyboardTab,
   SettingKeyboardTab,
+  StrokeKeyboardTab,
   SymbolKeyboardTab,
   WriteKeyboardTab,
 } from './CompositionKeyboard/KeyboardTabs';
@@ -17,6 +18,7 @@ export {
   LetterKeyboardTab,
   NumberKeyboardTab,
   SettingKeyboardTab,
+  StrokeKeyboardTab,
   SymbolKeyboardTab,
   WriteKeyboardTab,
 };
@@ -34,6 +36,7 @@ export { default as SymbolKeyboard } from './SymbolKeyboard';
 export { default as SettingKeyboard } from './SettingKeyboard';
 
 export { default as WriteKeyboard } from './WriteKeyboard';
+export { default as StrokeKeyboard } from './StrokeKeyboard';
 
 export { default as DragBlock } from './DragBlock';
 

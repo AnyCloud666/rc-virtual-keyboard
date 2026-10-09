@@ -6,7 +6,7 @@
 
 - 开箱即用的 `VirtualKeyboard`
 - 可组合的 `CompositionKeyboard`
-- 独立键盘组件：数字、字母、符号、功能、编辑、设置、手写板、Emoji
+- 独立键盘组件：数字、字母、笔画、符号、功能、编辑、设置、手写板、Emoji
 - 支持拼音候选、数字计算候选、手写识别候选
 - 支持浮动、固定上方、固定下方、固定左侧、固定右侧等位置模式
 - 支持输入框级别的 `data-vkb-*` 行为控制
@@ -525,6 +525,16 @@ const keyboard = useInput({
   },
 });
 ```
+
+## 笔画键盘
+
+默认键盘页签中包含笔画输入，也可以在自定义 `virtualKeyboardTab` 中加入 `StrokeKeyboardTab`。按笔顺输入横（1）、竖（2）、撇（3）、点（4）、折（5），候选区会按前缀匹配汉字；例如“口”为 `251`。点选候选字上屏，退格撤销一笔，确认选择首位候选字。
+
+笔画顺序有差异时，候选区也会尝试匹配已输入笔画的种类和数量。例如“口”的标准编码为 `251`，输入 `152` 也能找到；“不”的标准编码为 `1324`，按 `1234` 输入也能找到，输入到 `12` 时就会进入容错候选。候选字先按总笔画数从少到多排列；笔画数相同时，标准笔顺匹配优先，再按常用程度排列。
+
+笔顺码表覆盖基本汉字区，数据来自 [han-ideographs-stroke-order](https://github.com/takushun-wu/han-ideographs-stroke-order)（CC0 1.0），候选频率排序参考 [Conway Stroke Data](https://github.com/stroke-input/stroke-input-data)（公有领域）。
+
+页签“笔”字及五种笔画图标的楷体轮廓取自 [霞鹜文楷 Light](https://github.com/lxgw/LxgwWenKai)（SIL Open Font License 1.1）。
 
 ## 导出的组件与 hooks
 

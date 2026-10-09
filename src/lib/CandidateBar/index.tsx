@@ -8,12 +8,14 @@ import './style.css';
 type CandidateBarProps = {
   items?: string[];
   tempValue?: string;
+  tempDisplay?: React.ReactNode;
   onSelectItem?: (item: string) => void;
 };
 
 const CandidateBar = ({
   items = [],
   tempValue,
+  tempDisplay,
   onSelectItem,
 }: CandidateBarProps) => {
   const tempInputAreaRef = useRef<HTMLDivElement | null>(null);
@@ -123,6 +125,7 @@ const CandidateBar = ({
     item: string,
     key: string,
     className = 'candidate-bar-item',
+    content: React.ReactNode = item,
   ) => (
     <div
       key={key}
@@ -158,7 +161,7 @@ const CandidateBar = ({
         window.clearTimeout(selectTimerRef.current);
       }}
     >
-      {item}
+      {content}
     </div>
   );
 
@@ -193,6 +196,7 @@ const CandidateBar = ({
             tempValue,
             `temp-${tempValue}`,
             'candidate-bar-item candidate-bar-item-input',
+            tempDisplay ?? tempValue,
           )
           : null}
 
