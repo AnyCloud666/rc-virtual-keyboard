@@ -502,12 +502,6 @@ body {
   min-height: 284px;
 }
 
-.component-demo-keyboard-frame-write {
-  min-height: 284px;
-  height: 320px;
-  overflow: visible;
-}
-
 .component-demo-keyboard-frame-setting {
   min-height: 420px;
 }
@@ -799,11 +793,6 @@ body {
   .component-demo-keyboard-frame-edit,
   .component-demo-keyboard-frame-setting {
     min-height: auto;
-  }
-
-  .component-demo-keyboard-frame-write {
-    min-height: 284px;
-    height: 284px;
   }
 
   .mobile-push-demo {

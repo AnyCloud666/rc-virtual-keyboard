@@ -8,7 +8,7 @@ nav:
   title: 组件
   order: 1
   second:
-    title: 手写键
+    title: 拖动块
     order: 1
 ---
 
@@ -24,8 +24,6 @@ export default () => {
     <>
       <div> 可以尝试拖动旁边的粉色块 </div>
       <DragBlock>
-        {/* <WriteKeyboard onClick={onClick} /> */}
-
         <div style={{ width: 100, height: 100, background: 'pink' }}></div>
       </DragBlock>
     </>

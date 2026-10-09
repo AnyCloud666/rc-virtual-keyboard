@@ -26,8 +26,6 @@ export const controlsType = 'controls';
 export const editType = 'edit';
 /** 表情键盘 */
 export const emjoType = 'emjo';
-/** 手写键盘 */
-export const writeType = 'write';
 /** 设置键盘 */
 export const settingType = 'setting';
 

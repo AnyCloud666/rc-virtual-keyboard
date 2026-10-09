@@ -39,16 +39,5 @@ export default defineConfig(({ command }) => ({
     outDir: 'docs-dist',
     emptyOutDir: true,
     chunkSizeWarningLimit: 900,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('tesseract.js')) {
-              return 'vendor-ocr';
-            }
-          }
-        },
-      },
-    },
   },
 }));

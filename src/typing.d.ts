@@ -4,9 +4,6 @@ declare namespace VKB {
   type InputMode = 'zh' | 'en';
   type NumberKeyboardLayoutMode = 'asc' | 'desc';
   type PinyinLearningMode = 'Y' | 'N';
-  type ImageRecognitionOptions = {
-    inputMode?: InputMode;
-  };
   type StoredConfig = {
     themeMode: string;
     positionMode: string;
@@ -88,7 +85,6 @@ declare namespace VKB {
       appendText?: string,
       options?: { replaceText?: string },
     ) => void;
-    onRecognition?: (url: string) => void;
     onKeyDown?: (e: VKB.KeyboardAttributeType) => void;
     onKeyUp?: (e: VKB.KeyboardAttributeType) => void;
   };
@@ -100,7 +96,6 @@ declare namespace VKB {
    *  symbol:符号
    *  controls:操作
    *  edit: 表情
-   *  write: 手写
    *  setting: 设置
    */
   type KeyType =
@@ -111,7 +106,6 @@ declare namespace VKB {
     | 'controls'
     | 'edit'
     | 'emjo'
-    | 'write'
     | 'stroke'
     | 'setting'
     | 'chinese';

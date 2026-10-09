@@ -63,10 +63,6 @@ type CreateInteractionHandlersArgs = {
   enablePinyinLearning: boolean;
   onPinyin2Chinese: (value: string) => { pinyin: string; chinese: string[] };
   onEnglishWords: (value: string) => string[];
-  onImageToWord: (
-    url: string,
-    options?: VKB.ImageRecognitionOptions,
-  ) => Promise<string[]>;
   activeInputRef: React.MutableRefObject<HTMLInputElement | null>;
   lastActiveInputRef: React.MutableRefObject<HTMLInputElement | null>;
   inputType: React.MutableRefObject<string>;
@@ -125,7 +121,6 @@ export const createInteractionHandlers = ({
   enablePinyinLearning,
   onPinyin2Chinese,
   onEnglishWords,
-  onImageToWord,
   activeInputRef,
   lastActiveInputRef,
   inputType,
@@ -357,18 +352,6 @@ export const createInteractionHandlers = ({
         : chinese[0] || inputValue;
     onSelectChinese(candidate, appendText);
     return true;
-  };
-
-  const onRecognition = async (url: string) => {
-    try {
-      const result = await onImageToWord(url, {
-        inputMode,
-      });
-      setChinese([...new Set(result)]);
-    } catch (error) {
-      console.log('error: ', error);
-      setChinese([]);
-    }
   };
 
   const onInput = (e: VKB.KeyboardAttributeType) => {
@@ -864,7 +847,6 @@ export const createInteractionHandlers = ({
   };
 
   return {
-    onRecognition,
     onClick,
     onMouseDown,
     onMouseUp,

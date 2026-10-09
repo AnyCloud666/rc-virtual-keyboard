@@ -5,7 +5,6 @@ import {
   FunctionKeyboardDemo,
   SettingKeyboardDemo,
   SymbolKeyboardDemo,
-  WriteKeyboardDemo,
 } from './demos';
 import { sharedThemeTokens } from './shared';
 
@@ -194,32 +193,6 @@ export const panelComponentDocs: ComponentDoc[] = [
     ],
     tokens: sharedThemeTokens,
     renderDemo: EditKeyboardDemo,
-  },
-  {
-    key: 'write-keyboard',
-    path: '/components/write-keyboard',
-    title: 'WriteKeyboard',
-    menuLabel: 'WriteKeyboard',
-    description: '手写板组件，支持画布输入、候选字词选择、清空与回车。',
-    importCode: `import { WriteKeyboard } from 'rc-virtual-keyboard';`,
-    usageCode: `import { WriteKeyboard } from 'rc-virtual-keyboard';\n\n<WriteKeyboard\n  chinese={['键', '盘']}\n  onSelectChinese={(word) => console.log(word)}\n  onRecognition={(url) => console.log(url)}\n  onClick={(key) => console.log('click', key.code)}\n  onKeyDown={(key) => console.log('down', key.code)}\n  onKeyUp={(key) => console.log('up', key.code)}\n/>;`,
-    props: [
-      { name: 'chinese', type: 'string[]', defaultValue: '必填', description: '候选汉字列表' },
-      { name: 'onClick', type: '(key) => void', defaultValue: '-', description: '回车、删除、清空等功能键回调' },
-      { name: 'onKeyDown / onKeyUp', type: '(key) => void', defaultValue: '-', description: '按下与抬起阶段回调' },
-      { name: 'onSelectChinese', type: '(word: string) => void', defaultValue: '-', description: '选择候选字词时触发' },
-      { name: 'onRecognition', type: '(url: string) => void', defaultValue: '-', description: '手写图像识别钩子' },
-      { name: 'onMouseDown', type: '(event) => void', defaultValue: '-', description: '根节点 mouseDown 回调' },
-      { name: 'isKeyActive', type: '(key) => boolean', defaultValue: '-', description: '自定义激活态' },
-    ],
-    methods: [
-      { name: 'onSelectChinese', signature: '(word: string) => void', description: '候选字词选中回调' },
-      { name: 'onRecognition', signature: '(dataUrl: string) => void', description: '需要接入识别服务时使用' },
-      { name: 'onClick', signature: '(key: KeyboardAttributeType) => void', description: '清空、删除、回车等功能按键回调' },
-      { name: 'onKeyDown / onKeyUp', signature: '(key: KeyboardAttributeType) => void', description: '按键生命周期回调' },
-    ],
-    tokens: sharedThemeTokens,
-    renderDemo: WriteKeyboardDemo,
   },
   {
     key: 'setting-keyboard',

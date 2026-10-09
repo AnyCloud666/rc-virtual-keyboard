@@ -5,7 +5,6 @@ import {
   FunctionKeyboard,
   SettingKeyboard,
   SymbolKeyboard,
-  WriteKeyboard,
   keys,
 } from 'rc-virtual-keyboard';
 import { useDemoInputController } from './shared';
@@ -111,48 +110,6 @@ export function EditKeyboardDemo() {
         />
       </div>
       <div className="component-demo-result">最近动作：{pressed}</div>
-    </div>
-  );
-}
-
-export function WriteKeyboardDemo() {
-  const {
-    value,
-    setValue,
-    chinese,
-    onClick,
-    onKeyDown,
-    onKeyUp,
-    onSelectChinese,
-    onRecognition,
-    isKeyActive,
-  } = useDemoInputController({
-    defaultActiveKeyboard: keys.writeType,
-    onImageToWord: async () => ['键', '盘', '文', '档', '示', '例'],
-  });
-
-  return (
-    <div className="component-demo-stack">
-      <input
-        value={value}
-        placeholder="手写键盘示例"
-        onChange={(e) => setValue(e.target.value)}
-      />
-      <div className="component-demo-keyboard-frame component-demo-keyboard-frame-write">
-        <WriteKeyboard
-          chinese={chinese}
-          onSelectChinese={onSelectChinese}
-          onClick={onClick}
-          onKeyDown={onKeyDown}
-          onKeyUp={onKeyUp}
-          onRecognition={onRecognition}
-          isKeyActive={isKeyActive}
-        />
-      </div>
-      <div className="component-demo-result">
-        识别候选：{chinese.join(' / ') || '请先书写内容'}
-      </div>
-      <div className="component-demo-result">当前值：{value || '未输入'}</div>
     </div>
   );
 }

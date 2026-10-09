@@ -10,7 +10,6 @@ import {
 } from '../../keys';
 import { VKB } from '../../typing';
 import { english2WordsV1 } from '../../utils/english';
-import { imgToWordV1 } from '../../utils/imgToWord';
 import { pinyin2ChineseV3 } from '../../utils/pinyin';
 import { getStoredVkbConfig } from '../../utils/vkbConfig';
 import {
@@ -71,11 +70,6 @@ type UseInputOptions = {
   onPinyin2Chinese?: (value: string) => { pinyin: string; chinese: string[] };
   /** 英文字母转单词候选 */
   onEnglishWords?: (value: string) => string[];
-  /** 图片转文字，自定义实现图片转文字，默认采用 tesseract.js 识别图片文字 */
-  onImageToWord?: (
-    url: string,
-    options?: VKB.ImageRecognitionOptions,
-  ) => Promise<string[]>;
 };
 
 /**
@@ -104,7 +98,6 @@ const useInput = ({
   enablePinyinLearning = true,
   onPinyin2Chinese = pinyin2ChineseV3,
   onEnglishWords = english2WordsV1,
-  onImageToWord = imgToWordV1,
 }: UseInputOptions) => {
   /** 光标选择模式 */
   const cursorMode = useRef('index');
@@ -320,7 +313,6 @@ const useInput = ({
   );
 
   const {
-    onRecognition,
     onClick,
     onMouseDown,
     onMouseUp,
@@ -339,7 +331,6 @@ const useInput = ({
     enablePinyinLearning,
     onPinyin2Chinese,
     onEnglishWords,
-    onImageToWord,
     activeInputRef,
     lastActiveInputRef,
     inputType,
@@ -419,7 +410,6 @@ const useInput = ({
     onSelectChinese,
     onChangeInputMode,
     setActiveKeyboard,
-    onRecognition,
     onKeyDown,
     onKeyUp,
     isKeyActive,

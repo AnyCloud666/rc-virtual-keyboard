@@ -163,7 +163,6 @@ const CompositionKeyboard = ({
     onMouseUp,
     onSelectChinese,
     onChangeInputMode,
-    onRecognition,
     onKeyDown,
     onKeyUp,
     isKeyActive,
@@ -189,7 +188,7 @@ const CompositionKeyboard = ({
       return false;
     }
 
-    return !!target.closest('.write-content, .candidate-bar-list');
+    return !!target.closest('.candidate-bar-list');
   };
 
   return (
@@ -313,7 +312,6 @@ const CompositionKeyboard = ({
                   inputValue={inputValue}
                   onSelectChinese={onSelectChinese}
                   onMouseDown={onMouseDown}
-                  onRecognition={onRecognition}
                   onKeyDown={onKeyDown}
                   onKeyUp={onKeyUp}
                 />

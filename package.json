@@ -63,8 +63,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.27.0",
-    "ahooks": "^3.8.0",
-    "tesseract.js": "^5.1.1"
+    "ahooks": "^3.8.0"
   },
   "devDependencies": {
     "@ant-design/icons": "^5.5.0",

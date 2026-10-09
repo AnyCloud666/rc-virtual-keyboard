@@ -23,7 +23,6 @@ import {
   SymbolKeyboardTab,
   EditKeyboardTab,
   SettingKeyboardTab,
-  WriteKeyboardTab,
   StrokeKeyboardTab,
 } from 'rc-virtual-keyboard';
 export default () => {
@@ -48,7 +47,6 @@ export default () => {
             LetterKeyboardTab,
             NumberKeyboardTab,
             SymbolKeyboardTab,
-            WriteKeyboardTab,
             StrokeKeyboardTab,
             EditKeyboardTab,
             SettingKeyboardTab,

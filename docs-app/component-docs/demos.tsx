@@ -11,7 +11,6 @@ export {
   FunctionKeyboardDemo,
   SettingKeyboardDemo,
   SymbolKeyboardDemo,
-  WriteKeyboardDemo,
 } from './demos/panelDemos';
 
 export { DragBlockDemo } from './demos/utilityDemos';

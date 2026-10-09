@@ -1,13 +1,13 @@
 ﻿# rc-virtual-keyboard
 
-一个面向 React 的虚拟键盘组件库，适合收银、触控屏、自助终端、移动端输入接管、拼音候选、数字计算、手写输入等场景。
+一个面向 React 的虚拟键盘组件库，适合收银、触控屏、自助终端、移动端输入接管、拼音候选、数字计算、笔画输入等场景。
 
 ## 特性
 
 - 开箱即用的 `VirtualKeyboard`
 - 可组合的 `CompositionKeyboard`
-- 独立键盘组件：数字、字母、笔画、符号、功能、编辑、设置、手写板、Emoji
-- 支持拼音候选、数字计算候选、手写识别候选
+- 独立键盘组件：数字、字母、笔画、符号、功能、编辑、设置、Emoji
+- 支持拼音候选、笔画候选、数字计算候选
 - 支持浮动、固定上方、固定下方、固定左侧、固定右侧等位置模式
 - 支持输入框级别的 `data-vkb-*` 行为控制
 - 支持主题变量覆盖
@@ -89,7 +89,6 @@ export default function Demo() {
 - `FunctionKeyboard`
 - `EditKeyboard`
 - `SettingKeyboard`
-- `WriteKeyboard`
 
 ## `VirtualKeyboard` 进阶示例
 
@@ -270,7 +269,6 @@ export default function Demo() {
 - 输入、删除、光标操作
 - 中文拼音候选
 - 英文单词候选
-- 手写识别候选
 - 模拟 `input / change / keydown / keyup / keypress` 事件
 
 ### 常用入参
@@ -293,7 +291,6 @@ export default function Demo() {
 | `enablePinyinLearning` | 是否启用本地拼音学习重排 | `boolean` | `true` |
 | `onPinyin2Chinese` | 自定义拼音转中文 | `(value: string) => { pinyin: string; chinese: string[] }` | 内置实现 |
 | `onEnglishWords` | 自定义英文候选 | `(value: string) => string[]` | 内置实现 |
-| `onImageToWord` | 自定义手写识别 | `(url: string, options?) => Promise<string[]>` | 内置实现 |
 
 ### 常用返回值
 
@@ -310,7 +307,6 @@ export default function Demo() {
 | `onSelectChinese` | 候选词选择逻辑 |
 | `onChangeInputMode` | 切换中英文模式 |
 | `setActiveKeyboard` | 切换当前键盘 |
-| `onRecognition` | 手写识别入口 |
 | `onKeyDown` | 模拟键盘按下 |
 | `onKeyUp` | 模拟键盘抬起 |
 | `isKeyActive` | 当前键位高亮判断 |
@@ -366,7 +362,7 @@ const keyboard = useInput({
 
 - 只作用于字母键盘下的中文拼音候选
 - 不作用于英文候选排序
-- 不作用于手写识别、OCR、数字计算候选
+- 不作用于笔画、数字计算候选
 - 浏览器禁用 `IndexedDB` 时会自动降级回静态词典排序，不影响正常输入
 
 ## `data-vkb-*` 输入框属性
@@ -511,21 +507,6 @@ const keyboard = useInput({
 });
 ```
 
-## 手写键盘
-
-`WriteKeyboard` 支持手写板候选。
-
-如果你希望替换默认识别逻辑，可以通过 `useInput` 传入 `onImageToWord`：
-
-```tsx
-const keyboard = useInput({
-  async onImageToWord(url, options) {
-    // 调用你自己的 OCR 或识别服务
-    return ['示例', '候选词'];
-  },
-});
-```
-
 ## 笔画键盘
 
 默认键盘页签中包含笔画输入，也可以在自定义 `virtualKeyboardTab` 中加入 `StrokeKeyboardTab`。按笔顺输入横（1）、竖（2）、撇（3）、点（4）、折（5），候选区会按前缀匹配汉字；例如“口”为 `251`。点选候选字上屏，退格撤销一笔，确认选择首位候选字。
@@ -551,7 +532,6 @@ import {
   FunctionKeyboard,
   EditKeyboard,
   SettingKeyboard,
-  WriteKeyboard,
   DragBlock,
   WordTempList,
 } from 'rc-virtual-keyboard';
@@ -580,7 +560,6 @@ import {
   SymbolKeyboardTab,
   EditKeyboardTab,
   SettingKeyboardTab,
-  WriteKeyboardTab,
 } from 'rc-virtual-keyboard';
 ```
 

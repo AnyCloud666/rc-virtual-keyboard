@@ -105,7 +105,6 @@ export default () => {
 | onChange        | 操作时的回调,通过 ctx 重写 onChange 实现               | (value: string) => void   | -      |
 | onEnter         | 回车 通过 ctx 重写 onEnter 实现                        | () => void                | -      |
 | onPinyin2Word   | 默认实现了最简单的转换方式，可以自定义实现             | (pinyin:string)=>string[] | -      |
-| onImg2Word      | 手写板图片转字符，如果你想使用手写板，你应该实现该方法 | (imgUrl:string)=>string[] | -      |
 
 ## 支持的样式 token
 
@@ -139,7 +138,6 @@ const tabs: VKB.KeyboardTabItem[] = [
   SymbolKeyboardTab,
   EditKeyboardTab,
   SettingKeyboardTab,
-  WriteKeyboardTab,
 ];
 ```
 

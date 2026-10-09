@@ -7,7 +7,6 @@ import {
   SettingKeyboardTab,
   StrokeKeyboardTab,
   SymbolKeyboardTab,
-  WriteKeyboardTab,
 } from './CompositionKeyboard/KeyboardTabs';
 import * as keys from './keys';
 export {
@@ -20,7 +19,6 @@ export {
   SettingKeyboardTab,
   StrokeKeyboardTab,
   SymbolKeyboardTab,
-  WriteKeyboardTab,
 };
 
 export { default as EmojiKeyboard } from './EmojiKeyboard';
@@ -35,7 +33,6 @@ export { default as SymbolKeyboard } from './SymbolKeyboard';
 
 export { default as SettingKeyboard } from './SettingKeyboard';
 
-export { default as WriteKeyboard } from './WriteKeyboard';
 export { default as StrokeKeyboard } from './StrokeKeyboard';
 
 export { default as DragBlock } from './DragBlock';

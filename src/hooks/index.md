@@ -34,7 +34,6 @@ nav:
 | functionKeyHandlers   | 按单个 `F1-F12` 覆写默认行为                                                | Partial<Record<FunctionKeyCode, FunctionKeyHandler>>     | -                                   |
 | functionKeyDefaults   | 功能键默认行为配置                                                          | { helpUrl?: string; focusSelector?: string }             | -                                   |
 | onPinyin2Chinese      | 拼音转汉字，自定义实现拼音转汉字，默认内置实现支持全拼、词组联想和首字母简拼 | (value: string) => { pinyin: string; chinese: string[] } | pinyin2ChineseV3                    |
-| onImageToWord         | 图片转文字，自定义实现图片转文字，默认采用最简单的单字输入模式              | (image: string) => Promise<string[]>                     | imageToWordV1                       |
 
 ## 结果
 

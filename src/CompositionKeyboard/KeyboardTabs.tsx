@@ -8,7 +8,6 @@ import { ReactComponent as FunctionSvg } from '../svg/function.svg';
 import { ReactComponent as KeyboardSvg } from '../svg/keyboard.svg';
 import { ReactComponent as NumberSvg } from '../svg/number.svg';
 import { ReactComponent as SymbolSvg } from '../svg/symbol.svg';
-import { ReactComponent as WriteSvg } from '../svg/write.svg';
 // import EmjoSvg from './svg/emjo.svg?react'
 
 import { ReactComponent as SettingSvg } from '../svg/setting.svg';
@@ -19,7 +18,6 @@ import LetterKeyboard from '../LetterKeyboard';
 import NumberKeyboard from '../NumberKeyboard';
 import SettingKeyBoard from '../SettingKeyboard';
 import SymbolKeyboard from '../SymbolKeyboard';
-import WriteKeyboard from '../WriteKeyboard';
 import StrokeKeyboard from '../StrokeKeyboard';
 import { EN } from '../keys';
 import { VKB } from '../typing';
@@ -145,33 +143,6 @@ export const EditKeyboardTab: VKB.KeyboardTabItem = {
     />
   ),
 };
-/** 手写板tab */
-export const WriteKeyboardTab: VKB.KeyboardTabItem = {
-  id: 'write',
-  label: <WriteSvg />,
-  name: '手写板',
-  Component: ({
-    chinese,
-    onMouseDown,
-    onSelectChinese,
-    onRecognition,
-    onClick,
-    onKeyDown,
-    onKeyUp,
-    isKeyActive,
-  }) => (
-    <WriteKeyboard
-      chinese={chinese ?? []}
-      onClick={onClick}
-      onKeyDown={onKeyDown}
-      onKeyUp={onKeyUp}
-      onMouseDown={onMouseDown}
-      onRecognition={onRecognition}
-      onSelectChinese={onSelectChinese}
-      isKeyActive={isKeyActive}
-    />
-  ),
-};
 /** 五笔画输入 tab */
 export const StrokeKeyboardTab: VKB.KeyboardTabItem = {
   id: 'stroke',
@@ -239,7 +210,6 @@ const tabs: VKB.KeyboardTabItem[] = [
   FunctionKeyboardTab,
   SymbolKeyboardTab,
   EditKeyboardTab,
-  WriteKeyboardTab,
   StrokeKeyboardTab,
   SettingKeyboardTab,
 ];
